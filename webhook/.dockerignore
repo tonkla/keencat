@@ -1,0 +1,9 @@
+tmp
+.air.conf
+.dockerignore
+.env
+.env.example
+.git*
+Dockerfile
+Makefile
+README.md
