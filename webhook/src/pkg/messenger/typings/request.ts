@@ -6,6 +6,20 @@ export interface Recipient {
   id: string
 }
 
+export interface Message {
+  mid: string
+  seq: number
+  text?: string
+  quick_reply?: {
+    payload: string
+  }
+  attachments?: Attachment[]
+}
+
+export interface Postback {
+  payload: string
+}
+
 export interface MultimediaPayload {
   url: string
 }
@@ -69,18 +83,8 @@ export interface MessageReceivedEvent {
   sender: Sender
   recipient: Recipient
   timestamp: number
-  message: {
-    mid: string
-    seq: number
-    text?: string
-    quick_reply?: {
-      payload: string
-    }
-    attachments?: Attachment[]
-  }
-  postback: {
-    payload: string
-  }
+  message: Message
+  postback: Postback
 }
 
 export type MessageEvent = MessageReceivedEvent
@@ -94,4 +98,10 @@ export interface WebhookEntry {
 export interface WebhookEvent {
   object: 'page'
   entry: WebhookEntry[]
+}
+
+export interface WebhookParams {
+  mode: string
+  verifyToken: string
+  challenge: string
 }

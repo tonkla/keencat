@@ -111,17 +111,21 @@ export interface GamePlayButton {
   game_metadata: { player_id: string } | { context_id: string }
 }
 
-export interface ResponseMessage {
-  text?: string
-  attachment?: Attachment
-  quick_replies?: any[]
-  metadata?: string
-}
+export type ImageAspectRatio = 'horizontal' | 'square'
+export type MessagingType = 'RESPONSE' | 'UPDATE' | 'MESSAGE_TAG'
+export type SenderAction = 'typing_on' | 'typing_off' | 'mark_seen'
 
 export interface Message {
   messaging_type: MessagingType
   recipient: Recipient
   message: ResponseMessage
+}
+
+export interface ResponseMessage {
+  text?: string
+  attachment?: Attachment
+  quick_replies?: any[]
+  metadata?: string
 }
 
 export interface ButtonTemplate {
@@ -150,6 +154,9 @@ export interface GenericTemplateElement {
   buttons?: GenericTemplateButton[]
 }
 
-export type ImageAspectRatio = 'horizontal' | 'square'
-export type MessagingType = 'RESPONSE' | 'UPDATE' | 'MESSAGE_TAG'
-export type SenderAction = 'typing_on' | 'typing_off' | 'mark_seen'
+export interface MessageParams {
+  text: string
+  pageId: string
+  categoryId?: string
+  productId?: string
+}

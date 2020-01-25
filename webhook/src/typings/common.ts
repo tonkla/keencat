@@ -12,13 +12,3 @@ export interface Product {
   shopId: string
   pageId: string
 }
-
-export type EventKind = 'message' | 'postback'
-
-export interface ResponseParams {
-  kind: EventKind
-  msg: string
-  pageId: string
-  categoryId?: string
-  productId?: string
-}
