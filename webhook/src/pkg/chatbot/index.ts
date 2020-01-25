@@ -1,15 +1,19 @@
-import t from '../lang/th'
-import api from '../services/api'
-import { Category, Product, ResponseParams } from '../typings/common'
-import { GenericTemplateElement, ResponseMessage } from '../typings/response'
+import t from '../../lang/th'
+import api from '../../services/api'
+import { Category, Product } from '../../typings/common'
+import {
+  GenericTemplateElement,
+  MessageParams,
+  ResponseMessage,
+} from '../messenger/typings/response'
 
 async function getIntent(text: string): Promise<string> {
-  const msg = text ? text.toLowerCase() : ''
-  if (msg === 'h' || msg === 'hi' || msg === 'hello') {
+  const txt = text.toLowerCase()
+  if (txt === 'h' || txt === 'hi' || txt === 'hello') {
     return 'greeting'
-  } else if (msg === 'c' || msg === 'category') {
+  } else if (txt === 'c' || txt === 'category') {
     return 'list_categories'
-  } else if (msg === 'p' || msg === 'product') {
+  } else if (txt === 'p' || txt === 'product') {
     return 'list_products'
   }
   return ''
@@ -84,40 +88,42 @@ function handleUnknownMessage(): ResponseMessage {
   return { text: 'TODO: show help' }
 }
 
-async function response(params: ResponseParams): Promise<ResponseMessage> {
-  if (params.kind === 'message') {
-    switch (await getIntent(params.msg)) {
-      case 'greeting': {
-        return { text: t.hello }
-      }
-      case 'list_categories': {
-        const categories = await api.getCategories(params.pageId)
-        const elements = buildCategoryElements(categories)
-        return buildAttachmentTemplate(elements)
-      }
-      case 'list_products': {
-        const categoryId = params.categoryId || ''
-        const products = await api.getProducts(params.pageId, categoryId)
-        const elements = buildProductElements(products)
-        return buildAttachmentTemplate(elements)
-      }
+async function handleMessage(p: MessageParams): Promise<ResponseMessage> {
+  switch (await getIntent(p.text)) {
+    case 'greeting':
+      return { text: t.hello }
+    case 'list_categories': {
+      const categories = await api.getCategories(p.pageId)
+      const elements = buildCategoryElements(categories)
+      return buildAttachmentTemplate(elements)
     }
-  } else if (params.kind === 'postback') {
-    switch (params.msg) {
-      case 'list_products': {
-        const categoryId = params.categoryId || ''
-        const products = await api.getProducts(params.pageId, categoryId)
-        const elements = buildProductElements(products)
-        return buildAttachmentTemplate(elements)
-      }
-      case 'buy_product': {
-        return { text: `You buy product id='${params.productId}'` }
-      }
+    case 'list_products': {
+      const categoryId = p.categoryId || ''
+      const products = await api.getProducts(p.pageId, categoryId)
+      const elements = buildProductElements(products)
+      return buildAttachmentTemplate(elements)
     }
+    default:
+      return handleUnknownMessage()
   }
-  return handleUnknownMessage()
+}
+
+async function handlePostback(p: MessageParams): Promise<ResponseMessage> {
+  switch (p.text) {
+    case 'list_products': {
+      const products = await api.getProducts(p.pageId, p.categoryId)
+      const elements = buildProductElements(products)
+      return buildAttachmentTemplate(elements)
+    }
+    case 'buy_product': {
+      return { text: `You buy product id='${p.productId}'` }
+    }
+    default:
+      return handleUnknownMessage()
+  }
 }
 
 export default {
-  response,
+  handleMessage,
+  handlePostback,
 }
