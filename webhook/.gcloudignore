@@ -1,0 +1,11 @@
+.vscode/
+node_modules/
+src/
+.env.example
+.eslintrc.json
+.gcloudignore
+.gitignore
+.prettierrc
+Makefile
+README.md
+tsconfig.json
