@@ -1,0 +1,30 @@
+html {
+  font-size: 16px;
+  line-height: 23px;
+  box-sizing: border-box;
+  background-color: #f0f2f5;
+}
+@media (max-width: 1200px) {
+  html {
+    font-size: 15px;
+  }
+}
+@media (max-width: 800px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+body {
+  font-family: 'Montserrat', 'Kanit', sans-serif;
+  color: rgba(0, 0, 0, 0.65);
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+#root {
+  display: flex;
+  height: 100%;
+}
