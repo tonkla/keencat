@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Redirect } from 'react-router-dom'
 import { Icon, Layout } from 'antd'
 
 import { useStoreState, useStoreActions } from '../store'
@@ -11,17 +10,15 @@ import UserAvatar from '../components/UserAvatar'
 
 import '../styles/Home.scss'
 
-const { Content, Footer, Header } = Layout
-
 const Home: React.FC = ({ children }) => {
   const setActiveShop = useStoreActions(a => a.activeState.setShop)
 
   const user = useStoreState(s => s.userState.user)
-  const shop = useStoreState(s => s.activeState.shop)
+  const activeShop = useStoreState(s => s.activeState.shop)
   const shops = useStoreState(s => s.shopState.shops)
 
   const onShopChanged = (s: Shop) => {
-    if (shop && shop.id !== s.id) setActiveShop(s)
+    if (activeShop && activeShop.id !== s.id) setActiveShop(s)
   }
 
   const [collapsed, setCollapse] = useState(false)
@@ -29,8 +26,13 @@ const Home: React.FC = ({ children }) => {
     setCollapse(!collapsed)
   }
 
-  return user && shop ? (
+  const { Content, Footer, Header } = Layout
+
+  return !user ? (
+    <div>Loading...</div>
+  ) : (
     <div className="home-container">
+      {' '}
       <Layout>
         <SiderMenu collapsed={collapsed} />
         <Layout>
@@ -43,11 +45,11 @@ const Home: React.FC = ({ children }) => {
               />
             </div>
             <div className="wr">
-              {shops.length > 0 && (
+              {activeShop && shops.length > 0 && (
                 <div className="shop">
                   <ShopSelector
                     shops={shops}
-                    activeShop={shops.find((s: Shop) => s.id === shop.id)}
+                    activeShop={shops.find((s: Shop) => s.id === activeShop.id)}
                     callback={onShopChanged}
                   />
                 </div>
@@ -56,12 +58,12 @@ const Home: React.FC = ({ children }) => {
             </div>
           </Header>
           <Content>{children}</Content>
-          <Footer style={{ textAlign: 'center' }}>SleepyCat ©{new Date().getFullYear()}</Footer>
+          <Footer style={{ textAlign: 'center' }}>
+            {process.env.REACT_APP_APP_NAME || ''} ©{new Date().getFullYear()}
+          </Footer>
         </Layout>
       </Layout>
     </div>
-  ) : (
-    <Redirect to="/login" />
   )
 }
 

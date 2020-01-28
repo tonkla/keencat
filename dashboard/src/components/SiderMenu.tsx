@@ -24,7 +24,7 @@ const SiderMenu = (props: any) => {
           <div className="w">
             <img src={logo} alt="Logo" />
           </div>
-          <span>SleepyCat</span>
+          <span>{process.env.REACT_APP_APP_NAME || ''}</span>
         </div>
         <Menu
           theme="dark"

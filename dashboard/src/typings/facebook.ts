@@ -8,7 +8,7 @@ export interface LoginStatus {
   }
 }
 
-export interface Page {
+export interface FBPage {
   id: string
   name: string
 }
@@ -16,9 +16,5 @@ export interface Page {
 export interface UserInfo {
   id: string
   name: string
-  picture: string
-}
-
-export interface UserLogin {
-  accessToken: string
+  pictureUrl: string
 }

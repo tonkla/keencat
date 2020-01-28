@@ -1,4 +1,4 @@
-import { LoginStatus, Page, UserInfo, UserLogin } from '../typings/facebook'
+import { LoginStatus, FBPage, UserInfo } from '../typings/facebook'
 
 const _window: any = window
 
@@ -7,7 +7,7 @@ function init() {
     if (typeof _window.FB !== 'undefined') resolve()
     else {
       _window.fbAsyncInit = () => {
-        const appId = process.env.REACT_APP_APP_ID || ''
+        const appId = process.env.REACT_APP_FB_APP_ID || ''
         _window.FB.init({
           appId,
           cookie: true,
@@ -48,7 +48,14 @@ function logIn(permissions = {}) {
 function logOut() {
   return new Promise(resolve => {
     init().then(async () => {
-      if (await isAuthenticated()) _window.FB.logout(() => resolve())
+      if (await isAuthenticated()) {
+        // Note: FB.logout doesn't work on localhost
+        if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+          resolve()
+        } else {
+          _window.FB.logout(() => resolve())
+        }
+      }
     })
   })
 }
@@ -63,7 +70,7 @@ function getUserInfo(): Promise<UserInfo | null> {
             'GET',
             { redirect: false, type: 'normal' },
             ({ data }: any) => {
-              if (data) resolve({ ...user, picture: data.url })
+              if (data) resolve({ ...user, pictureUrl: data.url })
             }
           )
         })
@@ -72,7 +79,7 @@ function getUserInfo(): Promise<UserInfo | null> {
   })
 }
 
-function getPages(): Promise<Page[]> {
+function getPages(): Promise<FBPage[]> {
   return new Promise(resolve => {
     init().then(async () => {
       if (await isAuthenticated()) {
@@ -97,11 +104,6 @@ function getPageAccessToken(pageId: string) {
   })
 }
 
-async function getUserLogin(): Promise<UserLogin | null> {
-  const { authResponse }: any = await getLoginStatus()
-  return authResponse ? authResponse : null
-}
-
 async function isAuthenticated(): Promise<boolean> {
   const { status }: any = await getLoginStatus()
   return status && status === 'connected'
@@ -112,7 +114,6 @@ export default {
   getPageAccessToken,
   getPages,
   getUserInfo,
-  getUserLogin,
   isAuthenticated,
   logIn,
   logOut,

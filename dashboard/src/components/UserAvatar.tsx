@@ -2,17 +2,21 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import { Dropdown, Icon, Menu, Modal } from 'antd'
 
+import { useStoreActions } from '../store'
 import facebook from '../services/facebook'
 import { UserProps } from '../typings/user'
 
 const UserAvatar = ({ user }: UserProps) => {
   const history = useHistory()
 
+  const setUser = useStoreActions(a => a.userState.set)
+
   const handleLogOut = async () => {
     const { status } = await facebook.getLoginStatus()
     if (status === 'connected') await facebook.logOut()
-    localStorage.clear()
-    history.push('/')
+    // Note: FB.logout() doesn't work on localhost
+    setUser(null)
+    history.push('/login')
   }
 
   const showConfirmLogOut = () => {
@@ -37,7 +41,7 @@ const UserAvatar = ({ user }: UserProps) => {
     <Dropdown overlay={menu}>
       <div className="user">
         <div className="picture">
-          <img src={user.picture} alt={user.name} />
+          <img src={user.pictureUrl} alt={user.name} />
         </div>
         <div className="name">{user.name.split(' ')[0].slice(0, 10)}</div>
       </div>
