@@ -3,7 +3,6 @@ import { Redirect } from 'react-router-dom'
 import { Button, Card } from 'antd'
 
 import { useStoreState, useStoreActions } from '../../store'
-import remoteStorage from '../../services/remoteStorage'
 import utils from '../../services/utils'
 import Category from '../../typings/category'
 import Product from '../../typings/product'
@@ -38,10 +37,10 @@ const ProductIndex = () => {
   useEffect(() => {
     ;(async () => {
       if (!shop) return
-      setCategories(await remoteStorage.getCategories(shop))
+      // setCategories(await remoteStorage.getCategories(shop))
       setLoading(false)
     })()
-  }, [])
+  }, [shop])
 
   return categories.length === 0 ? (
     <Redirect to="/category" />

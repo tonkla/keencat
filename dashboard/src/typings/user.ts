@@ -1,7 +1,10 @@
 export default interface User {
   id: string
   name: string
-  picture?: string
+  email?: string
+  fbId?: string
+  lineId?: string
+  pictureUrl?: string
 }
 
 export interface UserProps extends JSX.IntrinsicAttributes {

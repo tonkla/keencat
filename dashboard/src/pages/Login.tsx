@@ -1,44 +1,72 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Icon } from 'antd'
 
-// import firestore from '../services/firebase/firestore'
-import facebook from '../services/facebook'
 import { useStoreState, useStoreActions } from '../store'
-// import { AppState, Page, Shop, Category } from '../typings'
+import facebook from '../services/facebook'
+import remoteStorage from '../services/remoteStorage'
+import utils from '../services/utils'
+import Page from '../typings/page'
+import User from '../typings/user'
 
 import '../styles/Login.scss'
 
 const Login: React.FC = () => {
   const [isLoading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const setUser = useStoreActions(a => a.userState.set)
   const user = useStoreState(s => s.userState.user)
 
-  const handleLogIn = useCallback(async () => {
+  const setAppStates = (_user: User, pages: Page[]) => {
+    setUser(_user)
+    setLoading(false)
+  }
+
+  const handleFacebookLogin = async () => {
     setLoading(true)
     if (await facebook.isAuthenticated()) {
-      const u = await facebook.getUserInfo()
-      if (u) {
-        setUser(u)
-        // dispatch({ type: 'setUser', payload: { user } })
-        // const pages: Page[] = await facebook.getPages()
-        // dispatch({ type: 'setPages', payload: { pages } })
-        // const shops: Shop[] = await api.getShops()
-        // dispatch({ type: 'setShops', payload: { shops } })
-        // if (shops.length > 0) {
-        //   dispatch({
-        //     type: 'setActiveShopId',
-        //     payload: { shopId: shops[0].id },
-        //   })
-        //   const categories: Category[] = await api.getCategories(shops[0].id)
-        //   dispatch({ type: 'setCategories', payload: { categories } })
-        setLoading(false)
+      const fbUser = await facebook.getUserInfo()
+      if (fbUser) {
+        const fbPages = await facebook.getPages()
+        const pages = fbPages.map(p => {
+          const page: Page = {
+            id: p.id,
+            name: p.name,
+            owner: '',
+          }
+          return page
+        })
+
+        const remoteUser = await remoteStorage.getUserByFacebookId(fbUser.id)
+        if (remoteUser) {
+          setAppStates(
+            remoteUser,
+            pages.map(p => ({ ...p, owner: remoteUser.id }))
+          )
+        } else {
+          const newUser: User = {
+            id: utils.genId(),
+            fbId: fbUser.id,
+            name: fbUser.name,
+            pictureUrl: fbUser.pictureUrl,
+          }
+          if (await remoteStorage.createUser(newUser)) {
+            setAppStates(
+              newUser,
+              pages.map(p => ({ ...p, owner: newUser.id }))
+            )
+          } else {
+            // Cannot create a new user
+            setError('Internal Server Error')
+            setLoading(false)
+          }
+        }
       }
     } else {
       await facebook.logIn()
     }
-  }, [setUser])
+  }
 
   return user ? (
     <Redirect to="/" />
@@ -52,12 +80,12 @@ const Login: React.FC = () => {
     <div className="login-container">
       <div className="col">
         <div className="text-name">
-          <span>SleepyCat</span>
+          <span>{process.env.REACT_APP_APP_NAME || ''}</span>
         </div>
         <div className="text-desc">
-          <span>Pet Care Booking via Facebook Messenger</span>
+          <span>Chatbot for your business</span>
         </div>
-        <div onClick={handleLogIn} className="fb-btn-login">
+        <div onClick={handleFacebookLogin} className="fb-btn-login">
           <div className="icon">
             <svg
               xmlns="https://www.w3.org/2000/svg"
@@ -79,6 +107,7 @@ const Login: React.FC = () => {
             <span>Log in With Facebook</span>
           </div>
         </div>
+        {error && <div className="error">{error}</div>}
       </div>
     </div>
   )

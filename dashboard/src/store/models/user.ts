@@ -4,7 +4,7 @@ import User from '../../typings/user'
 
 export interface UserStateModel {
   user: User | null
-  set: Action<UserStateModel, User>
+  set: Action<UserStateModel, User | null>
 }
 
 const userState: UserStateModel = {
