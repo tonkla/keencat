@@ -1,71 +1,26 @@
-$siderFontColor: rgba(255, 255, 255, 0.65);
+@import 'shared';
 
 .home-container {
   display: flex;
   width: 100%;
 
-  .ant-layout-sider {
-    overflow: auto;
-    height: 100vh;
-    z-index: 10;
-    box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35);
-
-    .logo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: rgba($siderFontColor, 1);
-      font-size: 20px;
-      margin: 10px 0 15px 0;
-
-      .w {
-        width: 40px;
-        height: 40px;
-        border-radius: 20px;
-        background-color: rgba($siderFontColor, 0.8);
-        margin-right: 5px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      img {
-        width: 30px;
-        height: 30px;
-      }
-    }
-
-    a {
-      color: inherit;
-    }
-  }
-
-  .ant-layout-sider-collapsed .logo span {
-    display: none;
-  }
-
   .ant-layout-header {
     background-color: #fff;
-    padding: 0;
+    padding: 0 20px;
     display: flex;
 
     .anticon {
-      font-size: 18px;
       cursor: pointer;
+      font-size: 18px;
       transition: color 0.3s;
-      &:hover {
-        color: #1890ff;
-      }
     }
 
-    .wl {
-      margin-left: 16px;
+    .left {
       display: flex;
       align-items: center;
     }
-    .wr {
+    .right {
       flex-grow: 1;
-      margin-right: 16px;
       display: flex;
       align-items: center;
       justify-content: flex-end;
@@ -98,43 +53,25 @@ $siderFontColor: rgba(255, 255, 255, 0.65);
         color: #f3f3f3;
       }
     }
-
-    .user {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0 10px;
-      cursor: pointer;
-
-      &:hover {
-        background-color: rgba(200, 200, 200, 0.15);
-      }
-
-      .picture {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 0;
-        height: 40px;
-        width: 40px;
-        border-radius: 20px;
-        background-color: $siderFontColor;
-
-        img {
-          height: 40px;
-          width: 40px;
-          border-radius: 20px;
-        }
-      }
-
-      .name {
-        margin-left: 5px;
-      }
-    }
   }
 
   .ant-layout-content {
     padding: 20px;
+  }
+
+  .ant-layout-footer {
+    text-align: center;
+    .love {
+      color: black;
+      font-size: 1.4rem;
+    }
+    a {
+      color: #d68717;
+      text-decoration: underline;
+      &:hover {
+        text-decoration: none;
+      }
+    }
   }
 
   .ant-card-head-title {

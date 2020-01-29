@@ -1,6 +1,6 @@
 import { Action, action } from 'easy-peasy'
 
-import Shop from '../../typings/shop'
+import { Shop } from '../../typings'
 
 export interface ActiveStateModel {
   shop: Shop | null

@@ -1,4 +1,4 @@
-export default interface Shop {
+export interface Shop {
   id: string
   name: string
   pageId: string

@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useStoreState } from '../store'
 
 import logo from '../assets/images/logo.png'
+import '../styles/SiderMenu.scss'
 
 const SiderMenu = (props: any) => {
   const activeShop = useStoreState(s => s.activeState.shop)
@@ -17,14 +18,18 @@ const SiderMenu = (props: any) => {
     setOpenKeys(s)
   }, [])
 
+  const appName = process.env.REACT_APP_APP_NAME || ''
+
   return (
     <div>
-      <Layout.Sider collapsible collapsed={props.collapsed} trigger={null} width={240}>
-        <div className="logo">
-          <div className="w">
-            <img src={logo} alt="Logo" />
+      <Layout.Sider collapsible collapsed={props.collapsed} trigger={null} width={220}>
+        <div className="brand">
+          <div className="logo">
+            <img src={logo} alt={appName} title={appName} />
           </div>
-          <span>{process.env.REACT_APP_APP_NAME || ''}</span>
+          <div className="name">
+            <span>{appName}</span>
+          </div>
         </div>
         <Menu
           theme="dark"

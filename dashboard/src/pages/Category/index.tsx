@@ -2,16 +2,17 @@ import React, { useEffect, useState } from 'react'
 import { Button, Card } from 'antd'
 
 import { useStoreActions, useStoreState } from '../../store'
-import remoteStorage from '../../services/remoteStorage'
+// import remoteStorage from '../../services/api'
 import utils from '../../services/utils'
-import Category from '../../typings/category'
+import { Category } from '../../typings'
+
 import CreateForm from './CreateForm'
 
 const CategoryIndex = () => {
   const [isFormEnabled, setFormEnabled] = useState(false)
   const [isLoading, setLoading] = useState(true)
 
-  const createCategory = useStoreActions(a => a.categoryState.create)
+  // const createCategory = useStoreActions(a => a.categoryState.create)
   const setCategories = useStoreActions(a => a.categoryState.setCategories)
 
   const user = useStoreState(s => s.userState.user)
@@ -27,14 +28,14 @@ const CategoryIndex = () => {
       pageId: shop.pageId,
       owner: user.id,
     }
-    createCategory(category)
+    // createCategory(category)
     setFormEnabled(false)
   }
 
   useEffect(() => {
     ;(async () => {
       if (!shop) return
-      setCategories(await remoteStorage.getCategories(shop))
+      // setCategories(await remoteStorage.getCategories(shop))
       setLoading(false)
     })()
   }, [shop, setCategories])

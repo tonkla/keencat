@@ -1,12 +1,9 @@
-export default interface User {
+export interface User {
   id: string
-  name: string
+  name?: string
   email?: string
-  fbId?: string
-  lineId?: string
   pictureUrl?: string
-}
-
-export interface UserProps extends JSX.IntrinsicAttributes {
-  user: User
+  firebaseId?: string
+  facebookId?: string
+  lineId?: string
 }

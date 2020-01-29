@@ -1,7 +1,7 @@
 import { Action, action, Thunk, thunk } from 'easy-peasy'
 
-import remoteStorage from '../../services/remoteStorage'
-import Category from '../../typings/category'
+// import remoteStorage from '../../services/api'
+import { Category } from '../../typings'
 
 export interface CategoryStateModel {
   categories: Category[]
@@ -14,7 +14,7 @@ const categoryState: CategoryStateModel = {
   categories: [],
   create: thunk(async (actions, category) => {
     actions._create(category)
-    await remoteStorage.createCategory(category)
+    // await remoteStorage.createCategory(category)
   }),
   setCategories: action((state, categories) => {
     state.categories = categories

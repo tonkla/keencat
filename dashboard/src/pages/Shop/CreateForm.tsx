@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Form, Input, Select } from 'antd'
 
-import Page from '../../typings/page'
+import { Page } from '../../typings'
 
 const CreateForm = (props: any) => {
   const { getFieldDecorator } = props.form

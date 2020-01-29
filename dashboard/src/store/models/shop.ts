@@ -1,7 +1,7 @@
 import { Action, action, Thunk, thunk } from 'easy-peasy'
 
-import remoteStorage from '../../services/remoteStorage'
-import Shop from '../../typings/shop'
+// import remoteStorage from '../../services/api'
+import { Shop } from '../../typings'
 
 export interface ShopStateModel {
   shops: Shop[]
@@ -14,7 +14,7 @@ const shopState: ShopStateModel = {
   shops: [],
   create: thunk(async (actions, shop) => {
     actions._create(shop)
-    await remoteStorage.createShop(shop)
+    // await remoteStorage.createShop(shop)
   }),
   setShops: action((state, shops) => {
     state.shops = shops

@@ -1,4 +1,4 @@
-export default interface Category {
+export interface Category {
   id: string
   name: string
   shopId: string

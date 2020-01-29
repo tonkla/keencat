@@ -3,9 +3,8 @@ import { Redirect } from 'react-router-dom'
 import { Button, Card } from 'antd'
 
 import { useStoreState, useStoreActions } from '../../store'
-import utils from '../../services/utils'
-import Category from '../../typings/category'
-import Product from '../../typings/product'
+// import utils from '../../services/utils'
+import { Category, Product } from '../../typings'
 
 import CreateForm from './CreateForm'
 
@@ -15,22 +14,22 @@ const ProductIndex = () => {
   const [isFormEnabled, setFormEnabled] = useState(false)
   const [isLoading, setLoading] = useState(true)
 
-  const createProduct = useStoreActions(a => a.productState.create)
+  // const createProduct = useStoreActions(a => a.productState.create)
 
   const user = useStoreState(s => s.userState.user)
   const shop = useStoreState(s => s.activeState.shop)
 
   const handleCreateProduct = async (values: any) => {
     if (!user || !shop) return
-    const product: Product = {
-      id: utils.genId(),
-      name: values.productName,
-      categoryId: values.categoryId,
-      shopId: shop.id,
-      pageId: shop.pageId,
-      owner: user.id,
-    }
-    createProduct(product)
+    // const product: Product = {
+    //   id: utils.genId(),
+    //   name: values.productName,
+    //   categoryId: values.categoryId,
+    //   shopId: shop.id,
+    //   pageId: shop.pageId,
+    //   owner: user.id,
+    // }
+    // createProduct(product)
     setFormEnabled(false)
   }
 

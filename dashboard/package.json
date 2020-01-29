@@ -4,7 +4,9 @@
   "private": true,
   "dependencies": {
     "antd": "^3.26.7",
+    "axios": "^0.19.2",
     "easy-peasy": "^3.3.0",
+    "firebase": "^7.7.0",
     "nanoid": "^2.1.10",
     "node-sass": "^4.13.1",
     "react": "^16.12.0",
