@@ -1,0 +1,40 @@
+@import 'shared';
+
+.ant-layout-sider {
+  overflow: auto;
+  height: 100vh;
+  z-index: 10;
+  box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35);
+
+  .brand {
+    align-items: center;
+    color: rgba($siderFontColor, 1);
+    display: flex;
+    font-size: 1.3rem;
+    padding: 20px;
+
+    .logo {
+      padding-right: 10px;
+      img {
+        width: 48px;
+        height: 48px;
+      }
+    }
+  }
+
+  a {
+    color: inherit;
+  }
+}
+
+.ant-layout-sider-collapsed {
+  .brand {
+    justify-content: center;
+    .logo {
+      padding: 0;
+    }
+    .name {
+      display: none;
+    }
+  }
+}

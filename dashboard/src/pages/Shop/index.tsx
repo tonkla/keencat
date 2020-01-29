@@ -3,9 +3,9 @@ import { Card, Button, Steps } from 'antd'
 
 import { useStoreState, useStoreActions } from '../../store'
 import facebook from '../../services/facebook'
-import utils from '../../services/utils'
+// import utils from '../../services/utils'
 // import Page from '../../typings/page'
-import Shop from '../../typings/shop'
+// import { Shop } from '../../typings'
 
 import CreateForm from './CreateForm'
 
@@ -15,7 +15,7 @@ const ShopIndex = () => {
   // TODO: FBPage & Page
   const [pages, setPages] = useState<any>([])
 
-  const createShop = useStoreActions(a => a.shopState.create)
+  // const createShop = useStoreActions(a => a.shopState.create)
 
   const user = useStoreState(s => s.userState.user)
   const shops = useStoreState(s => s.shopState.shops)
@@ -31,15 +31,15 @@ const ShopIndex = () => {
 
   const handleCreateShop = async (values: any) => {
     if (!user) return
-    const shop: Shop = {
-      id: utils.genId(),
-      name: values.shopName,
-      pageId: values.pageId,
-      owner: user.id,
-    }
+    // const shop: Shop = {
+    //   id: utils.genId(),
+    //   name: values.shopName,
+    //   pageId: values.pageId,
+    //   owner: user.id,
+    // }
     // const userLogin = await facebook.getUserLogin()
     // const { accessToken } = userLogin
-    createShop(shop)
+    // createShop(shop)
   }
 
   const editShop = async (shopId: string) => {}

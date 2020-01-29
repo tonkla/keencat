@@ -1,4 +1,4 @@
-export default interface Page {
+export interface Page {
   id: string
   name: string
   owner: string

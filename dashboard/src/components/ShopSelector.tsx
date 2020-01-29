@@ -1,7 +1,7 @@
 import React from 'react'
 import { Icon, Menu, Dropdown } from 'antd'
 
-import Shop from '../typings/shop'
+import { Shop } from '../typings'
 
 type ShopSelectorProps = {
   shops: Shop[]

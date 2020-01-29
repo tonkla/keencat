@@ -1,6 +1,6 @@
 import { Action, action } from 'easy-peasy'
 
-import User from '../../typings/user'
+import { User } from '../../typings'
 
 export interface UserStateModel {
   user: User | null

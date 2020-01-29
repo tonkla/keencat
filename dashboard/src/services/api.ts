@@ -1,52 +1,43 @@
-import Category from '../typings/category'
-import Product from '../typings/product'
-import Shop from '../typings/shop'
-import User from '../typings/user'
+import axios from 'axios'
 
-async function getCategories(shop: Shop): Promise<Category[]> {
-  return []
+import auth from './firebase/auth'
+// import firestore from './firebase/firestore'
+import utils from './utils'
+import { User } from '../typings'
+
+interface LoginParams {
+  token: string
+  uid: string
 }
 
-async function createCategory(category: Category) {
-  //
+async function signIn(params: LoginParams): Promise<User | null> {
+  const url = process.env.REACT_APP_API_URL
+  if (!url) return null
+  const { data: token } = await axios.post(`${url}/login`, params)
+  if (!token) return null
+  await auth.signIn(token)
+  const user = await auth.getUser()
+  if (!user) return null
+  return {
+    id: '',
+    firebaseId: user.uid,
+  }
 }
 
-async function getProducts(category: Category): Promise<Product[]> {
-  return []
+async function signOut() {
+  await auth.signOut()
 }
 
-async function createProduct(product: Product) {
-  //
+async function sendSignInLinkToEmail(email: string) {
+  await auth.sendSignInLinkToEmail(email)
 }
 
-async function getShops(owner: string): Promise<Shop[]> {
-  return []
-}
-
-async function createShop(shop: Shop) {
-  //
-}
-
-async function getUser(id: string): Promise<User | null> {
-  return null
-}
-
-async function getUserByFacebookId(fbId: string): Promise<User | null> {
-  return null
-}
-
-async function createUser(user: User): Promise<boolean> {
-  return false
-}
+// async function createShop(shop: Shop) {
+//   firestore.createShop(shop)
+// }
 
 export default {
-  getCategories,
-  createCategory,
-  getProducts,
-  createProduct,
-  getShops,
-  createShop,
-  getUser,
-  getUserByFacebookId,
-  createUser,
+  signIn,
+  signOut,
+  sendSignInLinkToEmail,
 }
