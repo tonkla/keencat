@@ -59,8 +59,11 @@ const Home: React.FC = ({ children }) => {
           </Header>
           <Content>{children}</Content>
           <Footer>
-            Crafted with <span className="love">😻</span> by{' '}
-            <a href="https://keencat.co">KeenCAT</a>
+            Crafted with{' '}
+            <span className="love" aria-label="love" role="img">
+              😻
+            </span>{' '}
+            by <a href="https://keencat.co">KeenCAT</a>
           </Footer>
         </Layout>
       </Layout>

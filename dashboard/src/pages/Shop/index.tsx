@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Card, Button, Steps } from 'antd'
 
-import { useStoreState, useStoreActions } from '../../store'
+import { useStoreState } from '../../store'
 import facebook from '../../services/facebook'
 // import utils from '../../services/utils'
 // import Page from '../../typings/page'

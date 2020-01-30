@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Button, Card } from 'antd'
 
-import { useStoreState, useStoreActions } from '../../store'
+import { useStoreState } from '../../store'
 // import utils from '../../services/utils'
 import { Category, Product } from '../../typings'
 
@@ -37,6 +37,8 @@ const ProductIndex = () => {
     ;(async () => {
       if (!shop) return
       // setCategories(await remoteStorage.getCategories(shop))
+      setCategories([])
+      setProducts([])
       setLoading(false)
     })()
   }, [shop])

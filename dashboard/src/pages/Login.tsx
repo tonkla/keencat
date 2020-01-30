@@ -33,7 +33,7 @@ const Login = () => {
         else setLoading(false)
       }
     })()
-  }, [])
+  }, [setUser, user])
 
   async function handleSignIn(): Promise<User | null> {
     if (!(await api.isSignInWithEmailLink(window.location.href))) return null
