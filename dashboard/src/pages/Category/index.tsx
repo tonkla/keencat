@@ -3,8 +3,8 @@ import { Button, Card } from 'antd'
 
 import { useStoreActions, useStoreState } from '../../store'
 // import remoteStorage from '../../services/api'
-import utils from '../../services/utils'
-import { Category } from '../../typings'
+// import utils from '../../services/utils'
+// import { Category } from '../../typings'
 
 import CreateForm from './CreateForm'
 
@@ -21,13 +21,13 @@ const CategoryIndex = () => {
 
   const handleCreateCategory = async (values: any) => {
     if (!user || !shop) return
-    const category: Category = {
-      id: utils.genId(),
-      name: values.categoryName,
-      shopId: shop.id,
-      pageId: shop.pageId,
-      owner: user.id,
-    }
+    // const category: Category = {
+    //   id: utils.genId(),
+    //   name: values.categoryName,
+    //   shopId: shop.id,
+    //   pageId: shop.pageId,
+    //   owner: user.id,
+    // }
     // createCategory(category)
     setFormEnabled(false)
   }
