@@ -1,8 +1,9 @@
 export interface User {
   id: string
-  name?: string
+  displayName?: string
   email?: string
-  pictureUrl?: string
+  photoURL?: string
+  phoneNumber?: number
   firebaseId?: string
   facebookId?: string
   lineId?: string

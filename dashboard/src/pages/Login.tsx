@@ -4,13 +4,16 @@ import { Alert, Button, Icon, Input } from 'antd'
 
 import { useStoreState, useStoreActions } from '../store'
 import api from '../services/api'
+import utils from '../services/utils'
+import { User } from '../typings'
 
 import '../styles/Login.scss'
 
-const Login: React.FC = () => {
+const Login = () => {
   const KEY_EMAIL = 'signinemail'
 
   const [isLoading, setLoading] = useState(false)
+  const [isSending, setSending] = useState(false)
   const [isDone, setDone] = useState(false)
   const [email, setEmail] = useState('')
   const inputEmail = useRef<Input>(null)
@@ -19,36 +22,64 @@ const Login: React.FC = () => {
   const user = useStoreState(s => s.userState.user)
 
   useEffect(() => {
-    const _email = localStorage.getItem(KEY_EMAIL)
-    if (_email) setEmail(_email)
+    ;(async () => {
+      if (user) return // The user may be assigned by Redux-Persist
+      setLoading(true)
+      const u1 = await api.getUser()
+      if (u1) setUser(u1)
+      else {
+        const u2 = await handleSignIn()
+        if (u2) setUser(u2)
+        else setLoading(false)
+      }
+    })()
   }, [])
 
-  const handleChangeEmail = (e: any) => {
-    const _email = e.target.value.trim()
-    setEmail(_email)
-    localStorage.setItem(KEY_EMAIL, _email)
+  async function handleSignIn(): Promise<User | null> {
+    if (!(await api.isSignInWithEmailLink(window.location.href))) return null
+    const email = localStorage.getItem(KEY_EMAIL)
+    if (!email) return null
+    const result = await api.signInWithEmailLink(email, window.location.href)
+    if (!result || !result.user) return null
+    localStorage.removeItem(KEY_EMAIL)
+    if (result.additionalUserInfo && result.additionalUserInfo.isNewUser) {
+      const u = {
+        id: utils.genId(),
+        firebaseId: result.user.uid,
+        email: result.user.email || '',
+      }
+      if (await api.createUser(u)) return u
+    } else {
+      const u = await api.getUserByFirebaseId(result.user.uid)
+      if (u) return u
+      else {
+        const u = {
+          id: utils.genId(),
+          firebaseId: result.user.uid,
+          email: result.user.email || '',
+        }
+        if (await api.createUser(u)) return u
+      }
+    }
+    return null
   }
 
-  const handleSignIn = async () => {
+  async function handleSendEmail() {
     if (!/(.+)@(.+){2,}\.(.+){2,}/.test(email)) {
       if (inputEmail && inputEmail.current) {
         inputEmail.current.input.value = ''
         inputEmail.current.input.focus()
-        localStorage.setItem(KEY_EMAIL, '')
       }
       return
     }
-    if (process.env.NODE_ENV === 'production') {
-      setLoading(true)
-      await api.sendSignInLinkToEmail(email)
-      setLoading(false)
+    setSending(true)
+    localStorage.setItem(KEY_EMAIL, email)
+    if (await api.sendSignInLinkToEmail(email)) {
       setDone(true)
     } else {
-      const u = {
-        id: 'test',
-      }
-      setUser(u)
+      // TODO: log cannot send the email
     }
+    setSending(false)
   }
 
   return user ? (
@@ -61,7 +92,7 @@ const Login: React.FC = () => {
         <section className="form">
           <Input
             ref={inputEmail}
-            onChange={handleChangeEmail}
+            onChange={e => setEmail(e.target.value.trim())}
             value={email}
             placeholder="Email"
             prefix={<Icon type="mail" style={{ color: 'rgba(0,0,0,.3)' }} />}
@@ -69,9 +100,9 @@ const Login: React.FC = () => {
             className="input"
           />
           <Button
-            onClick={handleSignIn}
-            loading={isLoading}
-            disabled={isDone}
+            onClick={handleSendEmail}
+            loading={isSending}
+            disabled={isDone || isLoading}
             type="primary"
             size="large"
             className="button"
@@ -83,6 +114,12 @@ const Login: React.FC = () => {
           <section className="message">
             <Alert message="We have sent a sign-in link to your email." type="success" showIcon />
           </section>
+        )}
+        {isLoading && (
+          <div className="loading">
+            <Icon type="loading-3-quarters" spin />
+            <span>Loading...</span>
+          </div>
         )}
       </div>
     </div>
