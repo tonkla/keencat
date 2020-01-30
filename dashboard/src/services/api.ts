@@ -1,43 +1,44 @@
-import axios from 'axios'
-
 import auth from './firebase/auth'
-// import firestore from './firebase/firestore'
-import utils from './utils'
+import firestore from './firebase/firestore'
 import { User } from '../typings'
 
-interface LoginParams {
-  token: string
-  uid: string
+async function createUser(user: User) {
+  return await firestore.createUser(user)
 }
 
-async function signIn(params: LoginParams): Promise<User | null> {
-  const url = process.env.REACT_APP_API_URL
-  if (!url) return null
-  const { data: token } = await axios.post(`${url}/login`, params)
-  if (!token) return null
-  await auth.signIn(token)
-  const user = await auth.getUser()
-  if (!user) return null
-  return {
-    id: '',
-    firebaseId: user.uid,
-  }
+async function getUser(): Promise<User | null> {
+  const u1 = await auth.getUser()
+  if (!u1) return null
+  const u2 = await getUserByFirebaseId(u1.uid)
+  return u2 ? u2 : null
+}
+
+async function getUserByFirebaseId(fid: string): Promise<User | null> {
+  return await firestore.getUserByFirebaseId(fid)
+}
+
+async function sendSignInLinkToEmail(email: string): Promise<boolean> {
+  return await auth.sendSignInLinkToEmail(email)
+}
+
+async function signInWithEmailLink(email: string, link: string) {
+  return await auth.signInWithEmailLink(email, link)
 }
 
 async function signOut() {
   await auth.signOut()
 }
 
-async function sendSignInLinkToEmail(email: string) {
-  await auth.sendSignInLinkToEmail(email)
+async function isSignInWithEmailLink(link: string): Promise<boolean> {
+  return auth.isSignInWithEmailLink(link)
 }
 
-// async function createShop(shop: Shop) {
-//   firestore.createShop(shop)
-// }
-
 export default {
-  signIn,
-  signOut,
+  createUser,
+  getUser,
+  getUserByFirebaseId,
+  isSignInWithEmailLink,
   sendSignInLinkToEmail,
+  signInWithEmailLink,
+  signOut,
 }

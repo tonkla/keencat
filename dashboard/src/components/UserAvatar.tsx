@@ -23,7 +23,7 @@ const UserAvatar = ({ user }: UserProps) => {
 
   const showConfirmSignOut = () => {
     Modal.confirm({
-      title: 'Are you sure you want to log out?',
+      title: 'Are you sure you want to sign out?',
       onOk() {
         handleSignOut()
       },
@@ -41,7 +41,7 @@ const UserAvatar = ({ user }: UserProps) => {
 
   return (
     <Dropdown overlay={menu}>
-      {user.pictureUrl ? <Avatar src={user.pictureUrl} /> : <Avatar icon="user" />}
+      {user.photoURL ? <Avatar src={user.photoURL} /> : <Avatar icon="user" />}
     </Dropdown>
   )
 }
