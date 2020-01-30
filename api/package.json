@@ -8,6 +8,8 @@
     "start": "ts-node-dev --respawn --transpileOnly --no-notify src/index.ts"
   },
   "dependencies": {
+    "@koa/cors": "^3.0.0",
+    "firebase-admin": "^8.9.2",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
     "koa-tree-router": "^0.5.0"
@@ -15,6 +17,7 @@
   "devDependencies": {
     "@types/koa": "^2.11.0",
     "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa__cors": "^3.0.1",
     "@types/node": "^13.5.0",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
