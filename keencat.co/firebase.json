@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "keencat",
+    "site": "keencat-1-2",
     "public": "public",
     "ignore": [
       "firebase.json",
