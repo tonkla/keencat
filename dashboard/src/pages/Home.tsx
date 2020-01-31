@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Icon, Layout } from 'antd'
 
 import { useStoreState, useStoreActions } from '../store'
+import shopRepo from '../services/firebase/firestore/shop'
 import { Shop } from '../typings/shop'
 
 import ShopSelector from '../components/ShopSelector'
@@ -12,18 +13,27 @@ import UserAvatar from '../components/UserAvatar'
 import '../styles/Home.scss'
 
 const Home: React.FC = ({ children }) => {
+  const [collapsed, setCollapse] = useState(false)
+
   const setActiveShop = useStoreActions(a => a.activeState.setShop)
+  const setShops = useStoreActions(a => a.shopState.setShops)
 
   const user = useStoreState(s => s.userState.user)
   const activeShop = useStoreState(s => s.activeState.shop)
   const shops = useStoreState(s => s.shopState.shops)
 
-  const onShopChanged = (s: Shop) => {
+  useEffect(() => {
+    if (!user) return
+    ;(async () => {
+      setShops(await shopRepo.findByOwner(user))
+    })()
+  }, [user, setShops])
+
+  function onShopChanged(s: Shop) {
     if (activeShop && activeShop.id !== s.id) setActiveShop(s)
   }
 
-  const [collapsed, setCollapse] = useState(false)
-  const toggle = () => {
+  function toggle() {
     setCollapse(!collapsed)
   }
 

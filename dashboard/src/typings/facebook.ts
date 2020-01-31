@@ -13,8 +13,13 @@ export interface FBPage {
   name: string
 }
 
+export interface FBPageAccessToken {
+  id: string
+  access_token: string
+}
+
 export interface UserInfo {
   id: string
   name: string
-  pictureUrl: string
+  photoURL: string
 }

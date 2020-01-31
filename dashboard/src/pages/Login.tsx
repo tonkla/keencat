@@ -3,8 +3,7 @@ import { Redirect } from 'react-router-dom'
 import { Alert, Button, Icon, Input } from 'antd'
 
 import { useStoreState, useStoreActions } from '../store'
-import api from '../services/api'
-import utils from '../services/utils'
+import userRepo from '../services/firebase/firestore/user'
 import { User } from '../typings'
 
 import '../styles/Login.scss'
@@ -25,7 +24,7 @@ const Login = () => {
     ;(async () => {
       if (user) return // The user may be assigned by Redux-Persist
       setLoading(true)
-      const u1 = await api.getUser()
+      const u1 = await userRepo.getUser()
       if (u1) setUser(u1)
       else {
         const u2 = await handleSignIn()
@@ -36,29 +35,27 @@ const Login = () => {
   }, [setUser, user])
 
   async function handleSignIn(): Promise<User | null> {
-    if (!(await api.isSignInWithEmailLink(window.location.href))) return null
+    if (!(await userRepo.isSignInWithEmailLink(window.location.href))) return null
     const email = localStorage.getItem(KEY_EMAIL)
     if (!email) return null
-    const result = await api.signInWithEmailLink(email, window.location.href)
-    if (!result || !result.user) return null
+    const result = await userRepo.signInWithEmailLink(email, window.location.href)
+    if (!result || !result.user || !result.user.email) return null
     localStorage.removeItem(KEY_EMAIL)
     if (result.additionalUserInfo && result.additionalUserInfo.isNewUser) {
-      const u = {
-        id: utils.genId(),
+      const user: User = {
+        email: result.user.email,
         firebaseId: result.user.uid,
-        email: result.user.email || '',
       }
-      if (await api.createUser(u)) return u
+      if (await userRepo.create(user)) return user
     } else {
-      const u = await api.getUserByFirebaseId(result.user.uid)
-      if (u) return u
+      const user = await userRepo.findByFirebaseId(result.user.uid)
+      if (user) return user
       else {
-        const u = {
-          id: utils.genId(),
+        const user: User = {
+          email: result.user.email,
           firebaseId: result.user.uid,
-          email: result.user.email || '',
         }
-        if (await api.createUser(u)) return u
+        if (await userRepo.create(user)) return user
       }
     }
     return null
@@ -74,7 +71,7 @@ const Login = () => {
     }
     setSending(true)
     localStorage.setItem(KEY_EMAIL, email)
-    if (await api.sendSignInLinkToEmail(email)) {
+    if (await userRepo.sendSignInLinkToEmail(email)) {
       setDone(true)
     } else {
       // TODO: log cannot send the email

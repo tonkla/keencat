@@ -1,50 +1,73 @@
 import React, { useState } from 'react'
 import { Card, Button, Steps } from 'antd'
 
-import { useStoreState } from '../../store'
+import { useStoreState, useStoreActions } from '../../store'
+import { pageRepository } from '../../services/api'
 import facebook from '../../services/facebook'
-// import utils from '../../services/utils'
-// import Page from '../../typings/page'
-// import { Shop } from '../../typings'
+import utils from '../../services/utils'
+import { Page, Shop } from '../../typings'
+import { FBPageAccessToken } from '../../typings/facebook'
 
 import CreateForm from './CreateForm'
 
 const ShopIndex = () => {
   const [step, setStep] = useState(0)
   const [isCreateShop, setCreateShop] = useState(false)
-  // TODO: FBPage & Page
-  const [pages, setPages] = useState<any>([])
+  const [pages, setPages] = useState<Page[]>([])
 
-  // const createShop = useStoreActions(a => a.shopState.create)
+  const createShop = useStoreActions(a => a.shopState.create)
 
   const user = useStoreState(s => s.userState.user)
   const shops = useStoreState(s => s.shopState.shops)
 
   const availablePages = pages.filter((p: any) => shops.filter(s => s.pageId !== p.id).length > 0)
 
-  const grantPagesAccess = async () => {
-    await facebook.logIn({ scope: 'pages_show_list,pages_messaging' })
-    const _pages = await facebook.getPages()
-    setPages(_pages)
-    if (_pages.length > 0) setStep(1)
-  }
-
-  const handleCreateShop = async (values: any) => {
+  async function handleGrantAccessFacebookPages() {
     if (!user) return
-    // const shop: Shop = {
-    //   id: utils.genId(),
-    //   name: values.shopName,
-    //   pageId: values.pageId,
-    //   owner: user.id,
-    // }
-    // const userLogin = await facebook.getUserLogin()
-    // const { accessToken } = userLogin
-    // createShop(shop)
+
+    await facebook.logIn({ scope: 'pages_show_list,pages_messaging' })
+    const fbPages = await facebook.getPages()
+    const { authResponse } = await facebook.getLoginStatus()
+    if (!authResponse || !authResponse.accessToken) return
+
+    const asyncPageAccessTokens: Promise<FBPageAccessToken | null>[] = []
+    const pages_1 = fbPages.map(fbPage => {
+      asyncPageAccessTokens.push(facebook.getPageAccessToken(fbPage.id))
+      const p: Page = {
+        id: utils.genId(),
+        owner: user,
+        facebookPageId: fbPage.id,
+        name: fbPage.name,
+        userAccessToken: authResponse.accessToken,
+      }
+      return p
+    })
+
+    const pageAccessTokens = await Promise.all(asyncPageAccessTokens)
+    const pages_2 = pages_1.map(page => {
+      const pat = pageAccessTokens.find(pat => (pat && pat.id === page.facebookPageId ? pat : null))
+      return pat ? { ...page, pageAccessToken: pat.access_token } : page
+    })
+
+    await Promise.all(pages_2.map(page => pageRepository.create(page)))
+    setPages(pages_2)
+    if (pages_2.length > 0) setStep(1)
   }
 
-  const editShop = async (shopId: string) => {}
+  async function handleCreateShop(values: any) {
+    if (!user) return
+    const shop: Shop = {
+      id: utils.genId(),
+      name: values.shopName,
+      pageId: values.pageId,
+      owner: user,
+    }
+    createShop(shop)
+  }
 
-  const deleteShop = async (shopId: string) => {}
+  async function editShop(shopId: string) {}
+
+  async function deleteShop(shopId: string) {}
 
   return (
     <div>
@@ -80,7 +103,7 @@ const ShopIndex = () => {
               <div style={{ marginTop: 30 }}>
                 <span>Please choose a page to be connected with a new shop.</span>
                 <div style={{ marginTop: 20 }}>
-                  <Button type="primary" onClick={grantPagesAccess}>
+                  <Button type="primary" onClick={handleGrantAccessFacebookPages}>
                     Choose
                   </Button>
                 </div>

@@ -1,5 +1,10 @@
+import { User } from './user'
+
 export interface Page {
   id: string
-  name: string
-  owner: string
+  owner: User
+  name?: string
+  facebookPageId?: string
+  pageAccessToken?: string
+  userAccessToken?: string
 }

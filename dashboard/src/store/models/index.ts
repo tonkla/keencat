@@ -16,7 +16,7 @@ export interface StoreModel {
 
 const storeModel: StoreModel = persist(
   { activeState, categoryState, productState, shopState, userState },
-  { storage: 'localStorage', whitelist: [] }
+  { storage: 'localStorage', blacklist: ['categoryState', 'productState', 'shopState'] }
 )
 
 export default storeModel
