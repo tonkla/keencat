@@ -1,4 +1,4 @@
-import { LoginStatus, FBPage, UserInfo } from '../typings/facebook'
+import { LoginStatus, FBPage, FBPageAccessToken, UserInfo } from '../typings/facebook'
 
 const _window: any = window
 
@@ -63,18 +63,17 @@ function logOut() {
 function getUserInfo(): Promise<UserInfo | null> {
   return new Promise(resolve => {
     init().then(async () => {
-      if (await isAuthenticated()) {
-        _window.FB.api('/me', (user: any) => {
-          _window.FB.api(
-            `${user.id}/picture`,
-            'GET',
-            { redirect: false, type: 'normal' },
-            ({ data }: any) => {
-              if (data) resolve({ ...user, pictureUrl: data.url })
-            }
-          )
-        })
-      } else resolve(null)
+      if (!(await isAuthenticated())) resolve(null)
+      _window.FB.api('/me', (user: any) => {
+        _window.FB.api(
+          `${user.id}/picture`,
+          'GET',
+          { redirect: false, type: 'normal' },
+          ({ data }: any) => {
+            if (data) resolve({ ...user, photoURL: data.url })
+          }
+        )
+      })
     })
   })
 }
@@ -82,24 +81,24 @@ function getUserInfo(): Promise<UserInfo | null> {
 function getPages(): Promise<FBPage[]> {
   return new Promise(resolve => {
     init().then(async () => {
-      if (await isAuthenticated()) {
-        _window.FB.api('/me/accounts', ({ data }: any) => {
-          resolve(data.map((p: any) => ({ id: p.id, name: p.name })))
-        })
-      }
+      if (!(await isAuthenticated())) resolve([])
+      _window.FB.api('/me/accounts', ({ data }: any) => {
+        resolve(data.map((p: any) => ({ id: p.id, name: p.name })))
+      })
     })
   })
 }
 
-function getPageAccessToken(pageId: string) {
+function getPageAccessToken(pageId: string): Promise<FBPageAccessToken | null> {
   return new Promise(resolve => {
-    if (!pageId) return resolve('The pageId is undefined.')
+    if (!pageId) resolve(null)
     init().then(async () => {
-      if (await isAuthenticated()) {
-        _window.FB.api(`/${pageId}?fields=access_token`, (response: any) => {
-          resolve(response.access_token)
-        })
-      }
+      if (!(await isAuthenticated())) resolve(null)
+      _window.FB.api(`/${pageId}?fields=access_token`, (response: any) => {
+        if (response?.access_token) {
+          resolve({ id: response.id, access_token: response.access_token })
+        }
+      })
     })
   })
 }

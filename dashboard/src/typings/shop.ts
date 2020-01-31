@@ -1,8 +1,10 @@
+import { User } from './user'
+
 export interface Shop {
   id: string
   name: string
   pageId: string
-  owner: string
+  owner: User
 }
 
 export interface CreateShopParams {
