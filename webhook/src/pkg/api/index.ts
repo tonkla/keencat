@@ -11,11 +11,15 @@ const api = axios.create({ headers: { authorization: accessToken } })
 
 async function getPageAccessToken(pageId: string): Promise<string | null> {
   try {
-    const result = await api.post(url, { cmd: 'getPageAccessToken', pageId })
-    return result.data
+    const result = await api.post(url, { cmd: 'findPage', pageId })
+    return result.data.pageAccessToken
   } catch (e) {
     return null
   }
+}
+
+async function resetPageAccessToken(pageId: string): Promise<boolean> {
+  return false
 }
 
 async function getCategories(pageId: string): Promise<Category[]> {
@@ -26,13 +30,9 @@ async function getProducts(pageId: string, categoryId?: string): Promise<Product
   return []
 }
 
-async function resetPageAccessToken(pageId: string): Promise<boolean> {
-  return false
-}
-
 export default {
   getCategories,
   getPageAccessToken,
-  getProducts,
   resetPageAccessToken,
+  getProducts,
 }
