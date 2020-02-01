@@ -25,11 +25,11 @@ const Login = () => {
     ;(async () => {
       if (user) return // The user may be assigned by Redux-Persist
       setLoading(true)
-      const u1 = await userRepo.getUser()
-      if (u1) setUser(u1)
+      const _user = await userRepo.getUser()
+      if (_user) setUser(_user)
       else {
-        const u2 = await handleSignIn()
-        if (u2) setUser(u2)
+        const _user = await handleSignIn()
+        if (_user) setUser(_user)
         else setLoading(false)
       }
     })()

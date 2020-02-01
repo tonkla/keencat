@@ -5,18 +5,19 @@ import { User } from '../../../typings'
 const firestore = firebase.firestore()
 
 async function getUser(): Promise<User | null> {
-  const u1 = await auth.getUser()
-  if (!u1) return null
+  const authUser = await auth.getUser()
+  if (!authUser) return null
 
-  const u2 = await findByFirebaseId(u1.uid)
-  if (!u2 && u1.email) {
+  const user = await findByFirebaseId(authUser.uid)
+  if (user) return user
+  else if (authUser.email) {
     const user: User = {
-      email: u1.email,
-      firebaseId: u1.uid,
+      email: authUser.email,
+      firebaseId: authUser.uid,
     }
-    await create(user)
+    if (await create(user)) return user
   }
-  return u2
+  return null
 }
 
 async function findByFirebaseId(firebaseId: string): Promise<User | null> {
