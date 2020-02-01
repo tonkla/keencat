@@ -1,5 +1,5 @@
 import admin from '../firebase'
-import { Category, Product, Shop } from '../../typings'
+import { Category, Page, Product, Shop } from '../../typings'
 
 async function findCategories(pageId: string): Promise<Category[]> {
   return []
@@ -13,19 +13,14 @@ async function findShop(pageId: string): Promise<Shop | null> {
   return null
 }
 
-async function getPageAccessToken(pageId: string): Promise<string | null> {
+async function findPage(pageId: string): Promise<Page | null> {
   try {
-    const doc = (
-      await admin
-        .firestore()
-        .collection('fbpages')
-        .where('id', '==', pageId)
-        .get()
-    ).docs[0]
-    if (doc.exists) {
-      const page: any = doc.data()
-      return page.pageAccessToken
-    }
+    const doc = await admin
+      .firestore()
+      .collection('fbpages')
+      .doc(pageId)
+      .get()
+    if (doc.exists) return doc.data() as Page
     return null
   } catch (e) {
     return null
@@ -36,5 +31,5 @@ export default {
   findCategories,
   findProducts,
   findShop,
-  getPageAccessToken,
+  findPage,
 }

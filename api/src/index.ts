@@ -18,43 +18,55 @@ async function handleError(ctx: Context, next: Function) {
   }
 }
 
-async function authorization(ctx: Context, next: Function) {
+async function handleDashboardCall(ctx: Context) {
+  const { authorization, uid } = ctx.headers
+  if (authorization && auth.authorize(authorization, uid)) {
+    const { cmd, pageId, categoryId } = ctx.request.body
+    if (!cmd) ctx.body = ''
+    if (cmd === 'hello') {
+      ctx.body = 'world'
+    } else if (cmd === 'findPage') {
+      ctx.body = await db.findPage(pageId)
+    } else if (cmd === 'findCategories') {
+      ctx.body = await db.findCategories(pageId)
+    } else if (cmd === 'findProducts') {
+      ctx.body = await db.findProducts(pageId, categoryId)
+    } else if (cmd === 'findShop') {
+      ctx.body = await db.findShop(pageId)
+    } else {
+      ctx.status = 400
+    }
+  } else ctx.status = 401
+}
+
+async function handleWebhookCall(ctx: Context) {
   const accessToken = process.env.API_ACCESS_TOKEN || ''
   const { authorization } = ctx.headers
-  if (authorization && authorization == accessToken) await next()
-  else ctx.status = 401
-}
-
-async function handleAPICall(ctx: Context) {
-  const { cmd, pageId, categoryId } = ctx.request.body
-  if (!cmd) ctx.body = ''
-  if (cmd === 'getPageAccessToken') {
-    ctx.body = await db.getPageAccessToken(pageId)
-  } else if (cmd === 'findCategories') {
-    ctx.body = await db.findCategories(pageId)
-  } else if (cmd === 'findProducts') {
-    ctx.body = await db.findProducts(pageId, categoryId)
-  } else if (cmd === 'findShop') {
-    ctx.body = await db.findShop(pageId)
-  } else {
-    ctx.body = ''
-  }
-}
-
-async function handleLogin(ctx: Context) {
-  const token = await auth.logIn(ctx.request.body)
-  if (token) ctx.body = token
+  if (authorization && authorization == accessToken) {
+    const { cmd, pageId, categoryId } = ctx.request.body
+    if (!cmd) ctx.body = ''
+    if (cmd === 'findPage') {
+      ctx.body = await db.findPage(pageId)
+    } else if (cmd === 'findCategories') {
+      ctx.body = await db.findCategories(pageId)
+    } else if (cmd === 'findProducts') {
+      ctx.body = await db.findProducts(pageId, categoryId)
+    } else if (cmd === 'findShop') {
+      ctx.body = await db.findShop(pageId)
+    } else {
+      ctx.status = 400
+    }
+  } else ctx.status = 401
 }
 
 const r = new Router()
-r.post('/', handleAPICall)
-r.post('/login', handleLogin)
+r.post('/dashboard', handleDashboardCall)
+r.post('/webhook', handleWebhookCall)
 r.get('/ping', (ctx: Context) => (ctx.body = 'pong'))
 
 new Koa()
   .use(cors())
   .use(bodyParser())
   .use(handleError)
-  .use(authorization)
   .use(r.routes())
   .listen({ port: 8080 }, () => console.log('🚀 API Launched'))
