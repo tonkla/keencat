@@ -1,6 +1,4 @@
-import admin from 'firebase-admin'
-
-admin.initializeApp({ credential: admin.credential.cert('./key.json') })
+import admin from '../firebase'
 
 interface LoginParams {
   uid: string
