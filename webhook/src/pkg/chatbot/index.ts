@@ -1,6 +1,6 @@
 import t from '../../lang/th'
-import api from '../../services/api'
-import { Category, Product } from '../../typings/common'
+import api from '../api'
+import { Category, Product } from '../../typings'
 import {
   GenericTemplateElement,
   MessageParams,

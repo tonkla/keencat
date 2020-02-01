@@ -1,6 +1,7 @@
 import axios from 'axios'
 import qs from 'qs'
 
+import api from '../api'
 import chatbot from '../chatbot'
 import { MessageEvent, WebhookEvent, WebhookParams } from './typings/request'
 import { Message, ResponseMessage } from './typings/response'
@@ -100,36 +101,26 @@ async function handlePostback(event: MessageEvent): Promise<void> {
 }
 
 async function send(senderId: string, message: Message): Promise<void> {
-  // try {
-  //   const pageAccessToken = await api.getPageAccessToken(senderId)
-  //   if (pageAccessToken) {
-  //     await axios.post(
-  //       'https://graph.facebook.com/v5.0/me/messages',
-  //       qs.stringify({ access_token: pageAccessToken, ...message })
-  //     )
-  //   } else {
-  //     // TODO: log('No pageAccessToken')
-  //   }
-  // } catch (e) {
-  //   // TODO: log
-  //   if (e.response && e.response.status === 400) {
-  //     await api.resetPageAccessToken(senderId)
-  //   }
-  // }
   try {
-    const accessToken = process.env.ACCESS_TOKEN || ''
-    const resp = await axios.post(
-      'https://graph.facebook.com/v5.0/me/messages',
-      qs.stringify({ access_token: accessToken, ...message })
-    )
-    if (resp && resp.data) {
-      // resp.data = { recipient_id?: string, message_id: string }
+    const pageAccessToken = await api.getPageAccessToken(senderId)
+    if (pageAccessToken) {
+      const resp = await axios.post(
+        'https://graph.facebook.com/v5.0/me/messages',
+        qs.stringify({ access_token: pageAccessToken, ...message })
+      )
+      if (resp && resp.data) {
+        // TODO: log success, resp.data={ recipient_id?: string, message_id: string }
+      }
     }
   } catch (e) {
     // TODO: log
     // https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes
     // e.response.data = { error:
     // { message: string, type: string, code: number, error_subcode?: number, fbtrace_id: string }}
+    //
+    // if (e.response && e.response.status === 400) {
+    //   await api.resetPageAccessToken(senderId)
+    // }
   }
 }
 
