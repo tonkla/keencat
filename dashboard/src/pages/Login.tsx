@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom'
 import { Alert, Button, Icon, Input } from 'antd'
 
 import { useStoreState, useStoreActions } from '../store'
+import auth from '../services/firebase/auth'
 import userRepo from '../services/firebase/firestore/user'
 import { User } from '../typings'
 
@@ -35,10 +36,10 @@ const Login = () => {
   }, [setUser, user])
 
   async function handleSignIn(): Promise<User | null> {
-    if (!(await userRepo.isSignInWithEmailLink(window.location.href))) return null
+    if (!(await auth.isSignInWithEmailLink(window.location.href))) return null
     const email = localStorage.getItem(KEY_EMAIL)
     if (!email) return null
-    const result = await userRepo.signInWithEmailLink(email, window.location.href)
+    const result = await auth.signInWithEmailLink(email, window.location.href)
     if (!result || !result.user || !result.user.email) return null
     localStorage.removeItem(KEY_EMAIL)
     if (result.additionalUserInfo && result.additionalUserInfo.isNewUser) {
@@ -71,7 +72,7 @@ const Login = () => {
     }
     setSending(true)
     localStorage.setItem(KEY_EMAIL, email)
-    if (await userRepo.sendSignInLinkToEmail(email)) {
+    if (await auth.sendSignInLinkToEmail(email)) {
       setDone(true)
     } else {
       // TODO: log cannot send the email

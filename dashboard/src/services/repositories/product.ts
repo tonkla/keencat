@@ -1,4 +1,4 @@
-import { Category, Product } from '../../../typings'
+import { Category, Product } from '../../typings'
 
 async function find(id: string) {}
 

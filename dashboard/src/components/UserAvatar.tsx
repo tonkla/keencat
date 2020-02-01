@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom'
 import { Avatar, Dropdown, Icon, Menu, Modal } from 'antd'
 
 import { useStoreActions } from '../store'
-import userRepository from '../services/firebase/firestore/user'
+import auth from '../services/firebase/auth'
 import { User } from '../typings'
 
 interface UserProps extends JSX.IntrinsicAttributes {
@@ -16,7 +16,7 @@ const UserAvatar = ({ user }: UserProps) => {
   const setUser = useStoreActions(a => a.userState.set)
 
   const handleSignOut = async () => {
-    await userRepository.signOut()
+    await auth.signOut()
     setUser(null)
     history.push('/login')
   }
