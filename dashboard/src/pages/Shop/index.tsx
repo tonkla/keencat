@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Card, Button, Steps } from 'antd'
 
 import { useStoreState, useStoreActions } from '../../store'
-import { pageRepository } from '../../services/api'
+import { pageRepository } from '../../services/repositories'
 import facebook from '../../services/facebook'
 import utils from '../../services/utils'
 import { Page, Shop } from '../../typings'
@@ -34,10 +34,9 @@ const ShopIndex = () => {
     const pages_1 = fbPages.map(fbPage => {
       asyncPageAccessTokens.push(facebook.getPageAccessToken(fbPage.id))
       const p: Page = {
-        id: utils.genId(),
-        owner: user,
-        facebookPageId: fbPage.id,
+        id: fbPage.id,
         name: fbPage.name,
+        owner: user,
         userAccessToken: authResponse.accessToken,
       }
       return p
@@ -65,10 +64,6 @@ const ShopIndex = () => {
     createShop(shop)
   }
 
-  async function editShop(shopId: string) {}
-
-  async function deleteShop(shopId: string) {}
-
   return (
     <div>
       {shops && shops.length > 0 && (
@@ -77,8 +72,7 @@ const ShopIndex = () => {
             <ul>
               {shops.map((shop: any) => (
                 <li key={shop.id}>
-                  {shop.name} [<i onClick={() => editShop(shop.id)}>edit</i>] [
-                  <i onClick={() => deleteShop(shop.id)}>delete</i>]
+                  {shop.name} [<i>edit</i>] [<i>delete</i>]
                 </li>
               ))}
             </ul>

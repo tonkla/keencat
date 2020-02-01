@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom'
 import { Icon, Layout } from 'antd'
 
 import { useStoreState, useStoreActions } from '../store'
-import shopRepo from '../services/firebase/firestore/shop'
+import shopRepository from '../services/repositories/shop'
 import { Shop } from '../typings/shop'
 
 import ShopSelector from '../components/ShopSelector'
@@ -25,7 +25,7 @@ const Home: React.FC = ({ children }) => {
   useEffect(() => {
     if (!user) return
     ;(async () => {
-      setShops(await shopRepo.findByOwner(user))
+      setShops(await shopRepository.findByOwner(user))
     })()
   }, [user, setShops])
 

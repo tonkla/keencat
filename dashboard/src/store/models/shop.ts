@@ -1,6 +1,6 @@
 import { Action, action, Thunk, thunk } from 'easy-peasy'
 
-import { shopRepository as shopRepo } from '../../services/api'
+import shopRepository from '../../services/repositories/shop'
 import { Shop } from '../../typings'
 
 export interface ShopStateModel {
@@ -13,7 +13,7 @@ export interface ShopStateModel {
 const shopState: ShopStateModel = {
   shops: [],
   create: thunk(async (actions, shop) => {
-    await shopRepo.create(shop)
+    await shopRepository.create(shop)
     actions._create(shop)
   }),
   setShops: action((state, shops) => {
