@@ -7,7 +7,8 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import auth from './pkg/auth'
-import db from './pkg/db'
+import dashboard from './routes/dashboard'
+import webhook from './routes/webhook'
 
 async function handleError(ctx: Context, next: Function) {
   try {
@@ -18,55 +19,36 @@ async function handleError(ctx: Context, next: Function) {
   }
 }
 
-async function handleDashboardCall(ctx: Context) {
-  const { authorization, uid } = ctx.headers
-  if (authorization && auth.authorize(authorization, uid)) {
-    const { cmd, pageId, categoryId } = ctx.request.body
-    if (!cmd) ctx.body = ''
-    if (cmd === 'hello') {
-      ctx.body = 'world'
-    } else if (cmd === 'findPage') {
-      ctx.body = await db.findPage(pageId)
-    } else if (cmd === 'findCategories') {
-      ctx.body = await db.findCategories(pageId)
-    } else if (cmd === 'findProducts') {
-      ctx.body = await db.findProducts(pageId, categoryId)
-    } else if (cmd === 'findShop') {
-      ctx.body = await db.findShop(pageId)
-    } else {
-      ctx.status = 400
-    }
-  } else ctx.status = 401
+async function authorize(ctx: Context, next: Function) {
+  if (ctx.request.method !== 'POST') return await next()
+
+  const { path } = ctx.request
+  if (path.indexOf('/dashboard') === 0) {
+    const { authorization, uid } = ctx.headers
+    if (authorization && auth.authorize(authorization, uid)) return await next()
+  } else if (path.indexOf('/webhook') === 0) {
+    const accessToken = process.env.API_ACCESS_TOKEN || ''
+    const { authorization } = ctx.headers
+    if (authorization && authorization === accessToken) return await next()
+  }
+  ctx.status = 401
 }
 
-async function handleWebhookCall(ctx: Context) {
-  const accessToken = process.env.API_ACCESS_TOKEN || ''
-  const { authorization } = ctx.headers
-  if (authorization && authorization == accessToken) {
-    const { cmd, pageId, categoryId } = ctx.request.body
-    if (!cmd) ctx.body = ''
-    if (cmd === 'findPage') {
-      ctx.body = await db.findPage(pageId)
-    } else if (cmd === 'findCategories') {
-      ctx.body = await db.findCategories(pageId)
-    } else if (cmd === 'findProducts') {
-      ctx.body = await db.findProducts(pageId, categoryId)
-    } else if (cmd === 'findShop') {
-      ctx.body = await db.findShop(pageId)
-    } else {
-      ctx.status = 400
-    }
-  } else ctx.status = 401
-}
+const r1 = new Router()
+r1.get('/ping', (ctx: Context) => (ctx.body = 'pong'))
 
-const r = new Router()
-r.post('/dashboard', handleDashboardCall)
-r.post('/webhook', handleWebhookCall)
-r.get('/ping', (ctx: Context) => (ctx.body = 'pong'))
+const r2 = new Router()
+r2.post('/create-shop', dashboard.createShop)
+
+const r3 = new Router()
+r3.post('/find-page', webhook.findPage)
 
 new Koa()
   .use(cors())
   .use(bodyParser())
   .use(handleError)
-  .use(r.routes())
+  .use(r1.routes())
+  .use(authorize)
+  .use(r2.mount('/dashboard'))
+  .use(r3.mount('/webhook'))
   .listen({ port: 8080 }, () => console.log('🚀 API Launched'))
