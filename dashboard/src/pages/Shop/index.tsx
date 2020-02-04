@@ -59,14 +59,12 @@ const ShopIndex = () => {
 
   return (
     <div>
-      {shops && shops.length > 0 && (
+      {shops.length > 0 && (
         <div style={{ marginBottom: 24 }}>
           <Card title="Your Shops" bordered={false}>
             <ul>
               {shops.map((shop: any) => (
-                <li key={shop.id}>
-                  {shop.name} [<i>edit</i>] [<i>delete</i>]
-                </li>
+                <li key={shop.id}>{shop.name}</li>
               ))}
             </ul>
           </Card>
@@ -88,7 +86,7 @@ const ShopIndex = () => {
             </Steps>
             {step === 0 && (
               <div style={{ marginTop: 30 }}>
-                <span>Please choose a page to be connected with a new shop.</span>
+                <span>Please choose a page to connect with a new shop.</span>
                 <div style={{ marginTop: 20 }}>
                   <Button type="primary" onClick={handleGrantAccessFacebookPages}>
                     Choose

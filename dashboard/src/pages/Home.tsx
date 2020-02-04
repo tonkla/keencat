@@ -6,14 +6,16 @@ import { useStoreState, useStoreActions } from '../store'
 import shopRepository from '../services/repositories/shop'
 import { Shop } from '../typings/shop'
 
+import Loading from '../components/Loading'
 import ShopSelector from '../components/ShopSelector'
 import SiderMenu from '../components/SiderMenu'
 import UserAvatar from '../components/UserAvatar'
 
-import '../styles/Home.scss'
+import './Home.scss'
 
 const Home: React.FC = ({ children }) => {
   const [collapsed, setCollapse] = useState(false)
+  const [isLoading, setLoading] = useState(true)
 
   const setActiveShop = useStoreActions(a => a.activeState.setShop)
   const setShops = useStoreActions(a => a.shopState.setShops)
@@ -24,13 +26,20 @@ const Home: React.FC = ({ children }) => {
 
   useEffect(() => {
     if (!user) return
+    setLoading(true)
     ;(async () => {
-      setShops(await shopRepository.findByOwner(user))
+      const shops = await shopRepository.findByOwner(user)
+      setShops(shops)
+      if (!activeShop && shops.length > 0) setActiveShop(shops[0])
+      setLoading(false)
     })()
-  }, [user, setShops])
+  }, [user, activeShop, setShops, setActiveShop])
 
-  function onShopChanged(s: Shop) {
-    if (activeShop && activeShop.id !== s.id) setActiveShop(s)
+  function onShopChanged(shopId: string) {
+    if (activeShop && activeShop.id !== shopId) {
+      const shop = shops.find(s => s.id === shopId)
+      if (shop) setActiveShop(shop)
+    }
   }
 
   function toggle() {
@@ -67,7 +76,7 @@ const Home: React.FC = ({ children }) => {
               <UserAvatar user={user} />
             </div>
           </Header>
-          <Content>{children}</Content>
+          <Content>{isLoading ? <Loading /> : children}</Content>
           <Footer>
             Crafted with{' '}
             <span className="love" aria-label="love" role="img">

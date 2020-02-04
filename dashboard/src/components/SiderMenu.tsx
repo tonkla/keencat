@@ -5,7 +5,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useStoreState } from '../store'
 
 import logo from '../assets/images/logo.png'
-import '../styles/SiderMenu.scss'
+import './SiderMenu.scss'
 
 const SiderMenu = (props: any) => {
   const activeShop = useStoreState(s => s.activeState.shop)
@@ -60,7 +60,7 @@ const SiderMenu = (props: any) => {
           )}
           {activeShop && (
             <Menu.Item key="/product">
-              <Icon type="file" />
+              <Icon type="picture" />
               <span>
                 <Link to="/product">Product</Link>
               </span>

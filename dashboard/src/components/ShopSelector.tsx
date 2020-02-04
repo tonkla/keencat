@@ -3,10 +3,10 @@ import { Icon, Menu, Dropdown } from 'antd'
 
 import { Shop } from '../typings'
 
-type ShopSelectorProps = {
+interface ShopSelectorProps {
   shops: Shop[]
   activeShop?: Shop
-  callback(shop: Shop): void
+  callback(shopId: string): void
 }
 
 const ShopSelector = (props: ShopSelectorProps) => {
@@ -27,12 +27,13 @@ const ShopSelector = (props: ShopSelectorProps) => {
       style={{
         display: 'flex',
         alignItems: 'center',
+        userSelect: 'none',
       }}
     >
-      <Dropdown overlay={menu} trigger={['click']} placement="bottomLeft">
-        <Icon type="shop" />
-      </Dropdown>
       {props.activeShop && <span style={{ paddingLeft: 5 }}>{props.activeShop.name}</span>}
+      <Dropdown overlay={menu} trigger={['click']} placement="bottomRight">
+        <Icon type="caret-down" style={{ fontSize: 15, paddingLeft: 5 }} />
+      </Dropdown>
     </div>
   )
 }
