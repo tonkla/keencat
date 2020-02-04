@@ -100,9 +100,9 @@ async function handlePostback(event: MessageEvent): Promise<void> {
   }
 }
 
-async function send(senderId: string, message: Message): Promise<void> {
+async function send(pageId: string, message: Message): Promise<void> {
   try {
-    const pageAccessToken = await api.getPageAccessToken(senderId)
+    const pageAccessToken = await api.getPageAccessToken(pageId)
     if (pageAccessToken) {
       const resp = await axios.post(
         'https://graph.facebook.com/v5.0/me/messages',

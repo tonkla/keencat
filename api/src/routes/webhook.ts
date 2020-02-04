@@ -4,8 +4,10 @@ import pageRepository from '../pkg/db/page'
 
 async function findPage(ctx: Context) {
   const { pageId } = ctx.request.body
-  if (pageId) ctx.body = await pageRepository.find(pageId)
-  else ctx.status = 400
+  if (pageId) {
+    const page = await pageRepository.find(pageId)
+    if (page) ctx.body = page
+  }
 }
 
 export default {

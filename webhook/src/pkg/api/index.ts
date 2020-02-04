@@ -11,8 +11,8 @@ const api = axios.create({ headers: { authorization: accessToken } })
 
 async function getPageAccessToken(pageId: string): Promise<string | null> {
   try {
-    const result = await api.post(url, { cmd: 'findPage', pageId })
-    return result.data.pageAccessToken
+    const { data } = await api.post(`${url}/find-page`, { pageId })
+    return data && data.accessToken ? data.accessToken : null
   } catch (e) {
     return null
   }
