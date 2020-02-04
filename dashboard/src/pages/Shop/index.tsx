@@ -6,14 +6,14 @@ import { pageRepository } from '../../services/repositories'
 import facebook from '../../services/facebook'
 import utils from '../../services/utils'
 import { Page, Shop } from '../../typings'
-import { FBPageAccessToken } from '../../typings/facebook'
+import { FBPage } from '../../typings/facebook'
 
 import CreateForm from './CreateForm'
 
 const ShopIndex = () => {
   const [step, setStep] = useState(0)
   const [isCreateShop, setCreateShop] = useState(false)
-  const [pages, setPages] = useState<Page[]>([])
+  const [pages, setPages] = useState<FBPage[]>([])
 
   const createShop = useStoreActions(a => a.shopState.create)
 
@@ -24,37 +24,15 @@ const ShopIndex = () => {
 
   async function handleGrantAccessFacebookPages() {
     if (!user) return
-
     await facebook.logIn({ scope: 'pages_show_list,pages_messaging' })
     const fbPages = await facebook.getPages()
-    const { authResponse } = await facebook.getLoginStatus()
-    if (!authResponse || !authResponse.accessToken) return
-
-    const asyncPageAccessTokens: Promise<FBPageAccessToken | null>[] = []
-    const pages_1 = fbPages.map(fbPage => {
-      asyncPageAccessTokens.push(facebook.getPageAccessToken(fbPage.id))
-      const p: Page = {
-        id: fbPage.id,
-        name: fbPage.name,
-        owner: user,
-        userAccessToken: authResponse.accessToken,
-      }
-      return p
-    })
-
-    const pageAccessTokens = await Promise.all(asyncPageAccessTokens)
-    const pages_2 = pages_1.map(page => {
-      const pat = pageAccessTokens.find(pat => (pat && pat.id === page.facebookPageId ? pat : null))
-      return pat ? { ...page, pageAccessToken: pat.access_token } : page
-    })
-
-    await Promise.all(pages_2.map(page => pageRepository.create(page)))
-    setPages(pages_2)
-    if (pages_2.length > 0) setStep(1)
+    setPages(fbPages)
+    if (fbPages.length > 0) setStep(1)
   }
 
   async function handleCreateShop(values: any) {
-    if (!user) return
+    if (!user || pages.length < 1) return
+
     const shop: Shop = {
       id: utils.genId(),
       name: values.shopName,
@@ -62,6 +40,21 @@ const ShopIndex = () => {
       owner: user,
     }
     createShop(shop)
+
+    const { authResponse } = await facebook.getLoginStatus()
+    if (!authResponse || !authResponse.accessToken) return
+
+    const fbPage = pages.find(page => page.id === values.pageId)
+    if (fbPage) {
+      const page: Page = {
+        id: fbPage.id,
+        name: fbPage.name,
+        psid: authResponse.userID,
+        userAccessToken: authResponse.accessToken,
+        owner: user,
+      }
+      await pageRepository.create(page)
+    }
   }
 
   return (

@@ -1,8 +1,9 @@
-import { LoginStatus, FBPage, FBPageAccessToken, UserInfo } from '../typings/facebook'
+import { FBLoginStatus, FBPage, FBUserInfo } from '../typings/facebook'
+// import { FBLoginStatus, FBPage, FBPageAccessToken, FBUserInfo } from '../typings/facebook'
 
 const _window: any = window
 
-function init() {
+function init(): Promise<void> {
   return new Promise(resolve => {
     if (typeof _window.FB !== 'undefined') resolve()
     else {
@@ -28,24 +29,13 @@ function init() {
   })
 }
 
-function getLoginStatus(): Promise<LoginStatus> {
+function logIn(scope = {}): Promise<FBLoginStatus> {
   return new Promise(resolve => {
-    init().then(() => _window.FB.getLoginStatus((response: any) => resolve(response)))
+    init().then(() => _window.FB.login((response: FBLoginStatus) => resolve(response), scope))
   })
 }
 
-function logIn(permissions = {}) {
-  return new Promise(resolve => {
-    init().then(() => {
-      _window.FB.login((response: any) => {
-        if (response.status === 'connected') resolve(response)
-        else resolve(null)
-      }, permissions)
-    })
-  })
-}
-
-function logOut() {
+function logOut(): Promise<void> {
   return new Promise(resolve => {
     init().then(async () => {
       if (await isAuthenticated()) {
@@ -60,7 +50,13 @@ function logOut() {
   })
 }
 
-function getUserInfo(): Promise<UserInfo | null> {
+function getLoginStatus(): Promise<FBLoginStatus> {
+  return new Promise(resolve => {
+    init().then(() => _window.FB.getLoginStatus((response: FBLoginStatus) => resolve(response)))
+  })
+}
+
+function getUserInfo(): Promise<FBUserInfo | null> {
   return new Promise(resolve => {
     init().then(async () => {
       if (!(await isAuthenticated())) resolve(null)
@@ -83,37 +79,37 @@ function getPages(): Promise<FBPage[]> {
     init().then(async () => {
       if (!(await isAuthenticated())) resolve([])
       _window.FB.api('/me/accounts', ({ data }: any) => {
-        resolve(data.map((p: any) => ({ id: p.id, name: p.name })))
+        resolve(data.map((p: FBPage) => ({ id: p.id, name: p.name })))
       })
     })
   })
 }
 
-function getPageAccessToken(pageId: string): Promise<FBPageAccessToken | null> {
-  return new Promise(resolve => {
-    if (!pageId) resolve(null)
-    init().then(async () => {
-      if (!(await isAuthenticated())) resolve(null)
-      _window.FB.api(`/${pageId}?fields=access_token`, (response: any) => {
-        if (response?.access_token) {
-          resolve({ id: response.id, access_token: response.access_token })
-        }
-      })
-    })
-  })
-}
+// function getPageAccessToken(pageId: string): Promise<FBPageAccessToken | null> {
+//   return new Promise(resolve => {
+//     if (!pageId) resolve(null)
+//     init().then(async () => {
+//       if (!(await isAuthenticated())) resolve(null)
+//       _window.FB.api(`/${pageId}?fields=access_token`, (response: any) => {
+//         if (response?.access_token) {
+//           resolve({ id: response.id, access_token: response.access_token })
+//         } else resolve(null)
+//       })
+//     })
+//   })
+// }
 
 async function isAuthenticated(): Promise<boolean> {
-  const { status }: any = await getLoginStatus()
-  return status && status === 'connected'
+  const { status } = await getLoginStatus()
+  return status === 'connected'
 }
 
 export default {
+  logIn,
+  logOut,
   getLoginStatus,
-  getPageAccessToken,
+  // getPageAccessToken,
   getPages,
   getUserInfo,
   isAuthenticated,
-  logIn,
-  logOut,
 }

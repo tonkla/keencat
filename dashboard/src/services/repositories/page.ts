@@ -6,7 +6,7 @@ async function find(pageId: string) {}
 async function findByOwner(owner: User) {}
 
 async function create(page: Page): Promise<void> {
-  await api.call({ cmd: 'createPage', page })
+  await api.call('/create-page', { page })
 }
 
 async function update(page: Page) {}

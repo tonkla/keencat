@@ -1,4 +1,4 @@
-export interface LoginStatus {
+export interface FBLoginStatus {
   status: 'connected' | 'not_authorized' | 'unknown'
   authResponse: {
     accessToken: string
@@ -9,8 +9,12 @@ export interface LoginStatus {
 }
 
 export interface FBPage {
-  id: string
+  access_token: string
+  category: string
+  category_list: string[]
   name: string
+  id: string
+  tasks: string[]
 }
 
 export interface FBPageAccessToken {
@@ -18,7 +22,7 @@ export interface FBPageAccessToken {
   access_token: string
 }
 
-export interface UserInfo {
+export interface FBUserInfo {
   id: string
   name: string
   photoURL: string
