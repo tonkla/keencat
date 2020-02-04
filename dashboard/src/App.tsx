@@ -14,7 +14,7 @@ import InboxIndex from './pages/Inbox'
 import OrderIndex from './pages/Order'
 
 import 'antd/dist/antd.css'
-import './styles/App.scss'
+import './App.scss'
 
 const App = () => (
   <StoreProvider store={store}>

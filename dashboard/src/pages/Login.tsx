@@ -7,7 +7,7 @@ import auth from '../services/firebase/auth'
 import userRepo from '../services/firebase/firestore/user'
 import { User } from '../typings'
 
-import '../styles/Login.scss'
+import './Login.scss'
 
 const Login = () => {
   const KEY_EMAIL = 'signinemail'
