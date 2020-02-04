@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import auth from './pkg/auth'
-import dashboard from './routes/dashboard'
+import { page, shop } from './routes/dashboard'
 import webhook from './routes/webhook'
 
 async function handleError(ctx: Context, next: Function) {
@@ -24,8 +24,16 @@ async function authorize(ctx: Context, next: Function) {
 
   const { path } = ctx.request
   if (path.indexOf('/dashboard') === 0) {
-    const { authorization, uid } = ctx.headers
-    if (authorization && auth.authorize(authorization, uid)) return await next()
+    const { authorization } = ctx.headers
+    if (authorization) {
+      const uid = auth.authorize(authorization)
+      if (!uid) ctx.status = 401
+      else {
+        await next()
+        if (!ctx.status || ctx.status !== 200) ctx.status = 400
+        return
+      }
+    }
   } else if (path.indexOf('/webhook') === 0) {
     const accessToken = process.env.API_ACCESS_TOKEN || ''
     const { authorization } = ctx.headers
@@ -38,7 +46,9 @@ const r1 = new Router()
 r1.get('/ping', (ctx: Context) => (ctx.body = 'pong'))
 
 const r2 = new Router()
-r2.post('/create-shop', dashboard.createShop)
+r2.post('/create-page', page.create)
+r2.post('/create-shop', shop.create)
+r2.post('/find-shops-by-owner', shop.findByOwner)
 
 const r3 = new Router()
 r3.post('/find-page', webhook.findPage)
