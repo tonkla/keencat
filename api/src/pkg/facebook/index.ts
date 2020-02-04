@@ -22,8 +22,6 @@ async function extendUserAccessToken(accessToken: string): Promise<FBUserAccessT
   }
 }
 
-async function extendPageAccessToken(accessToken: string) {}
-
 async function debugToken(token: string): Promise<FBUserPageToken | null> {
   try {
     const appId = process.env.FB_APP_ID || ''
@@ -51,7 +49,6 @@ async function getPages(extendedUserToken: string): Promise<FBPage[]> {
 
 export default {
   extendUserAccessToken,
-  extendPageAccessToken,
   debugToken,
   getPages,
 }
