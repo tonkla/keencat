@@ -8,7 +8,7 @@ async function find(pageId: string): Promise<Page | null> {
   try {
     const doc = await admin
       .firestore()
-      .collection('fbpages')
+      .collection('pages')
       .doc(pageId)
       .get()
     if (doc.exists) return doc.data() as Page
