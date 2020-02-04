@@ -26,11 +26,28 @@ async function authorize(ctx: Context, next: Function) {
   if (path.indexOf('/dashboard') === 0) {
     const { authorization } = ctx.headers
     if (authorization) {
-      const uid = auth.authorize(authorization)
-      if (!uid) ctx.status = 401
-      else {
+      const uid = await auth.authorize(authorization)
+      if (uid) {
+        // Verify owner of the incoming data
+        const { owner } = ctx.request.body
+        if (owner && owner.firebaseId !== uid) {
+          ctx.status = 401
+          return
+        }
+
         await next()
-        if (!ctx.status || ctx.status !== 200) ctx.status = 400
+
+        // Verify owner of the outgoing data
+        if (ctx.body && ctx.body.owner && ctx.body.owner !== uid) {
+          ctx.body = {}
+          ctx.status = 401
+          return
+        }
+
+        // Set default HTTP Status to '400: Bad Request'
+        if (!ctx.status || !(ctx.status === 200 || ctx.status === 500)) {
+          ctx.status = 400
+        }
         return
       }
     }

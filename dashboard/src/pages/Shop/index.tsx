@@ -102,7 +102,7 @@ const ShopIndex = () => {
                   <CreateForm pages={pages} callback={handleCreateShop} />
                 ) : (
                   <div>
-                    <span>You don't have any available page to be connected with a new shop.</span>
+                    <span>You don't have any available page to connect with a new shop.</span>
                   </div>
                 )}
               </div>
