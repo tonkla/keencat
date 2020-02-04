@@ -4,11 +4,12 @@ import { Shop, User } from '../../typings'
 async function find(id: string) {}
 
 async function findByOwner(owner: User): Promise<Shop[]> {
-  return []
+  const resp = await api.call('/find-shops-by-owner', { owner })
+  return resp && resp.data ? resp.data : []
 }
 
 async function create(shop: Shop): Promise<void> {
-  await api.call({ cmd: 'createShop', shop })
+  await api.call('/create-shop', { shop })
 }
 
 async function update(shop: Shop) {}

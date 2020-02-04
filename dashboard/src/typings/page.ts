@@ -2,9 +2,8 @@ import { User } from './user'
 
 export interface Page {
   id: string
+  psid: string
+  name: string
   owner: User
-  name?: string
-  facebookPageId?: string
-  pageAccessToken?: string
-  userAccessToken?: string
+  userAccessToken: string
 }

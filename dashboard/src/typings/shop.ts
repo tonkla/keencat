@@ -6,9 +6,3 @@ export interface Shop {
   pageId: string
   owner: User
 }
-
-export interface CreateShopParams {
-  name: string
-  pageId: string
-  userAccessToken: string
-}
