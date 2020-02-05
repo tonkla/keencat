@@ -21,6 +21,22 @@ async function findByCategory(categoryId: string): Promise<Product[]> {
   }
 }
 
+async function findByPage(pageId: string): Promise<Product[]> {
+  try {
+    const products: Product[] = []
+    const docs = await db
+      .collection('products')
+      .where('pageId', '==', pageId)
+      .get()
+    docs.forEach(d => {
+      if (d.exists) products.push(d.data() as Product)
+    })
+    return products
+  } catch (e) {
+    return []
+  }
+}
+
 async function create(input: ProductInput): Promise<boolean> {
   try {
     const { owner, ..._input } = input
@@ -42,6 +58,7 @@ async function remove(product: Product) {}
 export default {
   find,
   findByCategory,
+  findByPage,
   create,
   update,
   remove,
