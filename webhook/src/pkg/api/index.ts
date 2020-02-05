@@ -22,17 +22,27 @@ async function resetPageAccessToken(pageId: string): Promise<boolean> {
   return false
 }
 
-async function getCategories(pageId: string): Promise<Category[]> {
-  return []
+async function findCategories(pageId: string): Promise<Category[]> {
+  try {
+    const { data } = await api.post(`${url}/find-categories`, { pageId })
+    return data ? data : []
+  } catch (e) {
+    return []
+  }
 }
 
-async function getProducts(pageId: string, categoryId?: string): Promise<Product[]> {
-  return []
+async function findProducts(pageId: string, categoryId?: string): Promise<Product[]> {
+  try {
+    const { data } = await api.post(`${url}/find-products`, { pageId, categoryId })
+    return data ? data : []
+  } catch (e) {
+    return []
+  }
 }
 
 export default {
-  getCategories,
   getPageAccessToken,
   resetPageAccessToken,
-  getProducts,
+  findCategories,
+  findProducts,
 }

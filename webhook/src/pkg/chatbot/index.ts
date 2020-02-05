@@ -26,14 +26,14 @@ function buildCategoryElements(categories: Category[]): GenericTemplateElement[]
     subtitle: '',
     default_action: {
       type: 'web_url',
-      url: 'https://www.sleepycatty.com/',
+      url: 'https://keencat.co/',
       webview_height_ratio: 'COMPACT',
       messenger_extensions: true,
     },
     buttons: [
       {
         type: 'web_url',
-        url: 'https://www.sleepycatty.com/',
+        url: 'https://keencat.co/',
         title: 'View Details',
         webview_height_ratio: 'TALL',
         messenger_extensions: true,
@@ -54,13 +54,13 @@ function buildProductElements(products: Product[]): GenericTemplateElement[] {
     subtitle: '',
     default_action: {
       type: 'web_url',
-      url: 'https://www.sleepycatty.com',
+      url: 'https://keencat.co/',
       webview_height_ratio: 'COMPACT',
     },
     buttons: [
       {
         type: 'web_url',
-        url: 'https://www.sleepycatty.com',
+        url: 'https://keencat.co/',
         title: 'View Details',
       },
       {
@@ -85,21 +85,20 @@ function buildAttachmentTemplate(elements: GenericTemplateElement[]): ResponseMe
 }
 
 function handleUnknownMessage(): ResponseMessage {
-  return { text: 'TODO: show help' }
+  return { text: 'TODO: Show Help' }
 }
 
-async function handleMessage(p: MessageParams): Promise<ResponseMessage> {
-  switch (await getIntent(p.text)) {
+async function handleMessage(input: MessageParams): Promise<ResponseMessage> {
+  switch (await getIntent(input.text)) {
     case 'greeting':
       return { text: t.hello }
     case 'list_categories': {
-      const categories = await api.getCategories(p.pageId)
+      const categories = await api.findCategories(input.pageId)
       const elements = buildCategoryElements(categories)
       return buildAttachmentTemplate(elements)
     }
     case 'list_products': {
-      const categoryId = p.categoryId || ''
-      const products = await api.getProducts(p.pageId, categoryId)
+      const products = await api.findProducts(input.pageId, input.categoryId)
       const elements = buildProductElements(products)
       return buildAttachmentTemplate(elements)
     }
@@ -111,7 +110,7 @@ async function handleMessage(p: MessageParams): Promise<ResponseMessage> {
 async function handlePostback(p: MessageParams): Promise<ResponseMessage> {
   switch (p.text) {
     case 'list_products': {
-      const products = await api.getProducts(p.pageId, p.categoryId)
+      const products = await api.findProducts(p.pageId, p.categoryId)
       const elements = buildProductElements(products)
       return buildAttachmentTemplate(elements)
     }

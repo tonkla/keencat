@@ -71,7 +71,8 @@ r2.post('/find-products-by-category', product.findByCategory)
 r2.post('/find-shops-by-owner', shop.findByOwner)
 
 const r3 = new Router()
-r3.post('/find-categories-by-page', webhook.findCategoriesByPage)
+r3.post('/find-categories', webhook.findCategories)
+r3.post('/find-products', webhook.findProducts)
 r3.post('/find-page', webhook.findPage)
 
 new Koa()

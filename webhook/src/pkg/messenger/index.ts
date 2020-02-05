@@ -77,6 +77,7 @@ async function handlePostback(event: MessageEvent): Promise<void> {
     messaging_type: 'RESPONSE',
     message: {},
   }
+
   if (event.postback.payload === 'menu') {
     const message = { text: 'TODO: Show Menu' }
     await send(senderId, { ...response, message })
