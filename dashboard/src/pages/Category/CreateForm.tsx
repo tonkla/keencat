@@ -20,12 +20,10 @@ const CreateForm = (props: any) => {
     },
   }
 
-  const handleSubmit = (e: any) => {
+  function handleSubmit(e: any) {
     e.preventDefault()
     props.form.validateFieldsAndScroll((err: any, values: any) => {
-      if (!err) {
-        props.callback(values)
-      }
+      if (!err) props.callback(values)
     })
   }
 

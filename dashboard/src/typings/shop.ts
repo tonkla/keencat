@@ -5,4 +5,5 @@ export interface Shop {
   name: string
   pageId: string
   owner: User
+  ownerId?: string
 }

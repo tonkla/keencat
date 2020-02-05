@@ -7,11 +7,5 @@ export interface Product {
   shopId: string
   pageId: string
   owner: User
-}
-
-export interface CreateProductParams {
-  name: string
-  categoryId: string
-  shopId: string
-  pageId: string
+  ownerId?: string
 }

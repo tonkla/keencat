@@ -1,0 +1,19 @@
+.loading {
+  display: flex;
+  color: #909090;
+  i {
+    color: #b0b0b0;
+    font-size: 1.2rem;
+    padding-right: 10px;
+  }
+  &.center {
+    align-items: center;
+    justify-content: center;
+    padding-top: 30px;
+    i {
+      color: #b0b0b0;
+      font-size: 1.5rem;
+      padding-right: 10px;
+    }
+  }
+}

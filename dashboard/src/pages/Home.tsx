@@ -4,6 +4,7 @@ import { Icon, Layout } from 'antd'
 
 import { useStoreState, useStoreActions } from '../store'
 import shopRepository from '../services/repositories/shop'
+import utils from '../services/utils'
 import { Shop } from '../typings/shop'
 
 import Loading from '../components/Loading'
@@ -15,7 +16,7 @@ import './Home.scss'
 
 const Home: React.FC = ({ children }) => {
   const [collapsed, setCollapse] = useState(false)
-  const [isLoading, setLoading] = useState(true)
+  const [isLoading, setLoading] = useState(false)
 
   const setActiveShop = useStoreActions(a => a.activeState.setShop)
   const setShops = useStoreActions(a => a.shopState.setShops)
@@ -26,14 +27,15 @@ const Home: React.FC = ({ children }) => {
 
   useEffect(() => {
     if (!user) return
-    setLoading(true)
+    if (utils.isDev() && shops.length > 0) return
     ;(async () => {
-      const shops = await shopRepository.findByOwner(user)
-      setShops(shops)
-      if (!activeShop && shops.length > 0) setActiveShop(shops[0])
+      setLoading(true)
+      const _shops = await shopRepository.findByOwner(user)
+      setShops(_shops)
+      if (!activeShop && _shops.length > 0) setActiveShop(_shops[0])
       setLoading(false)
     })()
-  }, [user, activeShop, setShops, setActiveShop])
+  }, [user, shops, activeShop, setShops, setActiveShop])
 
   function onShopChanged(shopId: string) {
     if (activeShop && activeShop.id !== shopId) {
@@ -76,7 +78,7 @@ const Home: React.FC = ({ children }) => {
               <UserAvatar user={user} />
             </div>
           </Header>
-          <Content>{isLoading ? <Loading /> : children}</Content>
+          <Content>{isLoading ? <Loading position="center" /> : children}</Content>
           <Footer>
             Crafted with{' '}
             <span className="love" aria-label="love" role="img">

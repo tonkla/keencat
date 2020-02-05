@@ -4,10 +4,10 @@ export interface Shop {
   id: string
   name: string
   pageId: string
-  owner: string
+  ownerId: string
 }
 
-export interface ShopParams {
+export interface ShopInput {
   id: string
   name: string
   pageId: string
