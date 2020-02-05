@@ -26,20 +26,20 @@ const Home: React.FC = ({ children }) => {
   const shopId = useStoreState(s => s.activeState.shopId)
   const activeShop = shops.find(s => s.id === shopId)
 
+  // Note: DO NOT combine these two useEffects, will cause infinity loop with dependencies
   useEffect(() => {
+    if (utils.isDev()) return
     if (!user) return
-    if (utils.isDev() && shops.length > 0) {
-      if (!activeShop) setActiveShop(shops[0].id)
-      return
-    }
     ;(async () => {
       setLoading(true)
-      const _shops = await shopRepository.findByOwner(user)
-      setShops(_shops)
-      if (!activeShop && _shops.length > 0) setActiveShop(_shops[0].id)
+      setShops(await shopRepository.findByOwner(user))
       setLoading(false)
     })()
-  }, [user, shops, activeShop, setShops, setActiveShop])
+  }, [user, setShops])
+
+  useEffect(() => {
+    if (!activeShop && shops.length > 0) setActiveShop(shops[0].id)
+  }, [activeShop, shops, setActiveShop])
 
   function onShopChanged(shopId: string) {
     if (activeShop && activeShop.id !== shopId) {
