@@ -61,7 +61,7 @@ const ShopIndex = () => {
     <div>
       {shops.length > 0 && (
         <div style={{ marginBottom: 24 }}>
-          <Card title="Your Shops" bordered={false}>
+          <Card title="Shops" bordered={false}>
             <ul>
               {shops.map((shop: any) => (
                 <li key={shop.id}>{shop.name}</li>

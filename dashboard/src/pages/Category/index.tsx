@@ -17,16 +17,18 @@ const CategoryIndex = () => {
   const setCategories = useStoreActions(a => a.categoryState.setCategories)
 
   const user = useStoreState(s => s.userState.user)
-  const shop = useStoreState(s => s.activeState.shop)
+  const shops = useStoreState(s => s.shopState.shops)
+  const shopId = useStoreState(s => s.activeState.shopId)
+  const activeShop = shops.find(s => s.id === shopId)
   const categories = useStoreState(s => s.categoryState.categories)
 
   const handleCreateCategory = async (values: any) => {
-    if (!user || !shop) return
+    if (!user || !activeShop) return
     const category: Category = {
       id: utils.genId(),
       name: values.categoryName,
-      shopId: shop.id,
-      pageId: shop.pageId,
+      shopId: activeShop.id,
+      pageId: activeShop.pageId,
       owner: user,
     }
     createCategory(category)
@@ -34,17 +36,17 @@ const CategoryIndex = () => {
   }
 
   useEffect(() => {
-    if (!user || !shop) return
+    if (!user || !activeShop) return
     ;(async () => {
       setLoading(true)
-      setCategories(await categoryRepository.findByShop(shop.id))
+      setCategories(await categoryRepository.findByShop(activeShop.id))
       setLoading(false)
     })()
-  }, [user, shop, setCategories])
+  }, [user, activeShop, setCategories])
 
   return (
     <div>
-      <Card title="Category" bordered={false}>
+      <Card title="Categories" bordered={false}>
         {isLoading ? (
           <Loading position="left" />
         ) : categories.length === 0 ? (

@@ -1,7 +1,5 @@
 import React from 'react'
-import { Button, Form, Input, Select } from 'antd'
-
-import { Category } from '../../typings'
+import { Button, Form, Input } from 'antd'
 
 const CreateForm = (props: any) => {
   const { getFieldDecorator } = props.form
@@ -31,24 +29,6 @@ const CreateForm = (props: any) => {
 
   return (
     <Form {...formItemLayout} onSubmit={handleSubmit}>
-      <Form.Item label="Category">
-        {getFieldDecorator('categoryId', {
-          rules: [
-            {
-              required: true,
-              message: 'Please choose a category',
-            },
-          ],
-        })(
-          <Select placeholder="Choose Category" optionFilterProp="children">
-            {props.categories.map((category: Category) => (
-              <Select.Option key={category.id} value={category.id}>
-                {category.name}
-              </Select.Option>
-            ))}
-          </Select>
-        )}
-      </Form.Item>
       <Form.Item label="Product Name">
         {getFieldDecorator('productName', {
           rules: [

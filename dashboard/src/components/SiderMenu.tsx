@@ -8,7 +8,9 @@ import logo from '../assets/images/logo.png'
 import './SiderMenu.scss'
 
 const SiderMenu = (props: any) => {
-  const activeShop = useStoreState(s => s.activeState.shop)
+  const shops = useStoreState(s => s.shopState.shops)
+  const shopId = useStoreState(s => s.activeState.shopId)
+  const activeShop = shops.find(s => s.id === shopId)
 
   const location = useLocation()
 
