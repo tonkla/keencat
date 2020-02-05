@@ -4,7 +4,7 @@ import { Shop, User } from '../../typings'
 async function find(id: string) {}
 
 async function findByOwner(owner: User): Promise<Shop[]> {
-  const resp = await api.call('/find-shops-by-owner', { owner })
+  const resp = await api.call('/find-shops', { owner })
   return resp && resp.data ? resp.data : []
 }
 
