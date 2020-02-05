@@ -23,7 +23,11 @@ async function authorize(ctx: Context, next: Function) {
   if (ctx.request.method !== 'POST') return await next()
 
   const { path } = ctx.request
-  if (path.indexOf('/dashboard') === 0) {
+  if (path.indexOf('/webhook') === 0) {
+    const accessToken = process.env.API_ACCESS_TOKEN || ''
+    const { authorization } = ctx.headers
+    if (authorization && authorization === accessToken) return await next()
+  } else if (path.indexOf('/dashboard') === 0) {
     const { authorization } = ctx.headers
     if (authorization) {
       const uid = await auth.authorize(authorization)
@@ -50,10 +54,6 @@ async function authorize(ctx: Context, next: Function) {
         return
       }
     }
-  } else if (path.indexOf('/webhook') === 0) {
-    const accessToken = process.env.API_ACCESS_TOKEN || ''
-    const { authorization } = ctx.headers
-    if (authorization && authorization === accessToken) return await next()
   }
   ctx.status = 401
 }
@@ -62,18 +62,18 @@ const r1 = new Router()
 r1.get('/ping', (ctx: Context) => (ctx.body = 'pong'))
 
 const r2 = new Router()
-r2.post('/create-category', category.create)
-r2.post('/create-page', page.create)
-r2.post('/create-product', product.create)
-r2.post('/create-shop', shop.create)
-r2.post('/find-categories-by-shop', category.findByShop)
-r2.post('/find-products-by-category', product.findByCategory)
-r2.post('/find-shops-by-owner', shop.findByOwner)
+r2.post('/find-categories', webhook.findCategories)
+r2.post('/find-products', webhook.findProducts)
+r2.post('/find-page', webhook.findPage)
 
 const r3 = new Router()
-r3.post('/find-categories', webhook.findCategories)
-r3.post('/find-products', webhook.findProducts)
-r3.post('/find-page', webhook.findPage)
+r3.post('/create-category', category.create)
+r3.post('/create-page', page.create)
+r3.post('/create-product', product.create)
+r3.post('/create-shop', shop.create)
+r3.post('/find-categories', category.findByShop)
+r3.post('/find-products', product.findByCategory)
+r3.post('/find-shops', shop.findByOwner)
 
 new Koa()
   .use(cors())
@@ -81,6 +81,6 @@ new Koa()
   .use(handleError)
   .use(r1.routes())
   .use(authorize)
-  .use(r2.mount('/dashboard'))
-  .use(r3.mount('/webhook'))
+  .use(r2.mount('/webhook'))
+  .use(r3.mount('/dashboard'))
   .listen({ port: 8080 }, () => console.log('🚀 API Launched'))

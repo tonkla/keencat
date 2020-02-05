@@ -4,7 +4,7 @@ import { Product } from '../../typings'
 async function find(id: string) {}
 
 async function findByCategory(categoryId: string): Promise<Product[]> {
-  const resp = await api.call('/find-products-by-category', { categoryId })
+  const resp = await api.call('/find-products', { categoryId })
   return resp && resp.data ? resp.data : []
 }
 
