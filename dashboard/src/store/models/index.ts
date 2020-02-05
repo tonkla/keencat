@@ -18,7 +18,7 @@ const storeModel: StoreModel = persist(
   { activeState, categoryState, productState, shopState, userState },
   {
     storage: 'localStorage',
-    blacklist: ['categoryState', 'productState', 'shopState'],
+    blacklist: ['categoryState', 'productState'],
   }
 )
 

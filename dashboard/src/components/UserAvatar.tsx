@@ -18,6 +18,7 @@ const UserAvatar = ({ user }: UserProps) => {
   const handleSignOut = async () => {
     await auth.signOut()
     setUser(null)
+    localStorage.clear()
     history.push('/login')
   }
 

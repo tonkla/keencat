@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import auth from './pkg/auth'
-import { page, shop } from './routes/dashboard'
+import { category, page, shop } from './routes/dashboard'
 import webhook from './routes/webhook'
 
 async function handleError(ctx: Context, next: Function) {
@@ -45,9 +45,8 @@ async function authorize(ctx: Context, next: Function) {
         }
 
         // Set default HTTP Status to '400: Bad Request'
-        if (!ctx.status || !(ctx.status === 200 || ctx.status === 500)) {
-          ctx.status = 400
-        }
+        if (ctx.status !== 200 && ctx.status !== 500) ctx.status = 400
+
         return
       }
     }
@@ -63,11 +62,14 @@ const r1 = new Router()
 r1.get('/ping', (ctx: Context) => (ctx.body = 'pong'))
 
 const r2 = new Router()
+r2.post('/create-category', category.create)
 r2.post('/create-page', page.create)
 r2.post('/create-shop', shop.create)
+r2.post('/find-categories-by-shop', category.findByShop)
 r2.post('/find-shops-by-owner', shop.findByOwner)
 
 const r3 = new Router()
+r3.post('/find-categories-by-page', webhook.findCategoriesByPage)
 r3.post('/find-page', webhook.findPage)
 
 new Koa()

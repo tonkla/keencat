@@ -6,10 +6,5 @@ export interface Category {
   shopId: string
   pageId: string
   owner: User
-}
-
-export interface CreateCategoryParams {
-  name: string
-  shopId: string
-  pageId: string
+  ownerId?: string
 }

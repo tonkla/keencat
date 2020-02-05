@@ -4,13 +4,13 @@ export interface Page {
   id: string
   psid: string
   name: string
-  owner: string
+  ownerId: string
   accessToken: string
   issuedAt: string
   expiredAt: string
 }
 
-export interface PageParams {
+export interface PageInput {
   id: string
   psid: string
   name: string

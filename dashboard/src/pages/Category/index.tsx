@@ -2,17 +2,18 @@ import React, { useEffect, useState } from 'react'
 import { Button, Card } from 'antd'
 
 import { useStoreActions, useStoreState } from '../../store'
-// import remoteStorage from '../../services/api'
-// import utils from '../../services/utils'
-// import { Category } from '../../typings'
+import categoryRepository from '../../services/repositories/category'
+import utils from '../../services/utils'
+import { Category } from '../../typings'
 
+import Loading from '../../components/Loading'
 import CreateForm from './CreateForm'
 
 const CategoryIndex = () => {
   const [isFormEnabled, setFormEnabled] = useState(false)
-  const [isLoading, setLoading] = useState(true)
+  const [isLoading, setLoading] = useState(false)
 
-  // const createCategory = useStoreActions(a => a.categoryState.create)
+  const createCategory = useStoreActions(a => a.categoryState.create)
   const setCategories = useStoreActions(a => a.categoryState.setCategories)
 
   const user = useStoreState(s => s.userState.user)
@@ -21,30 +22,31 @@ const CategoryIndex = () => {
 
   const handleCreateCategory = async (values: any) => {
     if (!user || !shop) return
-    // const category: Category = {
-    //   id: utils.genId(),
-    //   name: values.categoryName,
-    //   shopId: shop.id,
-    //   pageId: shop.pageId,
-    //   owner: user.id,
-    // }
-    // createCategory(category)
+    const category: Category = {
+      id: utils.genId(),
+      name: values.categoryName,
+      shopId: shop.id,
+      pageId: shop.pageId,
+      owner: user,
+    }
+    createCategory(category)
     setFormEnabled(false)
   }
 
   useEffect(() => {
+    if (!user || !shop) return
     ;(async () => {
-      if (!shop) return
-      // setCategories(await remoteStorage.getCategories(shop))
+      setLoading(true)
+      setCategories(await categoryRepository.findByShop(shop.id))
       setLoading(false)
     })()
-  }, [shop, setCategories])
+  }, [user, shop, setCategories])
 
   return (
     <div>
       <Card title="Category" bordered={false}>
         {isLoading ? (
-          <span>Loading...</span>
+          <Loading position="left" />
         ) : categories.length === 0 ? (
           <span>There is no category, add a new one.</span>
         ) : (

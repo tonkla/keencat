@@ -1,5 +1,5 @@
 import admin from '../firebase/index'
-import { Shop, ShopParams, User } from '../../typings'
+import { Shop, ShopInput, User } from '../../typings'
 
 const db = admin.firestore()
 
@@ -21,9 +21,10 @@ async function findByOwner(owner: User): Promise<Shop[]> {
   }
 }
 
-async function create(params: ShopParams): Promise<boolean> {
+async function create(input: ShopInput): Promise<boolean> {
   try {
-    const shop = { ...params, owner: params.owner.firebaseId }
+    const { owner, ..._input } = input
+    const shop: Shop = { ..._input, ownerId: input.owner.firebaseId }
     await db
       .collection('shops')
       .doc(shop.id)

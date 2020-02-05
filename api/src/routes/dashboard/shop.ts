@@ -4,10 +4,7 @@ import shopRepository from '../../pkg/db/shop'
 
 async function findByOwner(ctx: Context) {
   const { owner } = ctx.request.body
-  if (owner) {
-    ctx.body = await shopRepository.findByOwner(owner)
-    ctx.status = 200
-  }
+  if (owner) ctx.body = await shopRepository.findByOwner(owner)
 }
 
 async function create(ctx: Context) {
