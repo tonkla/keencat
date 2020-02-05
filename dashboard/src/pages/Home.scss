@@ -32,11 +32,11 @@
           font-size: 28px;
           color: rgba(0, 0, 0, 0.35);
           &:hover {
-            color: rgba(24, 144, 255, 0.5);
+            color: rgba(24, 144, 255, 0.7);
           }
         }
         span {
-          color: rgba(0, 0, 0, 0.35);
+          color: rgba(0, 0, 0, 0.5);
           font-weight: 600;
         }
       }
@@ -72,6 +72,10 @@
         text-decoration: none;
       }
     }
+  }
+
+  .ant-card {
+    color: rgba(0, 0, 0, 0.85);
   }
 
   .ant-card-head-title {

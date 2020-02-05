@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import auth from './pkg/auth'
-import { category, page, shop } from './routes/dashboard'
+import { category, page, product, shop } from './routes/dashboard'
 import webhook from './routes/webhook'
 
 async function handleError(ctx: Context, next: Function) {
@@ -64,8 +64,10 @@ r1.get('/ping', (ctx: Context) => (ctx.body = 'pong'))
 const r2 = new Router()
 r2.post('/create-category', category.create)
 r2.post('/create-page', page.create)
+r2.post('/create-product', product.create)
 r2.post('/create-shop', shop.create)
 r2.post('/find-categories-by-shop', category.findByShop)
+r2.post('/find-products-by-category', product.findByCategory)
 r2.post('/find-shops-by-owner', shop.findByOwner)
 
 const r3 = new Router()

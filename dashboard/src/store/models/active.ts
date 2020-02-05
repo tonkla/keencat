@@ -1,16 +1,20 @@
 import { Action, action } from 'easy-peasy'
 
-import { Shop } from '../../typings'
-
 export interface ActiveStateModel {
-  shop: Shop | null
-  setShop: Action<ActiveStateModel, Shop>
+  categoryId: string | null
+  shopId: string | null
+  setCategoryId: Action<ActiveStateModel, string>
+  setShopId: Action<ActiveStateModel, string>
 }
 
 const activeState: ActiveStateModel = {
-  shop: null,
-  setShop: action((state, shop) => {
-    state.shop = shop
+  categoryId: null,
+  shopId: null,
+  setCategoryId: action((state, categoryId) => {
+    state.categoryId = categoryId
+  }),
+  setShopId: action((state, shopId) => {
+    state.shopId = shopId
   }),
 }
 

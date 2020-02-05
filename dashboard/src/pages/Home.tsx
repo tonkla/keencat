@@ -18,21 +18,25 @@ const Home: React.FC = ({ children }) => {
   const [collapsed, setCollapse] = useState(false)
   const [isLoading, setLoading] = useState(false)
 
-  const setActiveShop = useStoreActions(a => a.activeState.setShop)
+  const setActiveShop = useStoreActions(a => a.activeState.setShopId)
   const setShops = useStoreActions(a => a.shopState.setShops)
 
   const user = useStoreState(s => s.userState.user)
-  const activeShop = useStoreState(s => s.activeState.shop)
   const shops = useStoreState(s => s.shopState.shops)
+  const shopId = useStoreState(s => s.activeState.shopId)
+  const activeShop = shops.find(s => s.id === shopId)
 
   useEffect(() => {
     if (!user) return
-    if (utils.isDev() && shops.length > 0) return
+    if (utils.isDev() && shops.length > 0) {
+      if (!activeShop) setActiveShop(shops[0].id)
+      return
+    }
     ;(async () => {
       setLoading(true)
       const _shops = await shopRepository.findByOwner(user)
       setShops(_shops)
-      if (!activeShop && _shops.length > 0) setActiveShop(_shops[0])
+      if (!activeShop && _shops.length > 0) setActiveShop(_shops[0].id)
       setLoading(false)
     })()
   }, [user, shops, activeShop, setShops, setActiveShop])
@@ -40,7 +44,7 @@ const Home: React.FC = ({ children }) => {
   function onShopChanged(shopId: string) {
     if (activeShop && activeShop.id !== shopId) {
       const shop = shops.find(s => s.id === shopId)
-      if (shop) setActiveShop(shop)
+      if (shop) setActiveShop(activeShop.id)
     }
   }
 

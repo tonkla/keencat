@@ -1,10 +1,16 @@
-import { Category, Product } from '../../typings'
+import api from '../api'
+import { Product } from '../../typings'
 
 async function find(id: string) {}
 
-async function findByCategory(category: Category) {}
+async function findByCategory(categoryId: string): Promise<Product[]> {
+  const resp = await api.call('/find-products-by-category', { categoryId })
+  return resp && resp.data ? resp.data : []
+}
 
-async function create(product: Product) {}
+async function create(product: Product): Promise<void> {
+  await api.call('/create-product', { product })
+}
 
 async function update(product: Product) {}
 
