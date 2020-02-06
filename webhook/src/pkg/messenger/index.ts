@@ -2,7 +2,7 @@ import axios from 'axios'
 import qs from 'qs'
 
 import api from '../api'
-import chatbot from '../chatbot'
+import handler from './handler'
 import { MessageEvent, WebhookEvent, WebhookParams } from './typings/request'
 import { Message, ResponseMessage } from './typings/response'
 
@@ -30,7 +30,7 @@ async function handleMessage(event: MessageEvent): Promise<void> {
     message: {},
   }
   if (event.message.text) {
-    const message = await chatbot.handleMessage({
+    const message = await handler.handleMessage({
       text: event.message.text,
       pageId: event.recipient.id,
     })
@@ -83,17 +83,17 @@ async function handlePostback(event: MessageEvent): Promise<void> {
     await send(senderId, { ...response, message })
   }
 
-  const [kind, id] = event.postback.payload.split('=')
-  if (kind === 'categoryId') {
-    const message = await chatbot.handlePostback({
-      text: 'list_products',
+  const [type, id] = event.postback.payload.split('=')
+  if (type === 'categoryId') {
+    const message = await handler.handlePostback({
+      text: 'listProducts',
       pageId: event.recipient.id,
       categoryId: id,
     })
     await send(senderId, { ...response, message })
-  } else if (kind === 'productId') {
-    const message = await chatbot.handlePostback({
-      text: 'buy_product',
+  } else if (type === 'productId') {
+    const message = await handler.handlePostback({
+      text: 'buyProduct',
       pageId: event.recipient.id,
       productId: id,
     })
