@@ -10,7 +10,7 @@ async function detectIntent(text: string): Promise<IntentResponse | null> {
   try {
     const projectId = process.env.DIALOGFLOW_ID || ''
     const client = new dialogflow.SessionsClient({ keyFilename: './key.json' })
-    const session = client.sessionPath(projectId, nanoid(32))
+    const session = client.sessionPath(projectId, nanoid(20))
     const request = {
       session,
       queryInput: {
