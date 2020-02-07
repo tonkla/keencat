@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios'
 
 import auth from '../firebase/auth'
-import { Category, Page, Product, Shop, User } from '../../typings'
+import { Category, Page, Product, Shop } from '../../typings'
 
 interface APICallParams {
   categoryId?: string
@@ -12,7 +12,7 @@ interface APICallParams {
   product?: Product
   shopId?: string
   shop?: Shop
-  owner?: User
+  ownerId?: string
 }
 
 async function call(path: string, params: APICallParams): Promise<AxiosResponse | null> {

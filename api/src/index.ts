@@ -33,23 +33,15 @@ async function authorize(ctx: Context, next: Function) {
       const uid = await auth.authorize(authorization)
       if (uid) {
         // Verify owner of the incoming data
-        const { owner } = ctx.request.body
-        if (owner && owner.firebaseId !== uid) {
+        const { ownerId } = ctx.request.body
+        if (ownerId && ownerId !== uid) {
           ctx.status = 401
           return
         }
+        // Pass uid to verify owner on object level
+        else ctx.request.body = { ...ctx.request.body, ownerId: uid }
 
         await next()
-
-        // Verify owner of the outgoing data
-        if (ctx.body && ctx.body.owner && ctx.body.owner !== uid) {
-          ctx.body = {}
-          ctx.status = 401
-          return
-        }
-
-        // Set default HTTP Status to '400: Bad Request'
-        if (ctx.status !== 200 && ctx.status !== 500) ctx.status = 400
 
         return
       }
