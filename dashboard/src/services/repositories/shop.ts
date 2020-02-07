@@ -1,27 +1,27 @@
 import api from '../api'
-import { Shop, User } from '../../typings'
+import { Shop } from '../../typings'
 
-async function find(id: string) {}
-
-async function findByOwner(owner: User): Promise<Shop[]> {
-  const resp = await api.call('/find-shops', { ownerId: owner.firebaseId })
+async function findByOwner(ownerId: string): Promise<Shop[]> {
+  const resp = await api.call('/find-shops', { ownerId })
   return resp && resp.data ? resp.data : []
 }
 
-async function create(shop: Shop): Promise<void> {
-  await api.call('/create-shop', { shop })
+async function create(shop: Shop): Promise<boolean> {
+  const resp = await api.call('/create-shop', { shop })
+  return resp?.status === 200
 }
 
-async function update(shop: Shop) {
-  await api.call('/update-shop', { shop })
+async function update(shop: Shop): Promise<boolean> {
+  const resp = await api.call('/update-shop', { shop })
+  return resp?.status === 200
 }
 
-async function remove(shop: Shop) {
-  await api.call('/delete-shop', { shop })
+async function remove(shop: Shop): Promise<boolean> {
+  const resp = await api.call('/delete-shop', { shop })
+  return resp?.status === 200
 }
 
 export default {
-  find,
   findByOwner,
   create,
   update,

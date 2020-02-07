@@ -10,10 +10,10 @@ async function findByOwner(ownerId: string): Promise<Shop[]> {
     const shops: Shop[] = []
     const docs = await db
       .collection('shops')
-      .where('owner', '==', ownerId)
+      .where('ownerId', '==', ownerId)
       .get()
     docs.forEach(d => {
-      if (d.exists) shops.push(d.data() as Shop)
+      shops.push(d.data() as Shop)
     })
     return shops
   } catch (e) {
@@ -33,7 +33,17 @@ async function create(shop: Shop): Promise<boolean> {
   }
 }
 
-async function update(shop: Shop) {}
+async function update(shop: Shop): Promise<boolean> {
+  try {
+    await db
+      .collection('shops')
+      .doc(shop.id)
+      .set(shop)
+    return true
+  } catch (e) {
+    return false
+  }
+}
 
 async function remove(shop: Shop) {}
 

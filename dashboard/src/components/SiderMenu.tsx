@@ -46,25 +46,25 @@ const SiderMenu = (props: any) => {
               <Link to="/">Dashboard</Link>
             </span>
           </Menu.Item>
-          <Menu.Item key="/shop">
+          <Menu.Item key="/shops">
             <Icon type="shop" />
             <span>
-              <Link to="/shop">Shop</Link>
+              <Link to="/shops">Shop</Link>
             </span>
           </Menu.Item>
           {activeShop && (
-            <Menu.Item key="/category">
+            <Menu.Item key="/categories">
               <Icon type="folder" />
               <span>
-                <Link to="/category">Category</Link>
+                <Link to="/categories">Category</Link>
               </span>
             </Menu.Item>
           )}
           {activeShop && (
-            <Menu.Item key="/product">
+            <Menu.Item key="/products">
               <Icon type="picture" />
               <span>
-                <Link to="/product">Product</Link>
+                <Link to="/products">Product</Link>
               </span>
             </Menu.Item>
           )}
@@ -77,10 +77,10 @@ const SiderMenu = (props: any) => {
             </Menu.Item>
           )}
           {activeShop && (
-            <Menu.Item key="/order">
+            <Menu.Item key="/orders">
               <Icon type="unordered-list" />
               <span>
-                <Link to="/order">Order</Link>
+                <Link to="/orders">Order</Link>
               </span>
             </Menu.Item>
           )}

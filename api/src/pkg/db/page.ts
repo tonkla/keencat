@@ -36,7 +36,7 @@ async function create(input: PageInput): Promise<boolean> {
       id: input.id,
       name: input.name,
       psid: input.psid,
-      ownerId: input.owner.firebaseId,
+      ownerId: input.ownerId,
       accessToken: extPage.access_token,
       issuedAt: new Date(userPageToken.issued_at * 1000).toISOString(),
       expiredAt: new Date(userPageToken.data_access_expires_at * 1000).toISOString(),

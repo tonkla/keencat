@@ -8,7 +8,7 @@ const Dashboard = () => {
   const shops = useStoreState(s => s.shopState.shops)
 
   return shops.length === 0 ? (
-    <Redirect to="/shop" />
+    <Redirect to="/shops" />
   ) : (
     <Card title="Dashboard" bordered={false}>
       .
