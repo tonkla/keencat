@@ -6,6 +6,8 @@ import productState, { ProductStateModel } from './product'
 import shopState, { ShopStateModel } from './shop'
 import userState, { UserStateModel } from './user'
 
+export interface Injections {}
+
 export interface StoreModel {
   activeState: ActiveStateModel
   categoryState: CategoryStateModel

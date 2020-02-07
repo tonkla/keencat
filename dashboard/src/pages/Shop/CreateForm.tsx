@@ -65,6 +65,11 @@ const CreateForm = (props: any) => {
         <Button type="primary" htmlType="submit">
           Create
         </Button>
+        <div className="btn-cancel">
+          <span className="link" onClick={props.cancel}>
+            Cancel
+          </span>
+        </div>
       </Form.Item>
     </Form>
   )

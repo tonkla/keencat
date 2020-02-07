@@ -37,7 +37,8 @@ const ShopIndex = () => {
       id: utils.genId(),
       name: values.shopName,
       pageId: values.pageId,
-      owner: user,
+      categoryIds: [],
+      ownerId: user.firebaseId,
     }
     createShop(shop)
 
@@ -51,7 +52,7 @@ const ShopIndex = () => {
         name: fbPage.name,
         psid: authResponse.userID,
         userAccessToken: authResponse.accessToken,
-        owner: user,
+        ownerId: user.firebaseId,
       }
       await pageRepository.create(page)
     }
@@ -97,7 +98,11 @@ const ShopIndex = () => {
             {step === 1 && (
               <div style={{ marginTop: 30 }}>
                 {shops.length === 0 || availablePages.length > 0 ? (
-                  <CreateForm pages={pages} callback={handleCreateShop} />
+                  <CreateForm
+                    pages={availablePages}
+                    callback={handleCreateShop}
+                    cancel={() => setStep(0)}
+                  />
                 ) : (
                   <div>
                     <span>You don't have any available page to connect with a new shop.</span>

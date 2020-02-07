@@ -1,7 +1,34 @@
 import { Context } from 'koa'
 
 import categoryRepository from '../../pkg/db/category'
-import { Category } from '../../typings/category'
+
+async function find(ctx: Context) {
+  const { id, ownerId } = ctx.request.body
+  if (!id) {
+    ctx.status = 400
+    return
+  }
+  const category = await categoryRepository.find(id)
+  if (category && category.ownerId !== ownerId) {
+    ctx.status = 401
+    return
+  }
+  ctx.body = category
+}
+
+async function findByIds(ctx: Context) {
+  const { ids, ownerId } = ctx.request.body
+  if (!ids || ids.length < 1) {
+    ctx.status = 400
+    return
+  }
+  const categories = await categoryRepository.findByIds(ids)
+  if (categories.length > 0 && categories[0].ownerId !== ownerId) {
+    ctx.status = 401
+    return
+  }
+  ctx.body = categories
+}
 
 async function findByShop(ctx: Context) {
   const { shopId, ownerId } = ctx.request.body
@@ -23,16 +50,31 @@ async function create(ctx: Context) {
     ctx.status = 400
     return
   }
-  if (!ownerId || ownerId !== category.owner.firebaseId) {
+  if (!ownerId || ownerId !== category.ownerId) {
     ctx.status = 401
     return
   }
-  const { owner, ...input } = category
-  const _category: Category = { ...input, ownerId: input.owner.firebaseId }
-  if (await categoryRepository.create(_category)) ctx.status = 200
+  if (await categoryRepository.create(category)) ctx.status = 200
+  ctx.status = 200
+}
+
+async function update(ctx: Context) {
+  const { category, ownerId } = ctx.request.body
+  if (!category) {
+    ctx.status = 400
+    return
+  }
+  if (!ownerId || ownerId !== category.ownerId) {
+    ctx.status = 401
+    return
+  }
+  if (await categoryRepository.update(category)) ctx.status = 200
 }
 
 export default {
+  find,
+  findByIds,
   findByShop,
   create,
+  update,
 }

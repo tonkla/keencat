@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Redirect } from 'react-router-dom'
 import { Button, Card } from 'antd'
 
 import { useStoreActions, useStoreState } from '../../store'
@@ -8,6 +9,7 @@ import { Category } from '../../typings'
 
 import Loading from '../../components/Loading'
 import CreateForm from './CreateForm'
+import List from './List'
 
 const CategoryIndex = () => {
   const [isFormEnabled, setFormEnabled] = useState(false)
@@ -22,6 +24,16 @@ const CategoryIndex = () => {
   const activeShop = shops.find(s => s.id === shopId)
   const categories = useStoreState(s => s.categoryState.categories)
 
+  // Fetch categories
+  useEffect(() => {
+    if (!user || !activeShop) return
+    ;(async () => {
+      setLoading(true)
+      setCategories(await categoryRepository.findByIds(activeShop.categoryIds))
+      setLoading(false)
+    })()
+  }, [user, activeShop, setCategories])
+
   const handleCreateCategory = async (values: any) => {
     if (!user || !activeShop) return
     const category: Category = {
@@ -29,34 +41,24 @@ const CategoryIndex = () => {
       name: values.categoryName,
       shopId: activeShop.id,
       pageId: activeShop.pageId,
-      owner: user,
+      productIds: [],
+      ownerId: user.firebaseId,
     }
     createCategory(category)
     setFormEnabled(false)
   }
-
-  useEffect(() => {
-    if (!user || !activeShop) return
-    ;(async () => {
-      setLoading(true)
-      setCategories(await categoryRepository.findByShop(activeShop.id))
-      setLoading(false)
-    })()
-  }, [user, activeShop, setCategories])
 
   return (
     <div>
       <Card title="Categories" bordered={false}>
         {isLoading ? (
           <Loading position="left" />
-        ) : categories.length === 0 ? (
-          <span>There is no category, add a new one.</span>
+        ) : shops.length < 1 ? (
+          <Redirect to="/shops" />
+        ) : categories.length > 0 ? (
+          <List categories={categories} />
         ) : (
-          <ul>
-            {categories.map(c => (
-              <li key={c.id}>{c.name}</li>
-            ))}
-          </ul>
+          <span>There is no category, please add a new one.</span>
         )}
       </Card>
       {isFormEnabled ? (

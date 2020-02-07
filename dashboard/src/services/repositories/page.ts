@@ -1,12 +1,13 @@
 import api from '../api'
-import { Page, User } from '../../typings'
+import { Page } from '../../typings'
 
 async function find(pageId: string) {}
 
-async function findByOwner(owner: User) {}
+async function findByOwner(ownerId: string) {}
 
-async function create(page: Page): Promise<void> {
-  await api.call('/create-page', { page })
+async function create(page: Page): Promise<boolean> {
+  const resp = await api.call('/create-page', { page })
+  return resp?.status === 200
 }
 
 async function update(page: Page) {}

@@ -9,17 +9,19 @@ import { Product } from '../../typings'
 
 import Loading from '../../components/Loading'
 import CreateForm from './CreateForm'
+import List from './List'
 import './Product.scss'
 
 const ProductIndex = () => {
-  const [products, setProducts] = useState<Product[]>([])
   const [isFormEnabled, setFormEnabled] = useState(false)
   const [isLoading, setLoading] = useState(true)
   const [isFinding, setFinding] = useState(false)
 
   const setActiveCategory = useStoreActions(a => a.activeState.setCategoryId)
   const setCategories = useStoreActions(a => a.categoryState.setCategories)
+  const setProducts = useStoreActions(a => a.productState.setProducts)
   const createProduct = useStoreActions(a => a.productState.create)
+  const updateCategory = useStoreActions(a => a.categoryState.update)
 
   const user = useStoreState(s => s.userState.user)
 
@@ -27,28 +29,46 @@ const ProductIndex = () => {
   const categoryId = useStoreState(s => s.activeState.categoryId)
   const activeCategory = categories.find(c => c.id === categoryId)
 
+  const products = useStoreState(s => s.productState.products)
+
   const shops = useStoreState(s => s.shopState.shops)
   const shopId = useStoreState(s => s.activeState.shopId)
   const activeShop = shops.find(s => s.id === shopId)
 
+  // Fetch categories
   useEffect(() => {
-    if (!activeShop) return
+    if (
+      !activeShop ||
+      activeShop.categoryIds.length < 1 ||
+      (categories.length > 0 && categories[0].shopId === activeShop.id)
+    ) {
+      setLoading(false)
+      return
+    }
     ;(async () => {
       setLoading(true)
-      if (categories.length < 1) {
-        setCategories(await categoryRepository.findByShop(activeShop.id))
-      }
+      // setCategories(await categoryRepository.findByIds(activeShop.categoryIds))
       setLoading(false)
-
-      if (activeCategory) {
-        setFinding(true)
-        setProducts(await productRepository.findByCategory(activeCategory.id))
-        setFinding(false)
-      }
     })()
-  }, [activeShop, activeCategory, categories, setCategories])
+  }, [activeShop, categories, setCategories])
 
-  const handleCreateProduct = async (values: any) => {
+  // Fetch products
+  useEffect(() => {
+    if (
+      !activeCategory ||
+      activeCategory.productIds.length < 1 ||
+      (products.length > 0 && products[0].categoryId === activeCategory.id)
+    ) {
+      return
+    }
+    ;(async () => {
+      setFinding(true)
+      // setProducts(await productRepository.findByIds(activeCategory.productIds))
+      setFinding(false)
+    })()
+  }, [activeCategory, products, setProducts])
+
+  async function handleCreateProduct(values: any) {
     if (!user || !activeShop || !activeCategory) return
     const product: Product = {
       id: utils.genId(),
@@ -56,11 +76,16 @@ const ProductIndex = () => {
       categoryId: activeCategory.id,
       shopId: activeShop.id,
       pageId: activeShop.pageId,
-      owner: user,
+      ownerId: user.firebaseId,
     }
     setProducts([product, ...products])
     createProduct(product)
+    updateCategory({ ...activeCategory, productIds: [product.id, ...activeCategory.productIds] })
     setFormEnabled(false)
+  }
+
+  function handleChangeCategory(key: string) {
+    if (!activeCategory || activeCategory.id !== key) setActiveCategory(key)
   }
 
   return (
@@ -69,7 +94,7 @@ const ProductIndex = () => {
         {isLoading ? (
           <Loading position="left" />
         ) : categories.length < 1 ? (
-          <Redirect to="/category" />
+          <Redirect to="/categories" />
         ) : (
           <div>
             <div>
@@ -77,7 +102,7 @@ const ProductIndex = () => {
               <Select
                 style={{ width: 200 }}
                 placeholder="Please Choose"
-                onChange={(key: string) => setActiveCategory(key)}
+                onChange={handleChangeCategory}
                 defaultValue={activeCategory?.id}
               >
                 {categories.map(category => (
@@ -90,15 +115,7 @@ const ProductIndex = () => {
                 <Icon type="loading" style={{ color: '#999', fontSize: 15, paddingLeft: 10 }} />
               )}
             </div>
-            {products.length > 0 && (
-              <ul className="products">
-                {products.map(p => (
-                  <li key={p.id} className="product">
-                    {p.name}
-                  </li>
-                ))}
-              </ul>
-            )}
+            {products.length > 0 && <List products={products} />}
           </div>
         )}
       </Card>

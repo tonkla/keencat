@@ -1,24 +1,28 @@
 import api from '../api'
 import { Product } from '../../typings'
 
-async function find(id: string) {}
-
-async function findByCategory(categoryId: string): Promise<Product[]> {
-  const resp = await api.call('/find-products', { categoryId })
+async function findByIds(ids: string[]): Promise<Product[]> {
+  const resp = await api.call('/find-categories', { ids })
   return resp && resp.data ? resp.data : []
 }
 
-async function create(product: Product): Promise<void> {
-  await api.call('/create-product', { product })
+async function create(product: Product): Promise<boolean> {
+  const resp = await api.call('/create-product', { product })
+  return resp?.status === 200
 }
 
-async function update(product: Product) {}
+async function update(product: Product): Promise<boolean> {
+  const resp = await api.call('/update-product', { product })
+  return resp?.status === 200
+}
 
-async function remove(product: Product) {}
+async function remove(product: Product): Promise<boolean> {
+  const resp = await api.call('/delete-product', { product })
+  return resp?.status === 200
+}
 
 export default {
-  find,
-  findByCategory,
+  findByIds,
   create,
   update,
   remove,

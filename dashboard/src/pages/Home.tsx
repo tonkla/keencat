@@ -26,13 +26,13 @@ const Home: React.FC = ({ children }) => {
   const shopId = useStoreState(s => s.activeState.shopId)
   const activeShop = shops.find(s => s.id === shopId)
 
-  // Note: DO NOT combine these two useEffects, will cause infinity loop with dependencies
+  // Note: DO NOT combine these two useEffects, will cause infinite loop with dependencies
   useEffect(() => {
     if (utils.isDev()) return
     if (!user) return
     ;(async () => {
       setLoading(true)
-      setShops(await shopRepository.findByOwner(user))
+      setShops(await shopRepository.findByOwner(user.firebaseId))
       setLoading(false)
     })()
   }, [user, setShops])

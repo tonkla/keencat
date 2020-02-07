@@ -4,6 +4,8 @@ import auth from '../firebase/auth'
 import { Category, Page, Product, Shop } from '../../typings'
 
 interface APICallParams {
+  id?: string
+  ids?: string[]
   categoryId?: string
   category?: Category
   pageId?: string

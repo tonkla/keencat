@@ -3,5 +3,6 @@ export interface Category {
   name: string
   shopId: string
   pageId: string
+  productIds: string[]
   ownerId: string
 }

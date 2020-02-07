@@ -14,6 +14,6 @@ export interface PageInput {
   id: string
   psid: string
   name: string
-  owner: User
+  ownerId: string
   userAccessToken: string
 }
