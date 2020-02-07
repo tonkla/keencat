@@ -1,5 +1,5 @@
 import admin from '../firebase/index'
-import { Category, CategoryInput } from '../../typings'
+import { Category } from '../../typings'
 
 const db = admin.firestore()
 
@@ -13,7 +13,7 @@ async function findByPage(pageId: string): Promise<Category[]> {
       .where('pageId', '==', pageId)
       .get()
     docs.forEach(d => {
-      if (d.exists) categories.push(d.data() as Category)
+      categories.push(d.data() as Category)
     })
     return categories
   } catch (e) {
@@ -29,7 +29,7 @@ async function findByShop(shopId: string): Promise<Category[]> {
       .where('shopId', '==', shopId)
       .get()
     docs.forEach(d => {
-      if (d.exists) categories.push(d.data() as Category)
+      categories.push(d.data() as Category)
     })
     return categories
   } catch (e) {
@@ -37,10 +37,8 @@ async function findByShop(shopId: string): Promise<Category[]> {
   }
 }
 
-async function create(input: CategoryInput): Promise<boolean> {
+async function create(category: Category): Promise<boolean> {
   try {
-    const { owner, ..._input } = input
-    const category: Category = { ..._input, ownerId: input.owner.firebaseId }
     await db
       .collection('categories')
       .doc(category.id)
