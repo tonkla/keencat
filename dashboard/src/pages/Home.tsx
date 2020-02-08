@@ -82,7 +82,7 @@ const Home: React.FC = ({ children }) => {
               <UserAvatar user={user} />
             </div>
           </Header>
-          <Content>{isLoading ? <Loading position="center" /> : children}</Content>
+          <Content>{isLoading ? <Loading position="center" size="large" /> : children}</Content>
           <Footer>
             Crafted with{' '}
             <span className="love" aria-label="love" role="img">

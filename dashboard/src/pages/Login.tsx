@@ -7,6 +7,7 @@ import auth from '../services/firebase/auth'
 import userRepo from '../services/firebase/firestore/user'
 import { User } from '../typings'
 
+import Loading from '../components/Loading'
 import './Login.scss'
 
 const Login = () => {
@@ -113,12 +114,7 @@ const Login = () => {
             <Alert message="We have sent a sign-in link to your email." type="success" showIcon />
           </section>
         )}
-        {isLoading && (
-          <div className="loading">
-            <Icon type="loading-3-quarters" spin />
-            <span>Loading...</span>
-          </div>
-        )}
+        {isLoading && <Loading position="center" size="large" />}
       </div>
     </div>
   )

@@ -10,6 +10,7 @@ import { Category } from '../../typings'
 import Loading from '../../components/Loading'
 import CreateForm from './CreateForm'
 import List from './List'
+import './Category.scss'
 
 const CategoryIndex = () => {
   const [isFormEnabled, setFormEnabled] = useState(false)
@@ -52,7 +53,7 @@ const CategoryIndex = () => {
     <div>
       <Card title="Categories" bordered={false}>
         {isLoading ? (
-          <Loading position="left" />
+          <Loading />
         ) : shops.length < 1 ? (
           <Redirect to="/shops" />
         ) : categories.length > 0 ? (
@@ -66,7 +67,7 @@ const CategoryIndex = () => {
           <CreateForm callback={handleCreateCategory} cancel={() => setFormEnabled(false)} />
         </Card>
       ) : (
-        <div style={{ display: 'flex', marginTop: 20 }}>
+        <div className="buttons">
           <Button type="primary" onClick={() => setFormEnabled(true)}>
             Add Category
           </Button>
@@ -75,4 +76,5 @@ const CategoryIndex = () => {
     </div>
   )
 }
+
 export default CategoryIndex

@@ -80,7 +80,17 @@ async function update(category: Category): Promise<boolean> {
   }
 }
 
-async function remove(category: Category) {}
+async function remove(category: Category): Promise<boolean> {
+  try {
+    await db
+      .collection('categories')
+      .doc(category.id)
+      .delete()
+    return true
+  } catch (e) {
+    return false
+  }
+}
 
 export default {
   find,

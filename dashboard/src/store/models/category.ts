@@ -1,8 +1,8 @@
 import { Action, action, Thunk, thunk } from 'easy-peasy'
 
 import categoryRepository from '../../services/repositories/category'
-import { Category } from '../../typings'
 import { Injections, StoreModel } from './index'
+import { Category } from '../../typings'
 
 export interface CategoryStateModel {
   categories: Category[]
