@@ -1,0 +1,14 @@
+.ant-layout-footer {
+  text-align: center;
+  .love {
+    color: black;
+    font-size: 1.4rem;
+  }
+  a {
+    color: #d68717;
+    text-decoration: underline;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}

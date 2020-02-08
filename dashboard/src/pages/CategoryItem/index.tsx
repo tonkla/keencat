@@ -5,6 +5,7 @@ import { Button, Card, Modal } from 'antd'
 import { useStoreActions, useStoreState } from '../../store'
 import { Category } from '../../typings'
 
+import ProductIndex from '../Product'
 import Back from '../../components/Back'
 import Loading from '../../components/Loading'
 
@@ -54,6 +55,7 @@ const CategoryItem = () => {
               Delete
             </Button>
           </div>
+          {category && <ProductIndex category={category} />}
         </div>
       ) : (
         <Loading />

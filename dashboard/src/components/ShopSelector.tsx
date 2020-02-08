@@ -1,40 +1,42 @@
 import React from 'react'
 import { Icon, Menu, Dropdown } from 'antd'
 
+import { useStoreActions } from '../store'
 import { Shop } from '../typings'
 
-interface ShopSelectorProps {
+import './ShopSelector.scss'
+
+interface Props {
   shops: Shop[]
-  activeShop?: Shop
-  callback(shopId: string): void
+  activeShop: Shop
 }
 
-const ShopSelector = (props: ShopSelectorProps) => {
+const ShopSelector = ({ shops, activeShop }: Props) => {
+  const setActiveShop = useStoreActions(a => a.activeState.setShopId)
+
+  function handleChange({ key }: any) {
+    if (activeShop.id !== key) {
+      const shop = shops.find(s => s.id === key)
+      if (shop) setActiveShop(activeShop.id)
+    }
+  }
+
   const menu = (
-    <Menu
-      onClick={({ key }: any) => {
-        props.callback(key)
-      }}
-    >
-      {props.shops.map((shop: Shop) => (
+    <Menu onClick={handleChange}>
+      {shops.map((shop: Shop) => (
         <Menu.Item key={shop.id}>{shop.name}</Menu.Item>
       ))}
     </Menu>
   )
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        userSelect: 'none',
-      }}
-    >
-      {props.activeShop && <span style={{ paddingLeft: 5 }}>{props.activeShop.name}</span>}
+    <div className="shop-selector">
+      <span>{activeShop.name}</span>
       <Dropdown overlay={menu} trigger={['click']} placement="bottomRight">
-        <Icon type="caret-down" style={{ fontSize: 15, paddingLeft: 5 }} />
+        <Icon type="caret-down" />
       </Dropdown>
     </div>
   )
 }
+
 export default ShopSelector
