@@ -9,9 +9,9 @@ interface Params {
 
 const CategoryList = ({ categories }: Params) => {
   return (
-    <ul>
+    <ul className="categories">
       {categories.map(c => (
-        <li key={c.id}>
+        <li key={c.id} className="category">
           <Link to={`/categories/${c.id}`}>
             {c.name} ({c.productIds.length})
           </Link>

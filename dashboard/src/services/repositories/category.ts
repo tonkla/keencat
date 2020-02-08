@@ -2,6 +2,7 @@ import api from '../api'
 import { Category } from '../../typings'
 
 async function findByIds(ids: string[]): Promise<Category[]> {
+  if (ids.length < 1) return []
   const resp = await api.call('/find-categories', { ids })
   return resp && resp.data ? resp.data : []
 }

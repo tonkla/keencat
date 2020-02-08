@@ -44,30 +44,35 @@ async function findByCategory(ctx: Context) {
   ctx.body = products
 }
 
-async function create(ctx: Context) {
+function isValid(ctx: Context): boolean {
   const { product, ownerId } = ctx.request.body
   if (!product) {
     ctx.status = 400
-    return
+    return false
   }
   if (!ownerId || ownerId !== product.ownerId) {
     ctx.status = 401
-    return
+    return false
   }
+  return true
+}
+
+async function create(ctx: Context) {
+  if (!isValid(ctx)) return
+  const { product } = ctx.request.body
   if (await productRepository.create(product)) ctx.status = 200
 }
 
 async function update(ctx: Context) {
-  const { product, ownerId } = ctx.request.body
-  if (!product) {
-    ctx.status = 400
-    return
-  }
-  if (!ownerId || ownerId !== product.ownerId) {
-    ctx.status = 401
-    return
-  }
+  if (!isValid(ctx)) return
+  const { product } = ctx.request.body
   if (await productRepository.update(product)) ctx.status = 200
+}
+
+async function remove(ctx: Context) {
+  if (!isValid(ctx)) return
+  const { product } = ctx.request.body
+  if (await productRepository.remove(product)) ctx.status = 200
 }
 
 export default {
@@ -76,4 +81,5 @@ export default {
   findByCategory,
   create,
   update,
+  remove,
 }

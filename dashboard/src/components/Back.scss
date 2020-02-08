@@ -1,0 +1,15 @@
+@import '../styles/shared';
+
+.back {
+  align-items: center;
+  color: $linkColor;
+  cursor: pointer;
+  display: flex;
+  padding-bottom: 10px;
+  user-select: none;
+
+  .anticon {
+    font-size: 14px;
+    padding-right: 5px;
+  }
+}

@@ -80,7 +80,17 @@ async function update(product: Product): Promise<boolean> {
   }
 }
 
-async function remove(product: Product) {}
+async function remove(product: Product): Promise<boolean> {
+  try {
+    await db
+      .collection('products')
+      .doc(product.id)
+      .delete()
+    return true
+  } catch (e) {
+    return false
+  }
+}
 
 export default {
   find,

@@ -68,6 +68,8 @@ r3.post('/create-product', product.create)
 r3.post('/create-shop', shop.create)
 r3.post('/update-category', category.update)
 r3.post('/update-shop', shop.update)
+r3.post('/delete-category', category.remove)
+r3.post('/delete-product', product.remove)
 
 new Koa()
   .use(cors())

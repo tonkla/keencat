@@ -1,9 +1,7 @@
 import React from 'react'
-import { useHistory } from 'react-router-dom'
 import { Avatar, Dropdown, Icon, Menu, Modal } from 'antd'
 
 import { useStoreActions } from '../store'
-import auth from '../services/firebase/auth'
 import { User } from '../typings'
 
 interface UserProps extends JSX.IntrinsicAttributes {
@@ -11,22 +9,13 @@ interface UserProps extends JSX.IntrinsicAttributes {
 }
 
 const UserAvatar = ({ user }: UserProps) => {
-  const history = useHistory()
-
-  const setUser = useStoreActions(a => a.userState.set)
-
-  const handleSignOut = async () => {
-    await auth.signOut()
-    setUser(null)
-    localStorage.clear()
-    history.push('/login')
-  }
+  const signOut = useStoreActions(a => a.userState.signOut)
 
   const showConfirmSignOut = () => {
     Modal.confirm({
       title: 'Are you sure you want to sign out?',
       onOk() {
-        handleSignOut()
+        signOut()
       },
     })
   }

@@ -44,31 +44,35 @@ async function findByShop(ctx: Context) {
   ctx.body = categories
 }
 
-async function create(ctx: Context) {
+function isValid(ctx: Context): boolean {
   const { category, ownerId } = ctx.request.body
   if (!category) {
     ctx.status = 400
-    return
+    return false
   }
   if (!ownerId || ownerId !== category.ownerId) {
     ctx.status = 401
-    return
+    return false
   }
+  return true
+}
+
+async function create(ctx: Context) {
+  if (!isValid(ctx)) return
+  const { category } = ctx.request.body
   if (await categoryRepository.create(category)) ctx.status = 200
-  ctx.status = 200
 }
 
 async function update(ctx: Context) {
-  const { category, ownerId } = ctx.request.body
-  if (!category) {
-    ctx.status = 400
-    return
-  }
-  if (!ownerId || ownerId !== category.ownerId) {
-    ctx.status = 401
-    return
-  }
+  if (!isValid(ctx)) return
+  const { category } = ctx.request.body
   if (await categoryRepository.update(category)) ctx.status = 200
+}
+
+async function remove(ctx: Context) {
+  if (!isValid(ctx)) return
+  const { category } = ctx.request.body
+  if (await categoryRepository.remove(category)) ctx.status = 200
 }
 
 export default {
@@ -77,4 +81,5 @@ export default {
   findByShop,
   create,
   update,
+  remove,
 }
