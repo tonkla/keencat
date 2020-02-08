@@ -1,0 +1,36 @@
+.header.ant-layout-header {
+  background-color: #fff;
+  padding: 0 20px;
+  display: flex;
+  height: 48px;
+
+  .anticon {
+    cursor: pointer;
+    font-size: 18px;
+    transition: color 0.3s;
+  }
+
+  .left {
+    display: flex;
+    align-items: center;
+  }
+  .right {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    .ant-select {
+      width: 180px;
+    }
+    .ant-select-selection {
+      border: 1px solid #f6f6f6;
+    }
+    .ant-select-selection-selected-value {
+      color: #d0d0d0;
+    }
+    .ant-select-arrow {
+      color: #f3f3f3;
+    }
+  }
+}

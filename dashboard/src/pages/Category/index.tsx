@@ -1,47 +1,43 @@
 import React, { useEffect, useState } from 'react'
-import { Redirect } from 'react-router-dom'
 import { Button, Card } from 'antd'
 
-import { useStoreActions, useStoreState } from '../../store'
+import { useStoreActions } from '../../store'
 import categoryRepository from '../../services/repositories/category'
 import utils from '../../services/utils'
-import { Category } from '../../typings'
+import { Category, Shop, User } from '../../typings'
 
 import Loading from '../../components/Loading'
 import CreateForm from './CreateForm'
 import List from './List'
 import './Category.scss'
 
-const CategoryIndex = () => {
+interface Props {
+  shop: Shop
+  user: User
+}
+
+const CategoryIndex = ({ shop, user }: Props) => {
   const [isFormEnabled, setFormEnabled] = useState(false)
   const [isLoading, setLoading] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
 
   const createCategory = useStoreActions(a => a.categoryState.create)
-  const setCategories = useStoreActions(a => a.categoryState.setCategories)
-
-  const user = useStoreState(s => s.userState.user)
-  const shops = useStoreState(s => s.shopState.shops)
-  const shopId = useStoreState(s => s.activeState.shopId)
-  const activeShop = shops.find(s => s.id === shopId)
-  const categories = useStoreState(s => s.categoryState.categories)
 
   // Fetch categories
   useEffect(() => {
-    if (!user || !activeShop) return
     ;(async () => {
       setLoading(true)
-      setCategories(await categoryRepository.findByIds(activeShop.categoryIds))
+      setCategories(await categoryRepository.findByIds(shop.categoryIds))
       setLoading(false)
     })()
-  }, [user, activeShop, setCategories])
+  }, [shop, setCategories])
 
   const handleCreateCategory = async (values: any) => {
-    if (!user || !activeShop) return
     const category: Category = {
       id: utils.genId(),
       name: values.categoryName,
-      shopId: activeShop.id,
-      pageId: activeShop.pageId,
+      shopId: shop.id,
+      pageId: shop.pageId,
       productIds: [],
       ownerId: user.firebaseId,
     }
@@ -54,8 +50,6 @@ const CategoryIndex = () => {
       <Card title="Categories" bordered={false}>
         {isLoading ? (
           <Loading />
-        ) : shops.length < 1 ? (
-          <Redirect to="/shops" />
         ) : categories.length > 0 ? (
           <List categories={categories} />
         ) : (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Card, Button, Steps } from 'antd'
+import { Card, Button } from 'antd'
 
 import { useStoreState, useStoreActions } from '../../store'
 import { pageRepository } from '../../services/repositories'
@@ -8,19 +8,26 @@ import utils from '../../services/utils'
 import { Page, Shop } from '../../typings'
 import { FBPage } from '../../typings/facebook'
 
+import CategoryIndex from '../Category'
 import CreateForm from './CreateForm'
+
+type Source = 'facebook' | null
 
 const ShopIndex = () => {
   const [step, setStep] = useState(0)
-  const [isCreateShop, setCreateShop] = useState(false)
+  const [isFormEnabled, showForm] = useState(false)
   const [pages, setPages] = useState<FBPage[]>([])
 
   const createShop = useStoreActions(a => a.shopState.create)
 
   const user = useStoreState(s => s.userState.user)
   const shops = useStoreState(s => s.shopState.shops)
+  const shopId = useStoreState(s => s.activeState.shopId)
+  const activeShop = shops.find(s => s.id === shopId)
 
-  const availablePages = pages.filter((p: any) => shops.filter(s => s.pageId !== p.id).length > 0)
+  const availablePages = pages.filter(
+    p => shops.length < 1 || shops.filter(s => s.pageId !== p.id).length > 0
+  )
 
   async function handleGrantAccessFacebookPages() {
     if (!user) return
@@ -60,58 +67,32 @@ const ShopIndex = () => {
 
   return (
     <div>
-      {shops.length > 0 && (
-        <div style={{ marginBottom: 24 }}>
-          <Card title="Shops" bordered={false}>
-            <ul>
-              {shops.map((shop: any) => (
-                <li key={shop.id}>{shop.name}</li>
-              ))}
-            </ul>
-          </Card>
-          {!isCreateShop && (
-            <div style={{ display: 'flex', marginTop: 20 }}>
-              <Button type="primary" onClick={() => setCreateShop(true)}>
-                Create Shop
+      {user && activeShop && <CategoryIndex user={user} shop={activeShop} />}
+      {(isFormEnabled || shops.length < 1) && (
+        <Card title="Create Shop" bordered={false}>
+          {step === 0 && (
+            <div>
+              <Button icon="facebook" onClick={handleGrantAccessFacebookPages}>
+                Facebook Page
               </Button>
             </div>
           )}
-        </div>
-      )}
-      {(shops.length === 0 || isCreateShop) && (
-        <div>
-          <Card title="Create Shop" bordered={false}>
-            <Steps current={step}>
-              <Steps.Step title="Choose Page" />
-              <Steps.Step title="Create Shop" />
-            </Steps>
-            {step === 0 && (
-              <div style={{ marginTop: 30 }}>
-                <span>Please choose a page to connect with a new shop.</span>
-                <div style={{ marginTop: 20 }}>
-                  <Button type="primary" onClick={handleGrantAccessFacebookPages}>
-                    Choose
-                  </Button>
+          {step === 1 && (
+            <div>
+              {shops.length === 0 || availablePages.length > 0 ? (
+                <CreateForm
+                  pages={availablePages}
+                  callback={handleCreateShop}
+                  cancel={() => setStep(0)}
+                />
+              ) : (
+                <div>
+                  <span>You don't have any available page to connect with a new shop.</span>
                 </div>
-              </div>
-            )}
-            {step === 1 && (
-              <div style={{ marginTop: 30 }}>
-                {shops.length === 0 || availablePages.length > 0 ? (
-                  <CreateForm
-                    pages={availablePages}
-                    callback={handleCreateShop}
-                    cancel={() => setStep(0)}
-                  />
-                ) : (
-                  <div>
-                    <span>You don't have any available page to connect with a new shop.</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </Card>
-        </div>
+              )}
+            </div>
+          )}
+        </Card>
       )}
     </div>
   )

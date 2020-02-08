@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom'
 
 import { Category } from '../../typings/category'
 
-interface Params {
+interface Props {
   categories: Category[]
 }
 
-const CategoryList = ({ categories }: Params) => {
+const CategoryList = ({ categories }: Props) => {
   return (
     <ul className="categories">
       {categories.map(c => (

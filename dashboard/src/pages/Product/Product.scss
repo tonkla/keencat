@@ -3,7 +3,11 @@
   margin: 0;
   margin-top: 30px;
 
-  .product {
+  .list {
+    padding: 0;
+    margin: 0;
+  }
+  .item {
     list-style-position: inside;
   }
 }
