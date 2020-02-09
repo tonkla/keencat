@@ -22,9 +22,16 @@ async function remove(product: Product): Promise<boolean> {
   return resp?.status === 200
 }
 
+async function removeByIds(ids: string[]): Promise<boolean> {
+  if (ids.length < 1) return false
+  const resp = await api.call('/delete-products', { ids })
+  return resp?.status === 200
+}
+
 export default {
   findByIds,
   create,
   update,
   remove,
+  removeByIds,
 }

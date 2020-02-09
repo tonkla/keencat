@@ -1,0 +1,20 @@
+.ant-card.shop-details {
+  margin-bottom: 20px;
+
+  .shop-menu {
+    display: flex;
+    align-items: center;
+  }
+
+  .actions {
+    margin-left: 10px;
+
+    .ant-btn {
+      margin-right: 5px;
+    }
+  }
+
+  ul {
+    margin: 0;
+  }
+}

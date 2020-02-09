@@ -45,7 +45,17 @@ async function update(shop: Shop): Promise<boolean> {
   }
 }
 
-async function remove(shop: Shop) {}
+async function remove(shop: Shop): Promise<boolean> {
+  try {
+    await db
+      .collection('shops')
+      .doc(shop.id)
+      .delete()
+    return true
+  } catch (e) {
+    return false
+  }
+}
 
 export default {
   find,

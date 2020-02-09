@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icon, Menu, Dropdown } from 'antd'
+import { Icon, Menu, Dropdown, Select } from 'antd'
 
 import { useStoreActions } from '../store'
 import { Shop } from '../typings'
@@ -28,6 +28,8 @@ const ShopSelector = ({ shops, activeShop }: Props) => {
       ))}
     </Menu>
   )
+
+  const { Option } = Select
 
   return (
     <div className="shop-selector">

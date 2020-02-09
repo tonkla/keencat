@@ -3,6 +3,7 @@ import { Icon, Layout, Menu } from 'antd'
 import { Link, useLocation } from 'react-router-dom'
 
 import { Shop } from '../typings'
+import { PATH_SHOP } from '../constants'
 
 import logo from '../assets/images/logo.png'
 import './SiderMenu.scss'
@@ -42,10 +43,10 @@ const SiderMenu = ({ isCollapsed, activeShop }: Props) => {
               <Link to="/">Dashboard</Link>
             </span>
           </Menu.Item>
-          <Menu.Item key="/shops">
+          <Menu.Item key={PATH_SHOP}>
             <Icon type="shop" />
             <span>
-              <Link to="/shops">Manage Shop</Link>
+              <Link to={PATH_SHOP}>Manage Shop</Link>
             </span>
           </Menu.Item>
           {activeShop && (
