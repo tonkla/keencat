@@ -50,10 +50,10 @@ const Home: React.FC = ({ children }) => {
         <SiderMenu isCollapsed={isCollapsed} activeShop={activeShop} />
         <Layout>
           <Header
-            isCollapsed={isCollapsed}
-            setCollapse={setCollapse}
             shops={shops}
             activeShop={activeShop}
+            isCollapsed={isCollapsed}
+            setCollapse={setCollapse}
             user={user}
           />
           <Content>{isLoading ? <Loading position="center" size="large" /> : children}</Content>

@@ -1,6 +1,7 @@
 import { Action, action, Thunk, thunk } from 'easy-peasy'
 
 import shopRepository from '../../services/repositories/shop'
+import { Injections, StoreModel } from './index'
 import { Shop } from '../../typings'
 
 export interface ShopStateModel {
@@ -8,7 +9,7 @@ export interface ShopStateModel {
   setShops: Action<ShopStateModel, Shop[]>
   create: Thunk<ShopStateModel, Shop>
   update: Thunk<ShopStateModel, Shop>
-  remove: Thunk<ShopStateModel, Shop>
+  remove: Thunk<ShopStateModel, Shop, Injections, StoreModel>
   _create: Action<ShopStateModel, Shop>
   _update: Action<ShopStateModel, Shop>
   _remove: Action<ShopStateModel, Shop>
@@ -20,16 +21,18 @@ const shopState: ShopStateModel = {
     state.shops = shops
   }),
   create: thunk(async (actions, shop) => {
-    await shopRepository.create(shop)
-    actions._create(shop)
+    if (await shopRepository.create(shop)) actions._create(shop)
   }),
   update: thunk(async (actions, shop) => {
-    await shopRepository.update(shop)
-    actions._update(shop)
+    if (await shopRepository.update(shop)) actions._update(shop)
   }),
-  remove: thunk(async (actions, shop) => {
-    await shopRepository.remove(shop)
-    actions._remove(shop)
+  remove: thunk(async (actions, shop, { getStoreActions, getStoreState }) => {
+    if (await shopRepository.remove(shop)) {
+      const { productState, categoryState } = getStoreActions()
+      productState.removeByIds(getStoreState().productState.products.map(p => p.id))
+      categoryState.removeByIds(shop.categoryIds)
+      actions._remove(shop)
+    }
   }),
   _create: action((state, shop) => {
     state.shops = [shop, ...state.shops]

@@ -10,9 +10,11 @@ export interface ProductStateModel {
   create: Thunk<ProductStateModel, Product, Injections, StoreModel>
   update: Thunk<ProductStateModel, Product>
   remove: Thunk<ProductStateModel, Product, Injections, StoreModel>
+  removeByIds: Thunk<ProductStateModel, string[]>
   _create: Action<ProductStateModel, Product>
   _update: Action<ProductStateModel, Product>
   _remove: Action<ProductStateModel, Product>
+  _removeAll: Action<ProductStateModel>
 }
 
 const productState: ProductStateModel = {
@@ -50,6 +52,9 @@ const productState: ProductStateModel = {
       actions._remove(product)
     }
   }),
+  removeByIds: thunk(async (actions, ids) => {
+    if (await productRepository.removeByIds(ids)) actions._removeAll()
+  }),
   _create: action((state, product) => {
     state.products = [product, ...state.products]
   }),
@@ -58,6 +63,9 @@ const productState: ProductStateModel = {
   }),
   _remove: action((state, product) => {
     state.products = state.products.filter(p => p.id !== product.id)
+  }),
+  _removeAll: action(state => {
+    state.products = []
   }),
 }
 

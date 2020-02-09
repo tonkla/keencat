@@ -10,9 +10,11 @@ export interface CategoryStateModel {
   create: Thunk<CategoryStateModel, Category, Injections, StoreModel>
   update: Thunk<CategoryStateModel, Category>
   remove: Thunk<CategoryStateModel, Category, Injections, StoreModel>
+  removeByIds: Thunk<CategoryStateModel, string[]>
   _create: Action<CategoryStateModel, Category>
   _update: Action<CategoryStateModel, Category>
   _remove: Action<CategoryStateModel, Category>
+  _removeAll: Action<CategoryStateModel>
 }
 
 const categoryState: CategoryStateModel = {
@@ -38,6 +40,7 @@ const categoryState: CategoryStateModel = {
   }),
   remove: thunk(async (actions, category, { getStoreActions, getStoreState }) => {
     if (await categoryRepository.remove(category)) {
+      getStoreActions().productState.removeByIds(category.productIds)
       const shops = getStoreState().shopState.shops
       const shop = shops.find(s => s.id === category.shopId)
       if (shop) {
@@ -49,6 +52,9 @@ const categoryState: CategoryStateModel = {
       actions._remove(category)
     }
   }),
+  removeByIds: thunk(async (actions, ids) => {
+    if (await categoryRepository.removeByIds(ids)) actions._removeAll()
+  }),
   _create: action((state, category) => {
     state.categories = [category, ...state.categories]
   }),
@@ -57,6 +63,9 @@ const categoryState: CategoryStateModel = {
   }),
   _remove: action((state, category) => {
     state.categories = state.categories.filter(c => c.id !== category.id)
+  }),
+  _removeAll: action(state => {
+    state.categories = []
   }),
 }
 

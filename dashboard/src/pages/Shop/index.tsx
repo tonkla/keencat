@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Card, Button } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Button, Card, Input, Modal } from 'antd'
 
 import { useStoreState, useStoreActions } from '../../store'
 import { pageRepository } from '../../services/repositories'
@@ -10,15 +10,19 @@ import { FBPage } from '../../typings/facebook'
 
 import CategoryIndex from '../Category'
 import CreateForm from './CreateForm'
-
-type Source = 'facebook' | null
+import './Shop.scss'
 
 const ShopIndex = () => {
   const [step, setStep] = useState(0)
-  const [isFormEnabled, showForm] = useState(false)
   const [pages, setPages] = useState<FBPage[]>([])
+  const [shopName, setShopName] = useState('')
+  const [deletingConfirm, showDeletingConfirm] = useState(false)
 
   const createShop = useStoreActions(a => a.shopState.create)
+  const deleteShop = useStoreActions(a => a.shopState.remove)
+
+  const isCreateShop = useStoreState(s => s.sharedState.isCreateShop)
+  const setCreateShop = useStoreActions(a => a.sharedState.setCreateShop)
 
   const user = useStoreState(s => s.userState.user)
   const shops = useStoreState(s => s.shopState.shops)
@@ -28,6 +32,12 @@ const ShopIndex = () => {
   const availablePages = pages.filter(
     p => shops.length < 1 || shops.filter(s => s.pageId !== p.id).length > 0
   )
+
+  useEffect(() => {
+    return () => {
+      setCreateShop(false)
+    }
+  }, [setCreateShop])
 
   async function handleGrantAccessFacebookPages() {
     if (!user) return
@@ -63,12 +73,53 @@ const ShopIndex = () => {
       }
       await pageRepository.create(page)
     }
+
+    setCreateShop(false)
   }
+
+  async function handleDeleteShop() {
+    showDeletingConfirm(false)
+    if (activeShop && activeShop.name === shopName) deleteShop(activeShop)
+  }
+
+  const shopMenu = (shop: Shop) => (
+    <div className="shop-menu">
+      <span>{shop.name}</span>
+      <div className="actions">
+        <Button icon="edit" shape="circle-outline" title="Update Shop" />
+        <Button
+          icon="delete"
+          shape="circle-outline"
+          title="Delete Shop"
+          onClick={() => showDeletingConfirm(true)}
+        />
+      </div>
+      <Modal
+        title="Are you sure you want to delete?"
+        visible={deletingConfirm}
+        onOk={handleDeleteShop}
+        onCancel={() => showDeletingConfirm(false)}
+      >
+        <div>
+          <span>The shop and all related data will be permanently deleted.</span>
+          <div style={{ marginTop: 15 }}>
+            <span>Please type the shop name to confirm deleting.</span>
+            <div style={{ marginTop: 15 }}>
+              <Input
+                style={{ width: 250 }}
+                placeholder={shop.name}
+                onChange={e => setShopName(e.currentTarget.value)}
+              />
+            </div>
+          </div>
+        </div>
+      </Modal>
+    </div>
+  )
 
   return (
     <div>
-      {user && activeShop && <CategoryIndex user={user} shop={activeShop} />}
-      {(isFormEnabled || shops.length < 1) && (
+      {(isCreateShop || shops.length < 1) && (
         <Card title="Create Shop" bordered={false}>
           {step === 0 && (
             <div>
@@ -93,6 +144,17 @@ const ShopIndex = () => {
             </div>
           )}
         </Card>
+      )}
+      {!isCreateShop && user && activeShop && (
+        <div>
+          <Card className="shop-details" title={shopMenu(activeShop)} bordered={false}>
+            <ul>
+              <li>Phone: 08-1234-5678</li>
+              <li>Status: Open</li>
+            </ul>
+          </Card>
+          <CategoryIndex user={user} shop={activeShop} />
+        </div>
       )}
     </div>
   )
