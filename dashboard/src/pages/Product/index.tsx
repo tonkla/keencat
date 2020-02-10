@@ -19,20 +19,21 @@ const ProductIndex = ({ category }: Props) => {
   const [isFormEnabled, setFormEnabled] = useState(false)
   const [isLoading, setLoading] = useState(true)
 
-  const setProducts = useStoreActions(a => a.productState.setProducts)
   const createProduct = useStoreActions(a => a.productState.create)
-
-  const user = useStoreState(s => s.userState.user)
+  const setProducts = useStoreActions(a => a.productState.setProducts)
   const products = useStoreState(s => s.productState.products)
+  const user = useStoreState(s => s.userState.user)
 
   // Fetch products
   useEffect(() => {
     ;(async () => {
       setLoading(true)
-      setProducts(await productRepository.findByIds(category.productIds))
+      if (category.productIds.length !== products.length) {
+        setProducts(await productRepository.findByIds(category.productIds))
+      }
       setLoading(false)
     })()
-  }, [category, setProducts])
+  }, [category, products, setProducts])
 
   async function handleCreateProduct(values: any) {
     if (!user) return
@@ -46,25 +47,40 @@ const ProductIndex = ({ category }: Props) => {
     }
     createProduct(product)
     setFormEnabled(false)
+    setLoading(true)
+  }
+
+  function renderProductsTitle() {
+    return (
+      <div className="title">
+        <span>Products</span>
+        <div className="actions">
+          <Button
+            icon="plus"
+            shape="circle"
+            title="Add Product"
+            onClick={() => setFormEnabled(true)}
+          />
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="products">
-      <Card title="Products" bordered={false}>
-        {isLoading ? <Loading /> : products.length > 0 && <List products={products} />}
+      <Card title={renderProductsTitle()} bordered={false}>
+        {isLoading ? (
+          <Loading />
+        ) : products.length > 0 ? (
+          <List products={products} />
+        ) : (
+          <span>There is no product, please add a new one.</span>
+        )}
       </Card>
-      {isFormEnabled ? (
+      {isFormEnabled && (
         <Card title="Add Product" bordered={false} style={{ marginTop: 20 }}>
           <CreateForm callback={handleCreateProduct} cancel={() => setFormEnabled(false)} />
         </Card>
-      ) : (
-        category && (
-          <div style={{ display: 'flex', marginTop: 20 }}>
-            <Button type="primary" onClick={() => setFormEnabled(true)}>
-              Add Product
-            </Button>
-          </div>
-        )
       )}
     </div>
   )

@@ -1,5 +1,5 @@
 import admin from '../firebase/index'
-import { Category } from '../../typings'
+import { Category, Shop } from '../../typings'
 
 const db = admin.firestore()
 
@@ -92,6 +92,20 @@ async function remove(category: Category): Promise<boolean> {
   }
 }
 
+async function removeByShop(shop: Shop): Promise<boolean> {
+  try {
+    shop.categoryIds.forEach(async id => {
+      await db
+        .collection('categories')
+        .doc(id)
+        .delete()
+    })
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
 export default {
   find,
   findByIds,
@@ -100,4 +114,5 @@ export default {
   create,
   update,
   remove,
+  removeByShop,
 }

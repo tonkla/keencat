@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Card } from 'antd'
 
-import { useStoreActions } from '../../store'
+import { useStoreActions, useStoreState } from '../../store'
 import categoryRepository from '../../services/repositories/category'
 import utils from '../../services/utils'
 import { Category, Shop, User } from '../../typings'
@@ -19,20 +19,23 @@ interface Props {
 const CategoryIndex = ({ shop, user }: Props) => {
   const [isFormEnabled, setFormEnabled] = useState(false)
   const [isLoading, setLoading] = useState(false)
-  const [categories, setCategories] = useState<Category[]>([])
 
   const createCategory = useStoreActions(a => a.categoryState.create)
+  const setCategories = useStoreActions(a => a.categoryState.setCategories)
+  const categories = useStoreState(s => s.categoryState.categories)
 
   // Fetch categories
   useEffect(() => {
     ;(async () => {
       setLoading(true)
-      setCategories(await categoryRepository.findByIds(shop.categoryIds))
+      if (shop.categoryIds.length !== categories.length) {
+        setCategories(await categoryRepository.findByIds(shop.categoryIds))
+      }
       setLoading(false)
     })()
-  }, [shop, setCategories])
+  }, [shop, categories, setCategories])
 
-  const handleCreateCategory = async (values: any) => {
+  async function handleCreateCategory(values: any) {
     const category: Category = {
       id: utils.genId(),
       name: values.categoryName,
@@ -43,11 +46,28 @@ const CategoryIndex = ({ shop, user }: Props) => {
     }
     createCategory(category)
     setFormEnabled(false)
+    setLoading(true)
+  }
+
+  function renderCategoriesTitle() {
+    return (
+      <div className="title">
+        <span>Categories</span>
+        <div className="actions">
+          <Button
+            icon="plus"
+            shape="circle"
+            title="Add Category"
+            onClick={() => setFormEnabled(true)}
+          />
+        </div>
+      </div>
+    )
   }
 
   return (
     <div>
-      <Card title="Categories" bordered={false}>
+      <Card title={renderCategoriesTitle()} bordered={false}>
         {isLoading ? (
           <Loading />
         ) : categories.length > 0 ? (
@@ -56,16 +76,10 @@ const CategoryIndex = ({ shop, user }: Props) => {
           <span>There is no category, please add a new one.</span>
         )}
       </Card>
-      {isFormEnabled ? (
+      {isFormEnabled && (
         <Card title="Add Category" bordered={false} style={{ marginTop: 20 }}>
           <CreateForm callback={handleCreateCategory} cancel={() => setFormEnabled(false)} />
         </Card>
-      ) : (
-        <div className="buttons">
-          <Button type="primary" onClick={() => setFormEnabled(true)}>
-            Add Category
-          </Button>
-        </div>
       )}
     </div>
   )

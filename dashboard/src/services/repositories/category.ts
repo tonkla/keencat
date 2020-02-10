@@ -1,5 +1,5 @@
 import api from '../api'
-import { Category } from '../../typings'
+import { Category, Shop } from '../../typings'
 
 async function findByIds(ids: string[]): Promise<Category[]> {
   if (ids.length < 1) return []
@@ -22,9 +22,9 @@ async function remove(category: Category): Promise<boolean> {
   return resp?.status === 200
 }
 
-async function removeByIds(ids: string[]): Promise<boolean> {
-  if (ids.length < 1) return false
-  const resp = await api.call('/delete-categories', { ids })
+async function removeByShop(shop: Shop): Promise<boolean> {
+  if (shop.categoryIds.length < 1) return false
+  const resp = await api.call('/delete-categories', { shop })
   return resp?.status === 200
 }
 
@@ -33,5 +33,5 @@ export default {
   create,
   update,
   remove,
-  removeByIds,
+  removeByShop,
 }

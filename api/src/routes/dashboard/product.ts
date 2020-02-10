@@ -75,6 +75,19 @@ async function remove(ctx: Context) {
   if (await productRepository.remove(product)) ctx.status = 200
 }
 
+async function removeByCategory(ctx: Context) {
+  const { category, ownerId } = ctx.request.body
+  if (!category) {
+    ctx.status = 400
+    return
+  }
+  if (!ownerId || ownerId !== category.ownerId) {
+    ctx.status = 401
+    return
+  }
+  if (await productRepository.removeByCategory(category)) ctx.status = 200
+}
+
 export default {
   find,
   findByIds,
@@ -82,4 +95,5 @@ export default {
   create,
   update,
   remove,
+  removeByCategory,
 }

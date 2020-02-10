@@ -4,7 +4,7 @@ import { Layout } from 'antd'
 
 import { useStoreState, useStoreActions } from '../store'
 import shopRepository from '../services/repositories/shop'
-import utils from '../services/utils'
+// import utils from '../services/utils'
 
 import Loading from '../components/Loading'
 import SiderMenu from '../components/SiderMenu'
@@ -27,7 +27,8 @@ const Home: React.FC = ({ children }) => {
 
   // Note: DO NOT combine these two useEffects, will cause infinite loop with shops/setShops
   useEffect(() => {
-    if (utils.isDev()) return
+    // Note: In development, do not fetch shops everytime the component is mounted
+    // if (utils.isDev()) return
     if (!user) return
     ;(async () => {
       setLoading(true)

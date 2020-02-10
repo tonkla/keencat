@@ -7,7 +7,31 @@
   }
 
   .ant-card {
-    color: rgba(0, 0, 0, 0.85);
+    color: rgba(0, 0, 0, 0.8);
+    margin-bottom: 20px;
+
+    .ant-card-head {
+      color: rgba(0, 0, 0, 0.77);
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+
+      .actions {
+        margin-left: 10px;
+
+        .ant-btn {
+          margin-right: 5px;
+        }
+      }
+    }
+
+    .ant-card-body {
+      ul {
+        margin: 0;
+      }
+    }
   }
 
   .ant-card-head-title {
@@ -21,21 +45,30 @@
   .ant-modal-title {
     font-weight: 600;
   }
+
+  .buttons {
+    padding-top: 10px;
+  }
+
+  .btn-cancel {
+    display: inline;
+    margin-left: 15px;
+  }
+
+  .link {
+    cursor: pointer;
+    text-decoration: underline;
+    &:hover {
+      text-decoration: none;
+    }
+  }
 }
 
-.buttons {
-  padding-top: 10px;
-}
-
-.btn-cancel {
-  display: inline;
-  margin-left: 15px;
-}
-
-.link {
-  cursor: pointer;
-  text-decoration: underline;
-  &:hover {
-    text-decoration: none;
+.dialog-confirm-deleting {
+  .row {
+    margin-top: 10px;
+  }
+  .ant-input {
+    width: 250px;
   }
 }

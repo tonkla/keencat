@@ -15,8 +15,8 @@ import './Shop.scss'
 const ShopIndex = () => {
   const [step, setStep] = useState(0)
   const [pages, setPages] = useState<FBPage[]>([])
-  const [shopName, setShopName] = useState('')
   const [deletingConfirm, showDeletingConfirm] = useState(false)
+  const [confirmCode, setConfirmCode] = useState('')
 
   const createShop = useStoreActions(a => a.shopState.create)
   const deleteShop = useStoreActions(a => a.shopState.remove)
@@ -34,9 +34,7 @@ const ShopIndex = () => {
   )
 
   useEffect(() => {
-    return () => {
-      setCreateShop(false)
-    }
+    setCreateShop(false)
   }, [setCreateShop])
 
   async function handleGrantAccessFacebookPages() {
@@ -77,45 +75,46 @@ const ShopIndex = () => {
     setCreateShop(false)
   }
 
-  async function handleDeleteShop() {
+  async function handleDeleteShop(shop: Shop) {
     showDeletingConfirm(false)
-    if (activeShop && activeShop.name === shopName) deleteShop(activeShop)
+    if (shop.name === confirmCode) {
+      deleteShop(shop)
+      setCreateShop(true)
+      setStep(0)
+    }
   }
 
-  const shopMenu = (shop: Shop) => (
-    <div className="shop-menu">
-      <span>{shop.name}</span>
-      <div className="actions">
-        <Button icon="edit" shape="circle-outline" title="Update Shop" />
-        <Button
-          icon="delete"
-          shape="circle-outline"
-          title="Delete Shop"
-          onClick={() => showDeletingConfirm(true)}
-        />
-      </div>
-      <Modal
-        title="Are you sure you want to delete?"
-        visible={deletingConfirm}
-        onOk={handleDeleteShop}
-        onCancel={() => showDeletingConfirm(false)}
-      >
-        <div>
-          <span>The shop and all related data will be permanently deleted.</span>
-          <div style={{ marginTop: 15 }}>
-            <span>Please type the shop name to confirm deleting.</span>
-            <div style={{ marginTop: 15 }}>
-              <Input
-                style={{ width: 250 }}
-                placeholder={shop.name}
-                onChange={e => setShopName(e.currentTarget.value)}
-              />
-            </div>
-          </div>
+  function renderShopTitle(shop: Shop) {
+    return (
+      <div className="title">
+        <span>{shop.name}</span>
+        <div className="actions">
+          <Button icon="edit" shape="circle" title="Update Shop" />
+          <Button
+            icon="delete"
+            shape="circle"
+            title="Delete Shop"
+            onClick={() => showDeletingConfirm(true)}
+          />
         </div>
-      </Modal>
-    </div>
-  )
+        <Modal
+          title="Are you sure you want to delete?"
+          visible={deletingConfirm}
+          onOk={() => handleDeleteShop(shop)}
+          onCancel={() => showDeletingConfirm(false)}
+          className="dialog-confirm-deleting"
+        >
+          <span>The shop and all related data will be permanently deleted.</span>
+          <div className="row">
+            <span>Please type the shop name to confirm deleting.</span>
+          </div>
+          <div className="row">
+            <Input placeholder={shop.name} onChange={e => setConfirmCode(e.currentTarget.value)} />
+          </div>
+        </Modal>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -147,7 +146,7 @@ const ShopIndex = () => {
       )}
       {!isCreateShop && user && activeShop && (
         <div>
-          <Card className="shop-details" title={shopMenu(activeShop)} bordered={false}>
+          <Card title={renderShopTitle(activeShop)} bordered={false}>
             <ul>
               <li>Phone: 08-1234-5678</li>
               <li>Status: Open</li>
