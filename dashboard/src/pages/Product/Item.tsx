@@ -7,12 +7,15 @@ import { Product } from '../../typings'
 
 import Back from '../../components/Back'
 import Loading from '../../components/Loading'
+import Form from './Form'
 
 const ProductItem = () => {
   const [product, setProduct] = useState<Product | null>(null)
+  const [isFormEnabled, enableForm] = useState(false)
   const [deletingConfirm, showDeletingConfirm] = useState(false)
   const [confirmCode, setConfirmCode] = useState('')
 
+  const updateProduct = useStoreActions(a => a.productState.update)
   const deleteProduct = useStoreActions(a => a.productState.remove)
   const products = useStoreState(s => s.productState.products)
 
@@ -29,6 +32,12 @@ const ProductItem = () => {
     if (p) setProduct(p)
   }, [products, productsLength, id, history])
 
+  function handleUpdateProduct(product: Product) {
+    enableForm(false)
+    setProduct(product)
+    updateProduct(product)
+  }
+
   function handleDeleteProduct(product: Product) {
     showDeletingConfirm(false)
     if (product.name === confirmCode) deleteProduct(product)
@@ -39,6 +48,12 @@ const ProductItem = () => {
       <div className="title">
         <span>{product.name}</span>
         <div className="actions">
+          <Button
+            icon="edit"
+            shape="circle"
+            title="Edit Product"
+            onClick={() => enableForm(true)}
+          />
           <Button
             icon="delete"
             shape="circle"
@@ -71,12 +86,14 @@ const ProductItem = () => {
   return (
     <div className="product">
       <Back />
-      {product ? (
+      {!product ? (
+        <Loading />
+      ) : isFormEnabled ? (
+        <Form product={product} callback={handleUpdateProduct} cancel={() => enableForm(false)} />
+      ) : (
         <Card title={renderProductTitle(product)} bordered={false}>
           <span>{product.name}</span>
         </Card>
-      ) : (
-        <Loading />
       )}
     </div>
   )
