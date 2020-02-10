@@ -7,7 +7,7 @@ import utils from '../../services/utils'
 import { Category, Product } from '../../typings'
 
 import Loading from '../../components/Loading'
-import CreateForm from './CreateForm'
+import Form from './Form'
 import List from './List'
 import './Product.scss'
 
@@ -15,8 +15,8 @@ interface Props {
   category: Category
 }
 
-const ProductIndex = ({ category }: Props) => {
-  const [isFormEnabled, setFormEnabled] = useState(false)
+const ProductList = ({ category }: Props) => {
+  const [isFormEnabled, enableForm] = useState(false)
   const [isLoading, setLoading] = useState(true)
 
   const createProduct = useStoreActions(a => a.productState.create)
@@ -28,7 +28,10 @@ const ProductIndex = ({ category }: Props) => {
   useEffect(() => {
     ;(async () => {
       setLoading(true)
-      if (category.productIds.length !== products.length) {
+      if (
+        (category.productIds.length > 0 && category.productIds.length !== products.length) ||
+        (products.length > 0 && products[0].categoryId !== category.id)
+      ) {
         setProducts(await productRepository.findByIds(category.productIds))
       }
       setLoading(false)
@@ -39,14 +42,14 @@ const ProductIndex = ({ category }: Props) => {
     if (!user) return
     const product: Product = {
       id: utils.genId(),
-      name: values.productName,
+      name: values.name,
       categoryId: category.id,
       shopId: category.shopId,
       pageId: category.pageId,
       ownerId: user.firebaseId,
     }
     createProduct(product)
-    setFormEnabled(false)
+    enableForm(false)
     setLoading(true)
   }
 
@@ -55,12 +58,7 @@ const ProductIndex = ({ category }: Props) => {
       <div className="title">
         <span>Products</span>
         <div className="actions">
-          <Button
-            icon="plus"
-            shape="circle"
-            title="Add Product"
-            onClick={() => setFormEnabled(true)}
-          />
+          <Button icon="plus" shape="circle" title="Add Product" onClick={() => enableForm(true)} />
         </div>
       </div>
     )
@@ -77,12 +75,9 @@ const ProductIndex = ({ category }: Props) => {
           <span>There is no product, please add a new one.</span>
         )}
       </Card>
-      {isFormEnabled && (
-        <Card title="Add Product" bordered={false} style={{ marginTop: 20 }}>
-          <CreateForm callback={handleCreateProduct} cancel={() => setFormEnabled(false)} />
-        </Card>
-      )}
+      {isFormEnabled && <Form callback={handleCreateProduct} cancel={() => enableForm(false)} />}
     </div>
   )
 }
-export default ProductIndex
+
+export default ProductList

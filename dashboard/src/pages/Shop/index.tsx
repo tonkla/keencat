@@ -8,8 +8,8 @@ import utils from '../../services/utils'
 import { Page, Shop } from '../../typings'
 import { FBPage } from '../../typings/facebook'
 
-import CategoryIndex from '../Category'
-import CreateForm from './CreateForm'
+import CategoryList from '../Category'
+import Form from './Form'
 import './Shop.scss'
 
 const ShopIndex = () => {
@@ -34,7 +34,10 @@ const ShopIndex = () => {
   )
 
   useEffect(() => {
-    setCreateShop(false)
+    // Note: Work when the component is unmounted
+    return () => {
+      setCreateShop(false)
+    }
   }, [setCreateShop])
 
   async function handleGrantAccessFacebookPages() {
@@ -89,7 +92,7 @@ const ShopIndex = () => {
       <div className="title">
         <span>{shop.name}</span>
         <div className="actions">
-          <Button icon="edit" shape="circle" title="Update Shop" />
+          <Button icon="edit" shape="circle" title="Edit Shop" />
           <Button
             icon="delete"
             shape="circle"
@@ -119,7 +122,7 @@ const ShopIndex = () => {
   return (
     <div>
       {(isCreateShop || shops.length < 1) && (
-        <Card title="Create Shop" bordered={false}>
+        <Card title="Add Shop" bordered={false}>
           {step === 0 && (
             <div>
               <Button icon="facebook" onClick={handleGrantAccessFacebookPages}>
@@ -130,7 +133,7 @@ const ShopIndex = () => {
           {step === 1 && (
             <div>
               {shops.length === 0 || availablePages.length > 0 ? (
-                <CreateForm
+                <Form
                   pages={availablePages}
                   callback={handleCreateShop}
                   cancel={() => setStep(0)}
@@ -152,7 +155,7 @@ const ShopIndex = () => {
               <li>Status: Open</li>
             </ul>
           </Card>
-          <CategoryIndex user={user} shop={activeShop} />
+          <CategoryList user={user} shop={activeShop} />
         </div>
       )}
     </div>

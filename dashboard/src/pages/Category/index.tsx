@@ -7,7 +7,7 @@ import utils from '../../services/utils'
 import { Category, Shop, User } from '../../typings'
 
 import Loading from '../../components/Loading'
-import CreateForm from './CreateForm'
+import Form from './Form'
 import List from './List'
 import './Category.scss'
 
@@ -16,7 +16,7 @@ interface Props {
   user: User
 }
 
-const CategoryIndex = ({ shop, user }: Props) => {
+const CategoryList = ({ shop, user }: Props) => {
   const [isFormEnabled, setFormEnabled] = useState(false)
   const [isLoading, setLoading] = useState(false)
 
@@ -28,7 +28,10 @@ const CategoryIndex = ({ shop, user }: Props) => {
   useEffect(() => {
     ;(async () => {
       setLoading(true)
-      if (shop.categoryIds.length !== categories.length) {
+      if (
+        (shop.categoryIds.length > 0 && shop.categoryIds.length !== categories.length) ||
+        (categories.length > 0 && categories[0].shopId !== shop.id)
+      ) {
         setCategories(await categoryRepository.findByIds(shop.categoryIds))
       }
       setLoading(false)
@@ -38,7 +41,7 @@ const CategoryIndex = ({ shop, user }: Props) => {
   async function handleCreateCategory(values: any) {
     const category: Category = {
       id: utils.genId(),
-      name: values.categoryName,
+      name: values.name,
       shopId: shop.id,
       pageId: shop.pageId,
       productIds: [],
@@ -77,12 +80,10 @@ const CategoryIndex = ({ shop, user }: Props) => {
         )}
       </Card>
       {isFormEnabled && (
-        <Card title="Add Category" bordered={false} style={{ marginTop: 20 }}>
-          <CreateForm callback={handleCreateCategory} cancel={() => setFormEnabled(false)} />
-        </Card>
+        <Form callback={handleCreateCategory} cancel={() => setFormEnabled(false)} />
       )}
     </div>
   )
 }
 
-export default CategoryIndex
+export default CategoryList

@@ -3,7 +3,7 @@ import { Button, Form, Input, Select } from 'antd'
 
 import { Page } from '../../typings'
 
-const CreateForm = (props: any) => {
+const ShopForm = (props: any) => {
   const { getFieldDecorator } = props.form
   const formItemLayout = {
     labelCol: {
@@ -75,5 +75,5 @@ const CreateForm = (props: any) => {
   )
 }
 
-const _this: any = Form.create({ name: 'createShop' })(CreateForm)
+const _this: any = Form.create({ name: 'shopForm' })(ShopForm)
 export default _this

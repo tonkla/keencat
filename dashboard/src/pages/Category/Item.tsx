@@ -5,15 +5,18 @@ import { Button, Card, Input, Modal } from 'antd'
 import { useStoreActions, useStoreState } from '../../store'
 import { Category } from '../../typings'
 
-import ProductIndex from '../Product'
 import Back from '../../components/Back'
 import Loading from '../../components/Loading'
+import ProductList from '../Product'
+import Form from './Form'
 
 const CategoryItem = () => {
   const [category, setCategory] = useState<Category | null>(null)
+  const [isFormEnabled, enableForm] = useState(false)
   const [deletingConfirm, showDeletingConfirm] = useState(false)
   const [confirmCode, setConfirmCode] = useState('')
 
+  const updateCategory = useStoreActions(a => a.categoryState.update)
   const deleteCategory = useStoreActions(a => a.categoryState.remove)
   const categories = useStoreState(s => s.categoryState.categories)
 
@@ -30,6 +33,12 @@ const CategoryItem = () => {
     if (c) setCategory(c)
   }, [categories, categoriesLength, id, history])
 
+  function handleUpdateCategory(category: Category) {
+    enableForm(false)
+    setCategory(category)
+    updateCategory(category)
+  }
+
   function handleDeleteCateogory(category: Category) {
     showDeletingConfirm(false)
     if (category.name === confirmCode) deleteCategory(category)
@@ -40,6 +49,12 @@ const CategoryItem = () => {
       <div className="title">
         <span>{category.name}</span>
         <div className="actions">
+          <Button
+            icon="edit"
+            shape="circle"
+            title="Edit Category"
+            onClick={() => enableForm(true)}
+          />
           <Button
             icon="delete"
             shape="circle"
@@ -72,15 +87,21 @@ const CategoryItem = () => {
   return (
     <div className="category">
       <Back />
-      {category ? (
+      {!category ? (
+        <Loading />
+      ) : isFormEnabled ? (
+        <Form
+          category={category}
+          callback={handleUpdateCategory}
+          cancel={() => enableForm(false)}
+        />
+      ) : (
         <div>
           <Card title={renderCategoryTitle(category)} bordered={false}>
             <span>.</span>
           </Card>
-          <ProductIndex category={category} />
+          <ProductList category={category} />
         </div>
-      ) : (
-        <Loading />
       )}
     </div>
   )
