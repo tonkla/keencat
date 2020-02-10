@@ -53,7 +53,7 @@ const ShopIndex = () => {
 
     const shop: Shop = {
       id: utils.genId(),
-      name: values.shopName,
+      name: values.name,
       pageId: values.pageId,
       categoryIds: [],
       ownerId: user.firebaseId,
@@ -122,7 +122,7 @@ const ShopIndex = () => {
   return (
     <div>
       {(isCreateShop || shops.length < 1) && (
-        <Card title="Add Shop" bordered={false}>
+        <Card title="Create Shop" bordered={false}>
           {step === 0 && (
             <div>
               <Button icon="facebook" onClick={handleGrantAccessFacebookPages}>

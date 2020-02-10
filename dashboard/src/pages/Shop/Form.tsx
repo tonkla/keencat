@@ -34,7 +34,7 @@ const ShopForm = (props: any) => {
   return (
     <Form {...formItemLayout} onSubmit={handleSubmit}>
       <Form.Item label="Shop Name">
-        {getFieldDecorator('shopName', {
+        {getFieldDecorator('name', {
           rules: [
             {
               required: true,
@@ -48,7 +48,7 @@ const ShopForm = (props: any) => {
           rules: [
             {
               required: true,
-              message: 'Please choose a page to connected with',
+              message: 'Please choose a Facebook page',
             },
           ],
         })(
