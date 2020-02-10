@@ -58,7 +58,7 @@ const Header = (props: Props) => {
               className="btn-create-shop"
               icon="plus"
               shape="circle"
-              title="Add Shop"
+              title="Create Shop"
               onClick={handleCreateShop}
             />
           </div>
