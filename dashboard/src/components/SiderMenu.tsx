@@ -21,7 +21,7 @@ const SiderMenu = ({ isCollapsed, activeShop }: Props) => {
 
   return (
     <div>
-      <Layout.Sider collapsible collapsed={isCollapsed} trigger={null} width={220}>
+      <Layout.Sider collapsible collapsed={isCollapsed} trigger={null} width={200}>
         <div className="brand">
           <div className="logo">
             <img src={logo} alt={appName} title={appName} />
@@ -38,31 +38,31 @@ const SiderMenu = ({ isCollapsed, activeShop }: Props) => {
           selectedKeys={[location.pathname]}
         >
           <Menu.Item key="/">
-            <Icon type="dashboard" />
-            <span>
-              <Link to="/">Dashboard</Link>
-            </span>
+            <Link to="/">
+              <Icon type="dashboard" />
+              <span>Dashboard</span>
+            </Link>
           </Menu.Item>
           <Menu.Item key={PATH_SHOP}>
-            <Icon type="shop" />
-            <span>
-              <Link to={PATH_SHOP}>Manage Shop</Link>
-            </span>
+            <Link to={PATH_SHOP}>
+              <Icon type="shop" />
+              <span>Manage Shop</span>
+            </Link>
           </Menu.Item>
           {activeShop && (
             <Menu.Item key="/inbox">
-              <Icon type="message" />
-              <span>
-                <Link to="/inbox">Inbox</Link>
-              </span>
+              <Link to="/inbox">
+                <Icon type="message" />
+                <span>Inbox</span>
+              </Link>
             </Menu.Item>
           )}
           {activeShop && (
             <Menu.Item key="/orders">
-              <Icon type="unordered-list" />
-              <span>
-                <Link to="/orders">Order</Link>
-              </span>
+              <Link to="/orders">
+                <Icon type="unordered-list" />
+                <span>Order</span>
+              </Link>
             </Menu.Item>
           )}
         </Menu>

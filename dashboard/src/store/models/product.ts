@@ -2,7 +2,7 @@ import { Action, action, Thunk, thunk } from 'easy-peasy'
 
 import productRepository from '../../services/repositories/product'
 import { Injections, StoreModel } from './index'
-import { Product } from '../../typings'
+import { Category, Product } from '../../typings'
 
 export interface ProductStateModel {
   products: Product[]
@@ -10,7 +10,7 @@ export interface ProductStateModel {
   create: Thunk<ProductStateModel, Product, Injections, StoreModel>
   update: Thunk<ProductStateModel, Product>
   remove: Thunk<ProductStateModel, Product, Injections, StoreModel>
-  removeByIds: Thunk<ProductStateModel, string[]>
+  removeByCategory: Thunk<ProductStateModel, Category>
   _create: Action<ProductStateModel, Product>
   _update: Action<ProductStateModel, Product>
   _remove: Action<ProductStateModel, Product>
@@ -41,7 +41,7 @@ const productState: ProductStateModel = {
   }),
   remove: thunk(async (actions, product, { getStoreActions, getStoreState }) => {
     if (await productRepository.remove(product)) {
-      const categories = getStoreState().categoryState.categories
+      const { categories } = getStoreState().categoryState
       const category = categories.find(c => c.id === product.categoryId)
       if (category) {
         getStoreActions().categoryState.update({
@@ -52,8 +52,8 @@ const productState: ProductStateModel = {
       actions._remove(product)
     }
   }),
-  removeByIds: thunk(async (actions, ids) => {
-    if (await productRepository.removeByIds(ids)) actions._removeAll()
+  removeByCategory: thunk(async (actions, category) => {
+    if (await productRepository.removeByCategory(category)) actions._removeAll()
   }),
   _create: action((state, product) => {
     state.products = [product, ...state.products]

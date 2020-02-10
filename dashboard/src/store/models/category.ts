@@ -2,7 +2,7 @@ import { Action, action, Thunk, thunk } from 'easy-peasy'
 
 import categoryRepository from '../../services/repositories/category'
 import { Injections, StoreModel } from './index'
-import { Category } from '../../typings'
+import { Category, Shop } from '../../typings'
 
 export interface CategoryStateModel {
   categories: Category[]
@@ -10,7 +10,7 @@ export interface CategoryStateModel {
   create: Thunk<CategoryStateModel, Category, Injections, StoreModel>
   update: Thunk<CategoryStateModel, Category>
   remove: Thunk<CategoryStateModel, Category, Injections, StoreModel>
-  removeByIds: Thunk<CategoryStateModel, string[]>
+  removeByShop: Thunk<CategoryStateModel, Shop>
   _create: Action<CategoryStateModel, Category>
   _update: Action<CategoryStateModel, Category>
   _remove: Action<CategoryStateModel, Category>
@@ -40,20 +40,23 @@ const categoryState: CategoryStateModel = {
   }),
   remove: thunk(async (actions, category, { getStoreActions, getStoreState }) => {
     if (await categoryRepository.remove(category)) {
-      getStoreActions().productState.removeByIds(category.productIds)
-      const shops = getStoreState().shopState.shops
-      const shop = shops.find(s => s.id === category.shopId)
+      // Delete all child products
+      getStoreActions().productState.removeByCategory(category)
+
+      // Update shop.categoryIds
+      const shop = getStoreState().shopState.shops.find(s => s.id === category.shopId)
       if (shop) {
         getStoreActions().shopState.update({
           ...shop,
           categoryIds: shop.categoryIds.filter(id => id !== category.id),
         })
       }
+
       actions._remove(category)
     }
   }),
-  removeByIds: thunk(async (actions, ids) => {
-    if (await categoryRepository.removeByIds(ids)) actions._removeAll()
+  removeByShop: thunk(async (actions, shop) => {
+    if (await categoryRepository.removeByShop(shop)) actions._removeAll()
   }),
   _create: action((state, category) => {
     state.categories = [category, ...state.categories]

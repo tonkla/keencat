@@ -8,9 +8,7 @@ import AuthorizedRoute from './components/AuthorizedRoute'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import ShopIndex from './pages/Shop'
-import CategoryIndex from './pages/Category'
 import CategoryItem from './pages/CategoryItem'
-import ProductIndex from './pages/Product'
 import ProductItem from './pages/ProductItem'
 import InboxIndex from './pages/Inbox'
 import OrderIndex from './pages/Order'
@@ -25,13 +23,11 @@ const App = () => (
       <Switch>
         <Route path="/login" component={Login} />
         <AuthorizedRoute path="/" exact component={Dashboard} />
-        <AuthorizedRoute path="/categories" exact component={CategoryIndex} />
+        <AuthorizedRoute path={PATH_SHOP} exact component={ShopIndex} />
         <AuthorizedRoute path="/categories/:id" component={CategoryItem} />
+        <AuthorizedRoute path="/products/:id" component={ProductItem} />
         <AuthorizedRoute path="/inbox" exact component={InboxIndex} />
         <AuthorizedRoute path="/orders" exact component={OrderIndex} />
-        <AuthorizedRoute path="/products" exact component={ProductIndex} />
-        <AuthorizedRoute path="/products/:id" component={ProductItem} />
-        <AuthorizedRoute path={PATH_SHOP} exact component={ShopIndex} />
         <Redirect to="/" />
       </Switch>
     </Router>

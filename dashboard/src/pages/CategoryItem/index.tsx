@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
-import { Button, Card, Modal } from 'antd'
+import { Button, Card, Input, Modal } from 'antd'
 
 import { useStoreActions, useStoreState } from '../../store'
 import { Category } from '../../typings'
@@ -11,6 +11,8 @@ import Loading from '../../components/Loading'
 
 const CategoryItem = () => {
   const [category, setCategory] = useState<Category | null>(null)
+  const [deletingConfirm, showDeletingConfirm] = useState(false)
+  const [confirmCode, setConfirmCode] = useState('')
 
   const deleteCategory = useStoreActions(a => a.categoryState.remove)
   const categories = useStoreState(s => s.categoryState.categories)
@@ -28,18 +30,43 @@ const CategoryItem = () => {
     if (c) setCategory(c)
   }, [categories, categoriesLength, id, history])
 
-  function handleDelete() {
-    Modal.confirm({
-      title: 'Are you sure you want to delete?',
-      content: 'The category and all of its products will be permanently deleted.',
-      okType: 'danger',
-      okText: 'Delete',
-      cancelText: 'No',
-      onOk() {
-        if (category) deleteCategory(category)
-      },
-      onCancel() {},
-    })
+  function handleDeleteCateogory(category: Category) {
+    showDeletingConfirm(false)
+    if (category.name === confirmCode) deleteCategory(category)
+  }
+
+  function renderCategoryTitle(category: Category) {
+    return (
+      <div className="title">
+        <span>{category.name}</span>
+        <div className="actions">
+          <Button
+            icon="delete"
+            shape="circle"
+            title="Delete Category"
+            onClick={() => showDeletingConfirm(true)}
+          />
+        </div>
+        <Modal
+          title="Are you sure you want to delete?"
+          visible={deletingConfirm}
+          onOk={() => handleDeleteCateogory(category)}
+          onCancel={() => showDeletingConfirm(false)}
+          className="dialog-confirm-deleting"
+        >
+          <span>The category and all of its products will be permanently deleted.</span>
+          <div className="row">
+            <span>Please type the category name to confirm deleting.</span>
+          </div>
+          <div className="row">
+            <Input
+              placeholder={category.name}
+              onChange={e => setConfirmCode(e.currentTarget.value)}
+            />
+          </div>
+        </Modal>
+      </div>
+    )
   }
 
   return (
@@ -47,15 +74,10 @@ const CategoryItem = () => {
       <Back />
       {category ? (
         <div>
-          <Card title={`Category: ${category.name}`} bordered={false}>
-            <span>{category.name}</span>
+          <Card title={renderCategoryTitle(category)} bordered={false}>
+            <span>.</span>
           </Card>
-          <div className="buttons">
-            <Button type="primary" icon="delete" onClick={handleDelete}>
-              Delete
-            </Button>
-          </div>
-          {category && <ProductIndex category={category} />}
+          <ProductIndex category={category} />
         </div>
       ) : (
         <Loading />
