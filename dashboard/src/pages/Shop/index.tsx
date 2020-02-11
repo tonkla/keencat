@@ -135,6 +135,11 @@ const ShopIndex = () => {
               <Button icon="facebook" onClick={handleGrantAccessFacebookPages}>
                 Facebook Page
               </Button>
+              <div className="btn-cancel">
+                <span className="link" onClick={() => setCreateShop(false)}>
+                  Cancel
+                </span>
+              </div>
             </div>
           )}
           {step === 1 && (
