@@ -1,3 +1,5 @@
+@import '../styles/shared';
+
 .home-container {
   display: flex;
   width: 100%;
@@ -58,6 +60,7 @@
   }
 
   .link {
+    color: $linkColor;
     cursor: pointer;
     text-decoration: underline;
     &:hover {
