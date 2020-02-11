@@ -7,6 +7,7 @@ import { Product } from '../../typings'
 
 import Back from '../../components/Back'
 import Loading from '../../components/Loading'
+import Upload from '../../components/Upload'
 import Form from './Form'
 
 const ProductItem = () => {
@@ -41,6 +42,14 @@ const ProductItem = () => {
   function handleDeleteProduct(product: Product) {
     showDeletingConfirm(false)
     if (product.name === confirmCode) deleteProduct(product)
+  }
+
+  function handleUploadSuccess(imageUrl: string) {
+    // imageUrl
+  }
+
+  function handleUploadError(e: Error) {
+    //
   }
 
   function renderProductTitle(product: Product) {
@@ -93,6 +102,7 @@ const ProductItem = () => {
       ) : (
         <Card title={renderProductTitle(product)} bordered={false}>
           <span>{product.name}</span>
+          <Upload product={product} onSuccess={handleUploadSuccess} onError={handleUploadError} />
         </Card>
       )}
     </div>

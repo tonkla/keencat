@@ -14,6 +14,7 @@ interface APICallParams {
   product?: Product
   shopId?: string
   shop?: Shop
+  file?: any
   ownerId?: string
 }
 
