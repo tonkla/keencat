@@ -1,10 +1,18 @@
 import React from 'react'
 import { Button, Form, Input, Select } from 'antd'
 
-import { Page } from '../../typings'
+import { Page, Shop } from '../../typings'
 
-const ShopForm = (props: any) => {
-  const { getFieldDecorator } = props.form
+interface FormProps {
+  form: any
+  callback: any
+  cancel: any
+  pages: Page[]
+  shop?: Shop
+}
+
+const ShopForm = ({ form, callback, cancel, pages, shop }: FormProps) => {
+  const { getFieldDecorator } = form
   const formItemLayout = {
     labelCol: {
       sm: { span: 4 },
@@ -24,9 +32,9 @@ const ShopForm = (props: any) => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault()
-    props.form.validateFieldsAndScroll((err: any, values: any) => {
+    form.validateFieldsAndScroll((err: any, values: any) => {
       if (!err) {
-        props.callback(values)
+        shop ? callback({ ...shop, name: values.name }) : callback(values)
       }
     })
   }
@@ -35,6 +43,7 @@ const ShopForm = (props: any) => {
     <Form {...formItemLayout} onSubmit={handleSubmit}>
       <Form.Item label="Shop Name">
         {getFieldDecorator('name', {
+          initialValue: shop ? shop.name : '',
           rules: [
             {
               required: true,
@@ -43,30 +52,32 @@ const ShopForm = (props: any) => {
           ],
         })(<Input />)}
       </Form.Item>
-      <Form.Item label="Facebook Page">
-        {getFieldDecorator('pageId', {
-          rules: [
-            {
-              required: true,
-              message: 'Please choose a Facebook page',
-            },
-          ],
-        })(
-          <Select placeholder="Choose Page" optionFilterProp="children">
-            {props.pages.map((page: Page) => (
-              <Select.Option key={page.id} value={page.id}>
-                {page.name}
-              </Select.Option>
-            ))}
-          </Select>
-        )}
-      </Form.Item>
+      {!shop && (
+        <Form.Item label="Facebook Page">
+          {getFieldDecorator('pageId', {
+            rules: [
+              {
+                required: true,
+                message: 'Please choose a Facebook page',
+              },
+            ],
+          })(
+            <Select placeholder="Choose Page" optionFilterProp="children">
+              {pages.map((page: Page) => (
+                <Select.Option key={page.id} value={page.id}>
+                  {page.name}
+                </Select.Option>
+              ))}
+            </Select>
+          )}
+        </Form.Item>
+      )}
       <Form.Item {...tailFormItemLayout}>
         <Button type="primary" htmlType="submit">
-          Create
+          {shop ? 'Edit' : 'Create'}
         </Button>
         <div className="btn-cancel">
-          <span className="link" onClick={props.cancel}>
+          <span className="link" onClick={cancel}>
             Cancel
           </span>
         </div>

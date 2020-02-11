@@ -15,10 +15,12 @@ import './Shop.scss'
 const ShopIndex = () => {
   const [step, setStep] = useState(0)
   const [pages, setPages] = useState<FBPage[]>([])
+  const [isFormEnabled, enableForm] = useState(false)
   const [deletingConfirm, showDeletingConfirm] = useState(false)
   const [confirmCode, setConfirmCode] = useState('')
 
   const createShop = useStoreActions(a => a.shopState.create)
+  const updateShop = useStoreActions(a => a.shopState.update)
   const deleteShop = useStoreActions(a => a.shopState.remove)
 
   const isCreateShop = useStoreState(s => s.sharedState.isCreateShop)
@@ -78,6 +80,11 @@ const ShopIndex = () => {
     setCreateShop(false)
   }
 
+  async function handleUpdateShop(shop: Shop) {
+    enableForm(false)
+    updateShop(shop)
+  }
+
   async function handleDeleteShop(shop: Shop) {
     showDeletingConfirm(false)
     if (shop.name === confirmCode) {
@@ -92,7 +99,7 @@ const ShopIndex = () => {
       <div className="title">
         <span>{shop.name}</span>
         <div className="actions">
-          <Button icon="edit" shape="circle" title="Edit Shop" />
+          <Button icon="edit" shape="circle" title="Edit Shop" onClick={() => enableForm(true)} />
           <Button
             icon="delete"
             shape="circle"
@@ -121,7 +128,7 @@ const ShopIndex = () => {
 
   return (
     <div>
-      {(isCreateShop || shops.length < 1) && (
+      {isCreateShop || shops.length < 1 ? (
         <Card title="Create Shop" bordered={false}>
           {step === 0 && (
             <div>
@@ -146,17 +153,29 @@ const ShopIndex = () => {
             </div>
           )}
         </Card>
-      )}
-      {!isCreateShop && user && activeShop && (
-        <div>
-          <Card title={renderShopTitle(activeShop)} bordered={false}>
-            <ul>
-              <li>Phone: 08-1234-5678</li>
-              <li>Status: Open</li>
-            </ul>
-          </Card>
-          <CategoryList user={user} shop={activeShop} />
-        </div>
+      ) : isFormEnabled ? (
+        <Card title="Edit Shop" bordered={false}>
+          <Form
+            shop={activeShop}
+            pages={[]}
+            callback={handleUpdateShop}
+            cancel={() => enableForm(false)}
+          />
+        </Card>
+      ) : (
+        !isCreateShop &&
+        user &&
+        activeShop && (
+          <div>
+            <Card title={renderShopTitle(activeShop)} bordered={false}>
+              <ul>
+                <li>Phone: 08-1234-5678</li>
+                <li>Status: Open</li>
+              </ul>
+            </Card>
+            <CategoryList user={user} shop={activeShop} />
+          </div>
+        )
       )}
     </div>
   )
