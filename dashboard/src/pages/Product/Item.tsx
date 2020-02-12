@@ -126,7 +126,7 @@ const ProductItem = () => {
         <Form product={product} callback={handleUpdateProduct} cancel={() => enableForm(false)} />
       ) : (
         <Card title={renderProductTitle(product)} bordered={false}>
-          <span>{product.name}</span>
+          <span>{product.description}</span>
           <Upload
             product={product}
             onSuccess={handleUploadSuccess}

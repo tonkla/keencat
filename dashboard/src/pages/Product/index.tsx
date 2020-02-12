@@ -43,6 +43,7 @@ const ProductList = ({ category }: Props) => {
     const product: Product = {
       id: utils.genId(),
       name: values.name,
+      description: values.description,
       categoryId: category.id,
       shopId: category.shopId,
       pageId: category.pageId,
