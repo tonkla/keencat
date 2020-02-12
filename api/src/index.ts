@@ -60,6 +60,7 @@ r2.post('/find-page', webhook.findPage)
 
 const r3 = new Router()
 r3.post('/find-categories', category.findByIds)
+r3.post('/find-product', product.find)
 r3.post('/find-products', product.findByIds)
 r3.post('/find-shops', shop.findByOwner)
 r3.post('/create-category', category.create)
