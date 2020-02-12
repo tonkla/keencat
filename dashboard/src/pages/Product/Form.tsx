@@ -17,7 +17,7 @@ const ProductForm = ({ form, callback, cancel, product }: FormProps) => {
       sm: { span: 4 },
     },
     wrapperCol: {
-      sm: { span: 8 },
+      sm: { span: 10 },
     },
   }
   const tailFormItemLayout = {
@@ -33,7 +33,7 @@ const ProductForm = ({ form, callback, cancel, product }: FormProps) => {
     e.preventDefault()
     form.validateFieldsAndScroll((err: any, values: any) => {
       if (!err) {
-        product ? callback({ ...product, name: values.name }) : callback(values)
+        product ? callback({ ...product, ...values }) : callback(values)
       }
     })
   }
@@ -53,6 +53,17 @@ const ProductForm = ({ form, callback, cancel, product }: FormProps) => {
               },
             ],
           })(<Input />)}
+        </Form.Item>
+        <Form.Item label="Product Description">
+          {getFieldDecorator('description', {
+            initialValue: product ? product.description : '',
+            rules: [
+              {
+                required: true,
+                message: 'Please input a product description',
+              },
+            ],
+          })(<Input.TextArea rows={4} />)}
         </Form.Item>
         <Form.Item {...tailFormItemLayout}>
           <Button type="primary" htmlType="submit">
