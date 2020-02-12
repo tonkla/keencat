@@ -3,6 +3,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import { Button, Card, Input, Modal } from 'antd'
 
 import { useStoreActions, useStoreState } from '../../store'
+import { productRepository } from '../../services/repositories'
 import { Product } from '../../typings'
 
 import Back from '../../components/Back'
@@ -11,7 +12,7 @@ import Upload from '../../components/Upload'
 import Form from './Form'
 
 const ProductItem = () => {
-  const [product, setProduct] = useState<Product | null>(null)
+  const [product, setProduct] = useState<Product>()
   const [isFormEnabled, enableForm] = useState(false)
   const [deletingConfirm, showDeletingConfirm] = useState(false)
   const [confirmCode, setConfirmCode] = useState('')
@@ -29,8 +30,15 @@ const ProductItem = () => {
     // Product has been deleted
     if (products.length !== productsLength) history.goBack()
 
+    if (!id) return
     const p = products.find(p => p.id === id)
     if (p) setProduct(p)
+    else {
+      ;(async () => {
+        const p = await productRepository.find(id)
+        if (p) setProduct(p)
+      })()
+    }
   }, [products, productsLength, id, history])
 
   function handleUpdateProduct(product: Product) {
@@ -96,7 +104,9 @@ const ProductItem = () => {
     <div className="product">
       <Back />
       {!product ? (
-        <Loading />
+        <Card>
+          <Loading />
+        </Card>
       ) : isFormEnabled ? (
         <Form product={product} callback={handleUpdateProduct} cancel={() => enableForm(false)} />
       ) : (
