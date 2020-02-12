@@ -1,6 +1,7 @@
 import { Action, action, Thunk, thunk } from 'easy-peasy'
 
 import productRepository from '../../services/repositories/product'
+import storage from '../../services/firebase/storage'
 import { Injections, StoreModel } from './index'
 import { Category, Product } from '../../typings'
 
@@ -40,6 +41,11 @@ const productState: ProductStateModel = {
     actions._update(product)
   }),
   remove: thunk(async (actions, product, { getStoreActions, getStoreState }) => {
+    if (product.images && product.images.length > 0) {
+      product.images.forEach(async img => {
+        await storage.removeImage(img)
+      })
+    }
     if (await productRepository.remove(product)) {
       const { categories } = getStoreState().categoryState
       const category = categories.find(c => c.id === product.categoryId)
