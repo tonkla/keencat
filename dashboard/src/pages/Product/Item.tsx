@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
-import { Button, Card, Input, Modal } from 'antd'
+import { Alert, Button, Card, Input, Modal } from 'antd'
 
 import { useStoreActions, useStoreState } from '../../store'
 import { productRepository } from '../../services/repositories'
@@ -16,6 +16,7 @@ const ProductItem = () => {
   const [isFormEnabled, enableForm] = useState(false)
   const [deletingConfirm, showDeletingConfirm] = useState(false)
   const [confirmCode, setConfirmCode] = useState('')
+  const [error, setError] = useState<Error>()
 
   const updateProduct = useStoreActions(a => a.productState.update)
   const deleteProduct = useStoreActions(a => a.productState.remove)
@@ -53,11 +54,25 @@ const ProductItem = () => {
   }
 
   function handleUploadSuccess(imageUrl: string) {
-    // imageUrl
+    if (!product) return
+    const newProduct =
+      product.images && product.images.length > 0
+        ? { ...product, images: [...product.images, imageUrl] }
+        : { ...product, images: [imageUrl] }
+    setProduct(newProduct)
+    updateProduct(newProduct)
   }
 
-  function handleUploadError(e: Error) {
-    //
+  function handleUploadError(error: Error) {
+    setError(error)
+  }
+
+  function handleRemoveImage(imageUrl: string) {
+    if (!product || !product.images) return
+    const images = product.images.filter(img => img !== imageUrl)
+    const newProduct = { ...product, images }
+    setProduct(newProduct)
+    updateProduct(newProduct)
   }
 
   function renderProductTitle(product: Product) {
@@ -112,7 +127,13 @@ const ProductItem = () => {
       ) : (
         <Card title={renderProductTitle(product)} bordered={false}>
           <span>{product.name}</span>
-          <Upload product={product} onSuccess={handleUploadSuccess} onError={handleUploadError} />
+          <Upload
+            product={product}
+            onSuccess={handleUploadSuccess}
+            onError={handleUploadError}
+            onRemove={handleRemoveImage}
+          />
+          {error && <Alert message={error.message} type="error" showIcon closable />}
         </Card>
       )}
     </div>
