@@ -28,7 +28,7 @@ const Header = (props: Props) => {
   function handleChangeShop(shopId: string) {
     if (activeShop && activeShop.id !== shopId) {
       const shop = shops.find(s => s.id === shopId)
-      if (shop) setActiveShop(activeShop.id)
+      if (shop) setActiveShop(shop.id)
     }
   }
 

@@ -12,7 +12,7 @@ import CategoryItem from './pages/Category/Item'
 import ProductItem from './pages/Product/Item'
 import InboxIndex from './pages/Inbox'
 import OrderIndex from './pages/Order'
-import { PATH_SHOP } from './constants'
+import { PATH_CATEGORY, PATH_PRODUCT, PATH_SHOP } from './constants'
 
 import 'antd/dist/antd.css'
 import './App.scss'
@@ -24,8 +24,8 @@ const App = () => (
         <Route path="/login" component={Login} />
         <AuthorizedRoute path="/" exact component={Dashboard} />
         <AuthorizedRoute path={PATH_SHOP} exact component={ShopIndex} />
-        <AuthorizedRoute path="/categories/:id" component={CategoryItem} />
-        <AuthorizedRoute path="/products/:id" component={ProductItem} />
+        <AuthorizedRoute path={`${PATH_CATEGORY}/:id`} component={CategoryItem} />
+        <AuthorizedRoute path={`${PATH_PRODUCT}/:id`} component={ProductItem} />
         <AuthorizedRoute path="/inbox" exact component={InboxIndex} />
         <AuthorizedRoute path="/orders" exact component={OrderIndex} />
         <Redirect to="/" />
