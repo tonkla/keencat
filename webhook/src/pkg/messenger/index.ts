@@ -41,7 +41,7 @@ async function handleMessage(event: MessageEvent): Promise<void> {
   } else if (event.message.attachments) {
     const attachment = event.message.attachments[0]
     if (attachment && attachment.type === 'image') {
-      const message = handler.requireCustomerAddress()
+      const message = handler.requestCustomerAddress()
       await send(event.recipient.id, { ...response, message })
     }
   }
@@ -88,12 +88,12 @@ async function handlePostback(event: MessageEvent): Promise<void> {
 
     await typingOn(event)
     setTimeout(async () => {
-      const msg2 = handler.requirePayment()
+      const msg2 = handler.requestPayment()
       await send(senderId, { ...response, message: msg2 })
 
       await typingOn(event)
       setTimeout(async () => {
-        const msg3 = handler.requirePaymentSlip()
+        const msg3 = handler.requestPaymentSlip()
         await send(senderId, { ...response, message: msg3 })
       }, 1000)
     }, 1000)
