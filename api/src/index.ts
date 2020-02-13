@@ -55,8 +55,10 @@ r1.get('/ping', (ctx: Context) => (ctx.body = 'pong'))
 
 const r2 = new Router()
 r2.post('/find-categories', webhook.findCategories)
-r2.post('/find-products', webhook.findProducts)
 r2.post('/find-page', webhook.findPage)
+r2.post('/find-product', webhook.findProduct)
+r2.post('/find-products', webhook.findProducts)
+r2.post('/find-shop', webhook.findShop)
 
 const r3 = new Router()
 r3.post('/find-category', category.find)

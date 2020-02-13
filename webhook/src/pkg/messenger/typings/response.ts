@@ -119,6 +119,7 @@ export interface Message {
   messaging_type: MessagingType
   recipient: Recipient
   message: ResponseMessage
+  sender_action?: SenderAction
 }
 
 export interface ResponseMessage {

@@ -1,11 +1,12 @@
 import axios from 'axios'
 import dotenv from 'dotenv'
 
-import { Category, Product } from '../../typings'
+import { Category, Product, Shop } from '../../typings'
 
 dotenv.config()
 const accessToken = process.env.API_ACCESS_TOKEN || ''
-const url = process.env.API_URL || ''
+const url =
+  (process.env.NODE_ENV === 'development' ? process.env.API_URL_DEV : process.env.API_URL) || ''
 
 const api = axios.create({ headers: { authorization: accessToken } })
 
@@ -40,9 +41,29 @@ async function findProducts(pageId: string, categoryId?: string): Promise<Produc
   }
 }
 
+async function findProduct(pageId: string, productId: string): Promise<Product | null> {
+  try {
+    const { data } = await api.post(`${url}/find-product`, { pageId, productId })
+    return data ? data : null
+  } catch (e) {
+    return null
+  }
+}
+
+async function findShop(pageId: string): Promise<Shop | null> {
+  try {
+    const { data } = await api.post(`${url}/find-shop`, { pageId })
+    return data ? data : null
+  } catch (e) {
+    return null
+  }
+}
+
 export default {
   getPageAccessToken,
   resetPageAccessToken,
   findCategories,
+  findProduct,
   findProducts,
+  findShop,
 }

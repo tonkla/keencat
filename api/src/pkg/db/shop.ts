@@ -21,6 +21,22 @@ async function findByOwner(ownerId: string): Promise<Shop[]> {
   }
 }
 
+async function findByPage(pageId: string): Promise<Shop | null> {
+  try {
+    const shops: Shop[] = []
+    const docs = await db
+      .collection('shops')
+      .where('pageId', '==', pageId)
+      .get()
+    docs.forEach(d => {
+      shops.push(d.data() as Shop)
+    })
+    return shops.length > 0 ? shops[0] : null
+  } catch (e) {
+    return null
+  }
+}
+
 async function create(shop: Shop): Promise<boolean> {
   try {
     await db
@@ -60,6 +76,7 @@ async function remove(shop: Shop): Promise<boolean> {
 export default {
   find,
   findByOwner,
+  findByPage,
   create,
   update,
   remove,

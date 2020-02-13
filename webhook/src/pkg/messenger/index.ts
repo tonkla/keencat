@@ -4,7 +4,7 @@ import qs from 'qs'
 import api from '../api'
 import handler from './handler'
 import { MessageEvent, WebhookEvent, WebhookParams } from './typings/request'
-import { Message, ResponseMessage } from './typings/response'
+import { Message } from './typings/response'
 
 function verify({ mode, verifyToken, challenge }: WebhookParams): string {
   const token = process.env.MSG_VERIFY_TOKEN || ''
@@ -29,6 +29,9 @@ async function handleMessage(event: MessageEvent): Promise<void> {
     messaging_type: 'RESPONSE',
     message: {},
   }
+  await markSeen(event)
+  await typingOn(event)
+
   if (event.message.text) {
     const message = await handler.handleMessage({
       text: event.message.text,
@@ -38,33 +41,7 @@ async function handleMessage(event: MessageEvent): Promise<void> {
   } else if (event.message.attachments) {
     const attachment = event.message.attachments[0]
     if (attachment && attachment.type === 'image') {
-      const message: ResponseMessage = {
-        attachment: {
-          type: 'template',
-          payload: {
-            template_type: 'generic',
-            elements: [
-              {
-                title: 'Is this the right picture?',
-                subtitle: 'Tap a button to answer.',
-                image_url: attachment.payload.url,
-                buttons: [
-                  {
-                    type: 'postback',
-                    title: 'Yes!',
-                    payload: 'yes',
-                  },
-                  {
-                    type: 'postback',
-                    title: 'No!',
-                    payload: 'no',
-                  },
-                ],
-              },
-            ],
-          },
-        },
-      }
+      const message = handler.requireCustomerAddress()
       await send(event.recipient.id, { ...response, message })
     }
   }
@@ -77,28 +54,75 @@ async function handlePostback(event: MessageEvent): Promise<void> {
     messaging_type: 'RESPONSE',
     message: {},
   }
+  await markSeen(event)
+  await typingOn(event)
 
   if (event.postback.payload === 'menu') {
     const message = { text: 'TODO: Show Menu' }
     await send(senderId, { ...response, message })
+    return
   }
 
-  const [type, id] = event.postback.payload.split('=')
-  if (type === 'categoryId') {
+  const [key, id] = event.postback.payload.split('=')
+  if (key === 'categoryId') {
     const message = await handler.handlePostback({
       text: 'listProducts',
       pageId: event.recipient.id,
       categoryId: id,
     })
     await send(senderId, { ...response, message })
-  } else if (type === 'productId') {
+  } else if (key === 'productId') {
     const message = await handler.handlePostback({
-      text: 'buyProduct',
+      text: 'buy',
+      pageId: event.recipient.id,
+      productId: id,
+    })
+    await send(senderId, { ...response, message })
+  } else if (key === 'confirmProductId') {
+    const message = await handler.handlePostback({
+      text: 'confirm',
+      pageId: event.recipient.id,
+      productId: id,
+    })
+    await send(senderId, { ...response, message })
+
+    await typingOn(event)
+    setTimeout(async () => {
+      const msg2 = handler.requirePayment()
+      await send(senderId, { ...response, message: msg2 })
+
+      await typingOn(event)
+      setTimeout(async () => {
+        const msg3 = handler.requirePaymentSlip()
+        await send(senderId, { ...response, message: msg3 })
+      }, 1000)
+    }, 1000)
+  } else if (key === 'cancelProductId') {
+    const message = await handler.handlePostback({
+      text: 'cancel',
       pageId: event.recipient.id,
       productId: id,
     })
     await send(senderId, { ...response, message })
   }
+}
+
+async function markSeen(event: MessageEvent): Promise<void> {
+  const response: Message = {
+    recipient: { id: event.sender.id },
+    messaging_type: 'RESPONSE',
+    message: {},
+  }
+  await send(event.recipient.id, { ...response, sender_action: 'mark_seen' })
+}
+
+async function typingOn(event: MessageEvent): Promise<void> {
+  const response: Message = {
+    recipient: { id: event.sender.id },
+    messaging_type: 'RESPONSE',
+    message: {},
+  }
+  await send(event.recipient.id, { ...response, sender_action: 'typing_on' })
 }
 
 async function send(pageId: string, message: Message): Promise<void> {
