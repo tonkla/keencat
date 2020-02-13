@@ -3,6 +3,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import { Button, Card, Input, Modal } from 'antd'
 
 import { useStoreActions, useStoreState } from '../../store'
+import { categoryRepository } from '../../services/repositories'
 import { Category } from '../../typings'
 
 import Back from '../../components/Back'
@@ -16,6 +17,10 @@ const CategoryItem = () => {
   const [deletingConfirm, showDeletingConfirm] = useState(false)
   const [confirmCode, setConfirmCode] = useState('')
 
+  const shops = useStoreState(s => s.shopState.shops)
+  const shopId = useStoreState(s => s.activeState.shopId)
+  const activeShop = shops.find(s => s.id === shopId)
+
   const updateCategory = useStoreActions(a => a.categoryState.update)
   const deleteCategory = useStoreActions(a => a.categoryState.remove)
   const categories = useStoreState(s => s.categoryState.categories)
@@ -26,12 +31,20 @@ const CategoryItem = () => {
   const { id } = useParams()
 
   useEffect(() => {
+    if (!activeShop || !id) return
+
     // Category has been deleted
     if (categories.length !== categoriesLength) history.goBack()
 
     const c = categories.find(c => c.id === id)
     if (c) setCategory(c)
-  }, [categories, categoriesLength, id, history])
+    else {
+      ;(async () => {
+        const c = await categoryRepository.find(id)
+        if (c) setCategory(c)
+      })()
+    }
+  }, [activeShop, categories, categoriesLength, id, history])
 
   function handleUpdateCategory(category: Category) {
     enableForm(false)
@@ -88,7 +101,9 @@ const CategoryItem = () => {
     <div className="category">
       <Back />
       {!category ? (
-        <Loading />
+        <Card>
+          <Loading />
+        </Card>
       ) : isFormEnabled ? (
         <Form
           category={category}
