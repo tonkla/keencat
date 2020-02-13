@@ -18,6 +18,10 @@ const ProductItem = () => {
   const [confirmCode, setConfirmCode] = useState('')
   const [error, setError] = useState<Error>()
 
+  const shops = useStoreState(s => s.shopState.shops)
+  const shopId = useStoreState(s => s.activeState.shopId)
+  const activeShop = shops.find(s => s.id === shopId)
+
   const updateProduct = useStoreActions(a => a.productState.update)
   const deleteProduct = useStoreActions(a => a.productState.remove)
   const products = useStoreState(s => s.productState.products)
@@ -28,10 +32,11 @@ const ProductItem = () => {
   const { id } = useParams()
 
   useEffect(() => {
+    if (!activeShop || !id) return
+
     // Product has been deleted
     if (products.length !== productsLength) history.goBack()
 
-    if (!id) return
     const p = products.find(p => p.id === id)
     if (p) setProduct(p)
     else {
@@ -40,7 +45,7 @@ const ProductItem = () => {
         if (p) setProduct(p)
       })()
     }
-  }, [products, productsLength, id, history])
+  }, [activeShop, products, productsLength, id, history])
 
   function handleUpdateProduct(product: Product) {
     enableForm(false)

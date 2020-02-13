@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Redirect } from 'react-router-dom'
-import { Layout } from 'antd'
+import { Card, Layout } from 'antd'
 
 import { useStoreState, useStoreActions } from '../store'
 import shopRepository from '../services/repositories/shop'
-import utils from '../services/utils'
+// import utils from '../services/utils'
 
 import Loading from '../components/Loading'
 import SiderMenu from '../components/SiderMenu'
@@ -28,7 +28,7 @@ const Home: React.FC = ({ children }) => {
   // Note: DO NOT combine these two useEffects, will cause infinite loop with shops/setShops
   useEffect(() => {
     // Note: In development, do not fetch shops everytime the component is mounted
-    if (utils.isDev()) return
+    // if (utils.isDev()) return
     if (!user) return
     ;(async () => {
       setLoading(true)
@@ -38,7 +38,8 @@ const Home: React.FC = ({ children }) => {
   }, [user, setShops])
 
   useEffect(() => {
-    if (!activeShop && shops.length > 0) setActiveShop(shops[0].id)
+    if (shops.length > 0 && (!activeShop || !shops.map(s => s.id).includes(activeShop.id)))
+      setActiveShop(shops[0].id)
   }, [activeShop, shops, setActiveShop])
 
   const { Content } = Layout
@@ -57,7 +58,15 @@ const Home: React.FC = ({ children }) => {
             setCollapse={setCollapse}
             user={user}
           />
-          <Content>{isLoading ? <Loading position="center" size="large" /> : children}</Content>
+          <Content>
+            {isLoading ? (
+              <Card>
+                <Loading position="center" size="large" />
+              </Card>
+            ) : (
+              children
+            )}
+          </Content>
           <Footer />
         </Layout>
       </Layout>
