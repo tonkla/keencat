@@ -12,7 +12,7 @@ function init(): Promise<void> {
           appId,
           cookie: true,
           xfbml: false,
-          version: 'v5.0',
+          version: 'v6.0',
         })
         resolve()
       }

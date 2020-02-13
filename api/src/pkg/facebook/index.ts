@@ -3,12 +3,18 @@ import qs from 'qs'
 
 import { FBUserAccessToken, FBPage, FBUserPageToken } from '../../typings/facebook'
 
-const graphURL = 'https://graph.facebook.com/v5.0'
+const graphURL = 'https://graph.facebook.com/v6.0'
 
 async function extendUserAccessToken(accessToken: string): Promise<FBUserAccessToken | null> {
   try {
-    const appId = process.env.FB_APP_ID || ''
-    const appSecret = process.env.FB_APP_SECRET || ''
+    let appId, appSecret: string
+    if (process.env.NODE_ENV === 'development') {
+      appId = process.env.FB_APP_ID_DEV || ''
+      appSecret = process.env.FB_APP_SECRET_DEV || ''
+    } else {
+      appId = process.env.FB_APP_ID || ''
+      appSecret = process.env.FB_APP_SECRET || ''
+    }
     const params = qs.stringify({
       grant_type: 'fb_exchange_token',
       client_id: appId,
@@ -24,8 +30,14 @@ async function extendUserAccessToken(accessToken: string): Promise<FBUserAccessT
 
 async function debugToken(token: string): Promise<FBUserPageToken | null> {
   try {
-    const appId = process.env.FB_APP_ID || ''
-    const appSecret = process.env.FB_APP_SECRET || ''
+    let appId, appSecret: string
+    if (process.env.NODE_ENV === 'development') {
+      appId = process.env.FB_APP_ID_DEV || ''
+      appSecret = process.env.FB_APP_SECRET_DEV || ''
+    } else {
+      appId = process.env.FB_APP_ID || ''
+      appSecret = process.env.FB_APP_SECRET || ''
+    }
     const params = qs.stringify({
       input_token: token,
       access_token: `${appId}|${appSecret}`,

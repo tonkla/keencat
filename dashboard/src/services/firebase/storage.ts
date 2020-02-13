@@ -6,7 +6,7 @@ async function uploadImage(file: File, productId: string, shopId: string): Promi
     if (file.type === 'image/jpeg') ext = 'jpg'
     else if (file.type === 'image/png') ext = 'png'
     else return null
-    const filepath = `public/images/${shopId}/${productId}`
+    const filepath = `public/${shopId}/${productId}`
     const datetime = new Date()
       .toISOString()
       .replace(/[-T:]/g, '')
@@ -32,7 +32,7 @@ async function uploadImage(file: File, productId: string, shopId: string): Promi
   })
 }
 
-async function removeImage(imageUrl: string): Promise<boolean> {
+async function deleteImage(imageUrl: string): Promise<boolean> {
   try {
     const paths = imageUrl.match(/public.*\.(jpg|png)/g)
     if (!paths || paths.length < 1) return false
@@ -50,5 +50,5 @@ async function removeImage(imageUrl: string): Promise<boolean> {
 
 export default {
   uploadImage,
-  removeImage,
+  deleteImage,
 }

@@ -26,7 +26,7 @@ const shopState: ShopStateModel = {
   update: thunk(async (actions, shop) => {
     if (await shopRepository.update(shop)) actions._update(shop)
   }),
-  remove: thunk(async (actions, shop, { getStoreActions, getStoreState }) => {
+  remove: thunk(async (actions, shop, { getStoreActions, getStoreState, getState }) => {
     if (await shopRepository.remove(shop)) {
       const { productState: productActions, categoryState: categoryActions } = getStoreActions()
       // Delete all child products
@@ -41,7 +41,9 @@ const shopState: ShopStateModel = {
       actions._remove(shop)
 
       // Finally, reset active shop
-      getStoreActions().activeState.setShopId(null)
+      const { shops } = getState()
+      if (shops.length > 0) getStoreActions().activeState.setShopId(shops[0].id)
+      else getStoreActions().activeState.setShopId(null)
     }
   }),
   _create: action((state, shop) => {

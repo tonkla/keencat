@@ -72,7 +72,7 @@ const ProductItem = () => {
     setError(error)
   }
 
-  function handleRemoveImage(imageUrl: string) {
+  function handleDeleteImage(imageUrl: string) {
     if (!product || !product.images) return
     const images = product.images.filter(img => img !== imageUrl)
     const newProduct = { ...product, images }
@@ -136,7 +136,7 @@ const ProductItem = () => {
             product={product}
             onSuccess={handleUploadSuccess}
             onError={handleUploadError}
-            onRemove={handleRemoveImage}
+            onRemove={handleDeleteImage}
           />
           {error && <Alert message={error.message} type="error" showIcon closable />}
         </Card>

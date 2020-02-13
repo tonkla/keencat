@@ -41,12 +41,11 @@ const productState: ProductStateModel = {
     actions._update(product)
   }),
   remove: thunk(async (actions, product, { getStoreActions, getStoreState }) => {
-    if (product.images && product.images.length > 0) {
-      product.images.forEach(async img => {
-        await storage.removeImage(img)
-      })
-    }
     if (await productRepository.remove(product)) {
+      if (product.images && product.images.length > 0) {
+        product.images.forEach(async imgUrl => await storage.deleteImage(imgUrl))
+      }
+
       const { categories } = getStoreState().categoryState
       const category = categories.find(c => c.id === product.categoryId)
       if (category) {
@@ -59,6 +58,14 @@ const productState: ProductStateModel = {
     }
   }),
   removeByCategory: thunk(async (actions, category) => {
+    // Delete images in Firebase storage
+    const products = await productRepository.findByIds(category.productIds)
+    for (const product of products) {
+      if (product.images && product.images.length > 0) {
+        product.images.forEach(async imgUrl => await storage.deleteImage(imgUrl))
+      }
+    }
+
     if (await productRepository.removeByCategory(category)) actions._removeAll()
   }),
   _create: action((state, product) => {

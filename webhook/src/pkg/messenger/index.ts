@@ -106,7 +106,7 @@ async function send(pageId: string, message: Message): Promise<void> {
     const pageAccessToken = await api.getPageAccessToken(pageId)
     if (pageAccessToken) {
       const resp = await axios.post(
-        'https://graph.facebook.com/v5.0/me/messages',
+        'https://graph.facebook.com/v6.0/me/messages',
         qs.stringify({ access_token: pageAccessToken, ...message })
       )
       if (resp && resp.data) {

@@ -95,7 +95,7 @@ const ImageUpload = ({ onError, onSuccess, onRemove, product }: UploadProps) => 
         async onOk() {
           // Note: the URL is setted within useEffect()
           if (file.url) {
-            await storage.removeImage(file.url)
+            await storage.deleteImage(file.url)
             onRemove(file.url)
           }
           resolve(true)
