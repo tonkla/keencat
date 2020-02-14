@@ -50,14 +50,6 @@ const SiderMenu = ({ isCollapsed, activeShop }: Props) => {
             </Link>
           </Menu.Item>
           {activeShop && (
-            <Menu.Item key="/inbox">
-              <Link to="/inbox">
-                <Icon type="message" />
-                <span>Inbox</span>
-              </Link>
-            </Menu.Item>
-          )}
-          {activeShop && (
             <Menu.Item key="/orders">
               <Link to="/orders">
                 <Icon type="shopping-cart" />

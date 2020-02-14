@@ -1,9 +1,11 @@
 export interface Order {
   id: string
   shopId: string
+  ownerId: string
   customerId: string
   productId: string
-  status: 'Unpaid' | 'Approving' | 'Rejected' | 'Paid' | 'Canceled'
+  productName: string
+  status: 'unpaid' | 'approving' | 'rejected' | 'paid' | 'canceled'
   pageId?: string
   attachments?: string[]
   customerAddress?: string

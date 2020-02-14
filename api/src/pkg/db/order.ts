@@ -36,7 +36,7 @@ async function create(input: OrderInput) {
       customerId: input.customerId,
       pageId: input.pageId,
       productId: input.productId,
-      status: 'Unpaid',
+      status: 'unpaid',
       createdAt: new Date().toISOString(),
     }
     await db
@@ -70,7 +70,7 @@ async function update(input: OrderInput) {
         order.attachments = order.attachments
           ? [...input.attachments, ...order.attachments]
           : input.attachments
-        order.status = 'Approving'
+        order.status = 'approving'
       }
 
       if (input.customerAddress) {
