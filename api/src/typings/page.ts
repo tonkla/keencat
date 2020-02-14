@@ -1,5 +1,3 @@
-import { User } from './user'
-
 export interface Page {
   id: string
   psid: string
