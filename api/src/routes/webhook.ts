@@ -1,9 +1,11 @@
 import { Context } from 'koa'
 
 import categoryRepository from '../pkg/db/category'
+import orderRepository from '../pkg/db/order'
 import pageRepository from '../pkg/db/page'
 import productRepository from '../pkg/db/product'
 import shopRepository from '../pkg/db/shop'
+import { Order } from '../typings'
 
 async function findCategories(ctx: Context) {
   const { pageId } = ctx.request.body
@@ -43,10 +45,28 @@ async function findShop(ctx: Context) {
   }
 }
 
+async function createOrder(ctx: Context) {
+  const { pageId, customerId, productId } = ctx.request.body
+  if (pageId && customerId && productId) {
+    await orderRepository.create({ pageId, customerId, productId })
+    ctx.status = 200
+  }
+}
+
+async function updateOrder(ctx: Context) {
+  const { pageId, customerId, attachments, customerAddress } = ctx.request.body
+  if (pageId && customerId) {
+    await orderRepository.update({ pageId, customerId, attachments, customerAddress })
+    ctx.status = 200
+  }
+}
+
 export default {
   findCategories,
   findPage,
   findProduct,
   findProducts,
   findShop,
+  createOrder,
+  updateOrder,
 }

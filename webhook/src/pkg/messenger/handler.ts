@@ -98,7 +98,7 @@ async function handleMessage(input: MessageParams): Promise<ResponseMessage> {
       return buildAttachmentTemplate(elements)
     }
     case 'address': {
-      return { text: lang.endSale }
+      return { text: lang.endSale, intent: intent.type }
     }
     default:
       return handleUnknownMessage()
