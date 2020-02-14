@@ -5,6 +5,7 @@ import api from '../api'
 import handler from './handler'
 import { MessageEvent, WebhookEvent, WebhookParams } from './typings/request'
 import { Message } from './typings/response'
+import { Order } from '../../typings'
 
 function verify({ mode, verifyToken, challenge }: WebhookParams): string {
   const token = process.env.MSG_VERIFY_TOKEN || ''
@@ -33,16 +34,34 @@ async function handleMessage(event: MessageEvent): Promise<void> {
   await typingOn(event)
 
   if (event.message.text) {
-    const message = await handler.handleMessage({
+    const { intent, ...message } = await handler.handleMessage({
       text: event.message.text,
       pageId: event.recipient.id,
     })
     await send(event.recipient.id, { ...response, message })
+
+    // Update customer address
+    if (intent === 'address') {
+      const order: Order = {
+        pageId: event.recipient.id,
+        customerId: event.sender.id,
+        customerAddress: event.message.text,
+      }
+      await api.updateOrder(order)
+    }
   } else if (event.message.attachments) {
     const attachment = event.message.attachments[0]
     if (attachment && attachment.type === 'image') {
       const message = handler.requestCustomerAddress()
       await send(event.recipient.id, { ...response, message })
+
+      // Update transfer slip
+      const order: Order = {
+        pageId: event.recipient.id,
+        customerId: event.sender.id,
+        attachments: [attachment.payload.url],
+      }
+      await api.updateOrder(order)
     }
   }
 }
@@ -97,6 +116,14 @@ async function handlePostback(event: MessageEvent): Promise<void> {
         await send(senderId, { ...response, message: msg3 })
       }, 1000)
     }, 1000)
+
+    // Create purchasing order
+    const order: Order = {
+      pageId: event.recipient.id,
+      customerId: event.sender.id,
+      productId: id,
+    }
+    await api.createOrder(order)
   } else if (key === 'cancelProductId') {
     const message = await handler.handlePostback({
       text: 'cancel',

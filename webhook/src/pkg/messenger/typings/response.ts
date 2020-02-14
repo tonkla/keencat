@@ -127,6 +127,7 @@ export interface ResponseMessage {
   attachment?: Attachment
   quick_replies?: any[]
   metadata?: string
+  intent?: string
 }
 
 export interface ButtonTemplate {

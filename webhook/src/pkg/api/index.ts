@@ -1,26 +1,33 @@
 import axios from 'axios'
 import dotenv from 'dotenv'
 
-import { Category, Product, Shop } from '../../typings'
+import { Category, Order, Page, Product, Shop } from '../../typings'
 
 dotenv.config()
 const accessToken = process.env.API_ACCESS_TOKEN || ''
 const url =
   (process.env.NODE_ENV === 'development' ? process.env.API_URL_DEV : process.env.API_URL) || ''
 
+const redis = new Map<string, Page>()
+
 const api = axios.create({ headers: { authorization: accessToken } })
 
 async function getPageAccessToken(pageId: string): Promise<string | null> {
   try {
-    const { data } = await api.post(`${url}/find-page`, { pageId })
-    return data && data.accessToken ? data.accessToken : null
+    const page = redis.get(pageId)
+    if (page) {
+      return page.accessToken
+    } else {
+      const { data: page } = await api.post(`${url}/find-page`, { pageId })
+      if (page && page.accessToken) {
+        redis.set(pageId, page)
+        return page.accessToken
+      }
+      return null
+    }
   } catch (e) {
     return null
   }
-}
-
-async function resetPageAccessToken(pageId: string): Promise<boolean> {
-  return false
 }
 
 async function findCategories(pageId: string): Promise<Category[]> {
@@ -59,11 +66,24 @@ async function findShop(pageId: string): Promise<Shop | null> {
   }
 }
 
+async function createOrder(order: Order) {
+  try {
+    await api.post(`${url}/create-order`, order)
+  } catch (e) {}
+}
+
+async function updateOrder(order: Order) {
+  try {
+    await api.post(`${url}/update-order`, order)
+  } catch (e) {}
+}
+
 export default {
   getPageAccessToken,
-  resetPageAccessToken,
   findCategories,
   findProduct,
   findProducts,
   findShop,
+  createOrder,
+  updateOrder,
 }

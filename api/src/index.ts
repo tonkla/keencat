@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import auth from './pkg/auth'
-import { category, page, product, shop } from './routes/dashboard'
+import { category, order, page, product, shop } from './routes/dashboard'
 import webhook from './routes/webhook'
 
 async function handleError(ctx: Context, next: Function) {
@@ -38,7 +38,7 @@ async function authorize(ctx: Context, next: Function) {
           ctx.status = 401
           return
         }
-        // Pass uid to verify owner on object level
+        // Pass uid to verify owner at object level
         else ctx.request.body = { ...ctx.request.body, ownerId: uid }
 
         await next()
@@ -59,10 +59,13 @@ r2.post('/find-page', webhook.findPage)
 r2.post('/find-product', webhook.findProduct)
 r2.post('/find-products', webhook.findProducts)
 r2.post('/find-shop', webhook.findShop)
+r2.post('/create-order', webhook.createOrder)
+r2.post('/update-order', webhook.updateOrder)
 
 const r3 = new Router()
 r3.post('/find-category', category.find)
 r3.post('/find-categories', category.findByIds)
+r3.post('/find-orders', order.findByShop)
 r3.post('/find-product', product.find)
 r3.post('/find-products', product.findByIds)
 r3.post('/find-shops', shop.findByOwner)

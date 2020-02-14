@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
 
 import auth from '../firebase/auth'
 import { Category, Page, Product, Shop } from '../../typings'
@@ -18,7 +18,7 @@ interface APICallParams {
   ownerId?: string
 }
 
-async function call(path: string, params: APICallParams): Promise<AxiosResponse | null> {
+async function call(path: string, params: APICallParams) {
   try {
     const user = await auth.getUser()
     if (!user) return null

@@ -7,6 +7,24 @@ export interface Category {
   productIds: string[]
 }
 
+export interface Order {
+  pageId: string
+  customerId: string
+  productId?: string
+  attachments?: string[]
+  customerAddress?: string
+}
+
+export interface Page {
+  id: string
+  psid: string
+  name: string
+  ownerId: string
+  accessToken: string
+  issuedAt: string
+  expiredAt: string
+}
+
 export interface Product {
   id: string
   name: string

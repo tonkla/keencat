@@ -18,12 +18,16 @@ export interface StoreModel {
   userState: UserStateModel
 }
 
+const whitelist: any =
+  process.env.NODE_ENV === 'development'
+    ? ['activeState', 'userState', 'categoryState', 'productState', 'shopState']
+    : ['activeState', 'userState']
+
 const storeModel: StoreModel = persist(
   { activeState, categoryState, productState, sharedState, shopState, userState },
   {
     storage: 'localStorage',
-    // blacklist: ['categoryState', 'productState', 'sharedState', 'shopState'],
-    whitelist: ['activeState', 'userState'],
+    whitelist,
   }
 )
 
