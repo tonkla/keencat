@@ -3,7 +3,7 @@ export interface Order {
   shopId: string
   ownerId: string
   customerId: string
-  status: 'Unpaid' | 'Approving' | 'Rejected' | 'Paid' | 'Canceled'
+  status: 'unpaid' | 'approving' | 'rejected' | 'paid' | 'canceled'
   pageId?: string
   productId?: string
   attachments?: string[]
