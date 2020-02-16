@@ -1,3 +1,5 @@
+import { IntentResponse } from '../../dialogflow/typings'
+
 export interface Sender {
   id: string
 }
@@ -104,4 +106,15 @@ export interface WebhookParams {
   mode: string
   verifyToken: string
   challenge: string
+}
+
+export interface PostbackPayload {
+  action: 'listProducts' | 'buy' | 'confirm' | 'cancel'
+  shopId: string
+  pageId: string
+  customerId: string
+  productId?: string
+  productName?: string
+  categoryId?: string
+  ownerId?: string
 }

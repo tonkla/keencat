@@ -1,3 +1,5 @@
+export type OrderStatus = 'unpaid' | 'approving' | 'rejected' | 'paid' | 'canceled'
+
 export interface Order {
   id: string
   shopId: string
@@ -5,7 +7,7 @@ export interface Order {
   customerId: string
   productId: string
   productName: string
-  status: 'unpaid' | 'approving' | 'rejected' | 'paid' | 'canceled'
+  status: OrderStatus
   pageId?: string
   attachments?: string[]
   customerAddress?: string

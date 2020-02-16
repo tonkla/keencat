@@ -5,7 +5,8 @@ import { Card, Table, Tag } from 'antd'
 import { useStoreActions, useStoreState } from '../../store'
 import { orderRepository } from '../../services/repositories'
 import Loading from '../../components/Loading'
-import { PATH_ORDER, PATH_PRODUCT } from '../../constants'
+import { PATH_ORDER } from '../../constants'
+import { OrderStatus } from '../../typings'
 
 const OrderIndex = () => {
   const [isLoading, setLoading] = useState(false)
@@ -18,15 +19,15 @@ const OrderIndex = () => {
   const setOrders = useStoreActions(s => s.orderState.setOrders)
 
   useEffect(() => {
-    if (!activeShop || orders.length > 0) return
+    if (!activeShop || (process.env.NODE_ENV === 'development' && orders.length > 0)) return
     ;(async () => {
       setLoading(true)
       setOrders(await orderRepository.findByShop(activeShop.id))
       setLoading(false)
     })()
-  }, [activeShop, orders, setOrders])
+  }, [activeShop, orders.length, setOrders])
 
-  function renderStatusTag(status: string) {
+  function renderStatusTag(status: OrderStatus) {
     const color =
       status === 'unpaid'
         ? 'red'
@@ -49,7 +50,7 @@ const OrderIndex = () => {
     },
     {
       title: 'Product',
-      dataIndex: 'productId',
+      dataIndex: 'product',
     },
     {
       title: 'Date',
@@ -70,7 +71,7 @@ const OrderIndex = () => {
     return {
       key: order.id,
       id: <Link to={`${PATH_ORDER}/${order.id}`}>{id}</Link>,
-      productId: <Link to={`${PATH_PRODUCT}/${order.productId}`}>{order.productId}</Link>,
+      product: order.productName,
       createdAt: new Date(order.createdAt).toLocaleString('th', { timeZone: 'Asia/Bangkok' }),
       amount: 123,
       status: renderStatusTag(order.status),
