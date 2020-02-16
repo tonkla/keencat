@@ -7,10 +7,20 @@ export interface Category {
   productIds: string[]
 }
 
+export interface Customer {
+  id: string
+  name?: string
+  address?: string
+}
+
 export interface Order {
+  shopId: string
   pageId: string
   customerId: string
   productId?: string
+  productName?: string
+  categoryId?: string
+  ownerId?: string
   attachments?: string[]
   customerAddress?: string
 }
@@ -43,3 +53,12 @@ export interface Shop {
   categoryIds: string[]
   ownerId: string
 }
+
+export type ConversationStep =
+  | 'blank'
+  | 'greeting'
+  | 'categories'
+  | 'products'
+  | 'name'
+  | 'address'
+  | 'transferSlip'

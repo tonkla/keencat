@@ -1,6 +1,4 @@
 import admin from '../firebase/index'
-import utils from '../utils'
-import shopRepository from './shop'
 import { Order, OrderInput } from '../../typings'
 
 const db = admin.firestore()
@@ -11,6 +9,8 @@ async function findByShop(shopId: string): Promise<Order[]> {
     const docs = await db
       .collection('orders')
       .where('shopId', '==', shopId)
+      .orderBy('createdAt', 'desc')
+      .limit(30)
       .get()
     docs.forEach(d => {
       orders.push(d.data() as Order)
@@ -21,44 +21,45 @@ async function findByShop(shopId: string): Promise<Order[]> {
   }
 }
 
-async function create(input: OrderInput) {
+async function create(input: OrderInput): Promise<string | null> {
   try {
-    // TODO: add support to more providers, e.g. LINE
-    if (!input.pageId) return
+    if (!input.shopId || !input.ownerId) return null
 
-    const shop = await shopRepository.findByPage(input.pageId)
-    if (!shop) return false
+    const createdAt = new Date().toISOString()
+    const id = createdAt.replace(/[-T:Z.]/g, '')
 
     const order: Order = {
-      id: utils.genId(),
-      shopId: shop.id,
-      ownerId: shop.ownerId,
-      customerId: input.customerId,
+      id,
       pageId: input.pageId,
+      customerId: input.customerId,
+      shopId: input.shopId,
+      ownerId: input.ownerId,
       productId: input.productId,
+      productName: input.productName,
       status: 'unpaid',
-      createdAt: new Date().toISOString(),
+      createdAt,
     }
     await db
       .collection('orders')
       .doc(order.id)
       .set(order)
-    return true
+    return id
   } catch (e) {
-    return false
+    return null
   }
 }
 
 async function update(input: OrderInput) {
   try {
-    // TODO: add support to more providers, e.g. LINE
-    if (!input.pageId) return
+    if (!input.shopId) return
 
     let orders: Order[] = []
     const docs = await db
       .collection('orders')
-      .where('pageId', '==', input.pageId)
+      .where('shopId', '==', input.shopId)
       .where('customerId', '==', input.customerId)
+      .orderBy('createdAt', 'desc')
+      .limit(1)
       .get()
     docs.forEach(doc => {
       orders.push(doc.data() as Order)

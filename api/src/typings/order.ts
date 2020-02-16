@@ -6,6 +6,7 @@ export interface Order {
   status: 'unpaid' | 'approving' | 'rejected' | 'paid' | 'canceled'
   pageId?: string
   productId?: string
+  productName?: string
   attachments?: string[]
   customerAddress?: string
   createdAt: string
@@ -15,7 +16,10 @@ export interface Order {
 export interface OrderInput {
   pageId: string
   customerId: string
+  shopId?: string
+  ownerId?: string
   productId?: string
+  productName?: string
   attachments?: string[]
   customerAddress?: string
 }

@@ -17,7 +17,7 @@ async function handleGetMessenger(ctx: Context) {
 
 async function handlePostMessenger(ctx: Context) {
   await msg.reply(ctx.request.body)
-  ctx.body = 'EVENT_RECEIVED'
+  ctx.status = 200
 }
 
 async function handleGetWebview(ctx: Context) {
@@ -47,8 +47,10 @@ r.post('/msg', handlePostMessenger)
 r.get('/webview', handleGetWebview)
 r.get('/ping', (ctx: Context) => (ctx.body = 'pong'))
 
+const port = process.env.NODE_ENV === 'development' ? 8081 : 8080
+
 new Koa()
   .use(bodyParser())
   .use(handleError)
   .use(r.routes())
-  .listen({ port: 8081 }, () => console.log('🚀 Messenger Launched'))
+  .listen({ port }, () => console.log('🚀 Messenger Launched'))

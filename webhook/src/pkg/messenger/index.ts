@@ -2,8 +2,10 @@ import axios from 'axios'
 import qs from 'qs'
 
 import api from '../api'
-import handler from './handler'
-import { MessageEvent, WebhookEvent, WebhookParams } from './typings/request'
+import cache from '../api/cache'
+import dialogflow from '../dialogflow'
+import builder from './builder'
+import { MessageEvent, WebhookEvent, WebhookParams, PostbackPayload } from './typings/request'
 import { Message } from './typings/response'
 import { Order } from '../../typings'
 
@@ -25,112 +27,136 @@ async function reply(body: WebhookEvent): Promise<void> {
 }
 
 async function handleMessage(event: MessageEvent): Promise<void> {
-  const response: Message = {
-    recipient: { id: event.sender.id },
-    messaging_type: 'RESPONSE',
-    message: {},
-  }
   await markSeen(event)
   await typingOn(event)
 
-  if (event.message.text) {
-    const { intent, ...message } = await handler.handleMessage({
-      text: event.message.text,
-      pageId: event.recipient.id,
-    })
-    await send(event.recipient.id, { ...response, message })
+  const pageId = event.recipient.id
+  const customerId = event.sender.id
+  const { text, attachments } = event.message
 
-    // Update customer address
-    if (intent === 'address') {
-      const order: Order = {
-        pageId: event.recipient.id,
-        customerId: event.sender.id,
-        customerAddress: event.message.text,
-      }
-      await api.updateOrder(order)
+  const response: Message = {
+    recipient: { id: customerId },
+    messaging_type: 'RESPONSE',
+    message: {},
+  }
+
+  // const step = cache.getConversationStep(pageId, customerId)
+
+  if (text) {
+    const intent = await dialogflow.detectIntent(text)
+    if (!intent) {
+      const message = builder.respondFallbackMessage()
+      await send(pageId, { ...response, message })
+      return
     }
-  } else if (event.message.attachments) {
-    const attachment = event.message.attachments[0]
+
+    if (intent.type === 'greeting') {
+      const message = await builder.respondGreeting(pageId, customerId, intent.text)
+      await send(pageId, { ...response, message })
+      cache.setConversationStep(pageId, customerId, 'greeting')
+    } else if (intent.type === 'address') {
+      const shop = await api.findShop(pageId)
+      if (shop) {
+        const order: Order = {
+          pageId,
+          customerId,
+          shopId: shop.id,
+          customerAddress: event.message.text,
+        }
+        await api.updateOrder(order)
+      }
+
+      const message = builder.requestPayment()
+      await send(pageId, { ...response, message })
+
+      await typingOn(event)
+      setTimeout(async () => {
+        const message = builder.requestTransferSlip()
+        await send(pageId, { ...response, message })
+      }, 1000)
+
+      cache.setConversationStep(pageId, customerId, 'transferSlip')
+    }
+  } else if (attachments) {
+    const attachment = attachments[0]
     if (attachment && attachment.type === 'image') {
-      const message = handler.requestCustomerAddress()
-      await send(event.recipient.id, { ...response, message })
+      const shop = await api.findShop(pageId)
+      if (shop) {
+        const order: Order = {
+          pageId,
+          customerId,
+          shopId: shop.id,
+          attachments: [attachment.payload.url],
+        }
+        await api.updateOrder(order)
 
-      // Update transfer slip
-      const order: Order = {
-        pageId: event.recipient.id,
-        customerId: event.sender.id,
-        attachments: [attachment.payload.url],
+        const message = builder.respondApproving()
+        await send(pageId, { ...response, message })
+      } else {
+        await typingOff(event)
       }
-      await api.updateOrder(order)
+    } else {
+      await typingOff(event)
     }
+  } else {
+    const message = builder.respondFallbackMessage()
+    await send(pageId, { ...response, message })
   }
 }
 
 async function handlePostback(event: MessageEvent): Promise<void> {
-  const senderId = event.recipient.id
-  const response: Message = {
-    recipient: { id: event.sender.id },
-    messaging_type: 'RESPONSE',
-    message: {},
-  }
   await markSeen(event)
   await typingOn(event)
 
+  const pageId = event.recipient.id
+  const customerId = event.sender.id
+
+  const response: Message = {
+    recipient: { id: customerId },
+    messaging_type: 'RESPONSE',
+    message: {},
+  }
+
   if (event.postback.payload === 'menu') {
     const message = { text: 'TODO: Show Menu' }
-    await send(senderId, { ...response, message })
+    await send(pageId, { ...response, message })
     return
   }
 
-  const [key, id] = event.postback.payload.split('=')
-  if (key === 'categoryId') {
-    const message = await handler.handlePostback({
-      text: 'listProducts',
-      pageId: event.recipient.id,
-      categoryId: id,
-    })
-    await send(senderId, { ...response, message })
-  } else if (key === 'productId') {
-    const message = await handler.handlePostback({
-      text: 'buy',
-      pageId: event.recipient.id,
-      productId: id,
-    })
-    await send(senderId, { ...response, message })
-  } else if (key === 'confirmProductId') {
-    const message = await handler.handlePostback({
-      text: 'confirm',
-      pageId: event.recipient.id,
-      productId: id,
-    })
-    await send(senderId, { ...response, message })
+  const payload: PostbackPayload = JSON.parse(event.postback.payload)
 
-    await typingOn(event)
-    setTimeout(async () => {
-      const msg2 = handler.requestPayment()
-      await send(senderId, { ...response, message: msg2 })
+  if (payload.action === 'listProducts') {
+    const message = await builder.respondProducts(pageId, payload.categoryId)
+    await send(pageId, { ...response, message })
+  } else if (payload.action === 'buy') {
+    if (payload.productId) {
+      const message = await builder.requestConfirm(pageId, payload.productId)
+      if (message) {
+        await send(pageId, { ...response, message })
+      } else {
+        await typingOff(event)
+      }
+    } else {
+      await typingOff(event)
+    }
+  } else if (payload.action === 'confirm') {
+    const orderId = await api.createOrder(payload)
+    if (orderId) {
+      const message = builder.respondCreateOrderSucceeded(orderId)
+      await send(pageId, { ...response, message })
 
       await typingOn(event)
       setTimeout(async () => {
-        const msg3 = handler.requestPaymentSlip()
-        await send(senderId, { ...response, message: msg3 })
+        const message = builder.requestAddress()
+        await send(pageId, { ...response, message })
       }, 1000)
-    }, 1000)
-
-    // Create purchasing order
-    const order: Order = {
-      pageId: event.recipient.id,
-      customerId: event.sender.id,
-      productId: id,
-    }
-    await api.createOrder(order)
-  } else if (key === 'cancelProductId') {
-    const message = await handler.handlePostback({
-      text: 'cancel',
-      pageId: event.recipient.id,
-      productId: id,
-    })
-    await send(senderId, { ...response, message })
+    } else typingOff(event)
+  } else if (payload.action === 'cancel') {
+    const message = builder.respondCancel()
+    await send(pageId, { ...response, message })
+  } else {
+    const message = builder.respondFallbackMessage()
+    await send(pageId, { ...response, message })
   }
 }
 
@@ -152,26 +178,36 @@ async function typingOn(event: MessageEvent): Promise<void> {
   await send(event.recipient.id, { ...response, sender_action: 'typing_on' })
 }
 
+async function typingOff(event: MessageEvent): Promise<void> {
+  const response: Message = {
+    recipient: { id: event.sender.id },
+    messaging_type: 'RESPONSE',
+    message: {},
+  }
+  await send(event.recipient.id, { ...response, sender_action: 'typing_off' })
+}
+
 async function send(pageId: string, message: Message): Promise<void> {
   try {
-    const pageAccessToken = await api.getPageAccessToken(pageId)
-    if (pageAccessToken) {
+    const page = await api.findPage(pageId)
+    if (page && page.accessToken) {
       const resp = await axios.post(
         'https://graph.facebook.com/v6.0/me/messages',
-        qs.stringify({ access_token: pageAccessToken, ...message })
+        qs.stringify({ access_token: page.accessToken, ...message })
       )
       if (resp && resp.data) {
         // TODO: log success, resp.data={ recipient_id?: string, message_id: string }
       }
     }
   } catch (e) {
+    console.log('Error=', e.response.data.error)
     // TODO: log
     // https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes
     // e.response.data = { error:
     // { message: string, type: string, code: number, error_subcode?: number, fbtrace_id: string }}
     //
     // if (e.response && e.response.status === 400) {
-    //   await api.resetPageAccessToken(senderId)
+    //   await api.resetPageAccessToken(pageId)
     // }
   }
 }

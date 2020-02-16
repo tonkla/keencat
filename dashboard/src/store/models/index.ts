@@ -22,7 +22,7 @@ export interface StoreModel {
 
 const whitelist: any =
   process.env.NODE_ENV === 'development'
-    ? ['activeState', 'userState', 'categoryState', 'productState', 'shopState', 'orderState']
+    ? ['activeState', 'userState', 'categoryState', 'productState', 'shopState']
     : ['activeState', 'userState']
 
 const storeModel: StoreModel = persist(

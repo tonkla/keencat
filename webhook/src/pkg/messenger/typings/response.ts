@@ -127,7 +127,6 @@ export interface ResponseMessage {
   attachment?: Attachment
   quick_replies?: any[]
   metadata?: string
-  intent?: string
 }
 
 export interface ButtonTemplate {
@@ -154,11 +153,4 @@ export interface GenericTemplateElement {
     messenger_extensions?: boolean
   }
   buttons?: GenericTemplateButton[]
-}
-
-export interface MessageParams {
-  text: string
-  pageId: string
-  categoryId?: string
-  productId?: string
 }

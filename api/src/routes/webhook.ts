@@ -1,15 +1,23 @@
 import { Context } from 'koa'
 
 import categoryRepository from '../pkg/db/category'
+import customerRepository from '../pkg/db/customer'
 import orderRepository from '../pkg/db/order'
 import pageRepository from '../pkg/db/page'
 import productRepository from '../pkg/db/product'
 import shopRepository from '../pkg/db/shop'
-import { Order } from '../typings'
 
 async function findCategories(ctx: Context) {
   const { pageId } = ctx.request.body
   if (pageId) ctx.body = await categoryRepository.findByPage(pageId)
+}
+
+async function findCustomer(ctx: Context) {
+  const { customerId } = ctx.request.body
+  if (customerId) {
+    const customer = await customerRepository.find(customerId)
+    if (customer) ctx.body = customer
+  }
 }
 
 async function findPage(ctx: Context) {
@@ -45,28 +53,36 @@ async function findShop(ctx: Context) {
   }
 }
 
+async function createCustomer(ctx: Context) {
+  const customer = ctx.request.body
+  if (customer && customer.id) {
+    if (await customerRepository.create(customer)) ctx.status = 200
+  }
+}
+
 async function createOrder(ctx: Context) {
-  const { pageId, customerId, productId } = ctx.request.body
-  if (pageId && customerId && productId) {
-    await orderRepository.create({ pageId, customerId, productId })
-    ctx.status = 200
+  const order = ctx.request.body
+  if (order && order.pageId && order.customerId) {
+    const orderId = await orderRepository.create(order)
+    if (orderId) ctx.body = orderId
   }
 }
 
 async function updateOrder(ctx: Context) {
-  const { pageId, customerId, attachments, customerAddress } = ctx.request.body
-  if (pageId && customerId) {
-    await orderRepository.update({ pageId, customerId, attachments, customerAddress })
-    ctx.status = 200
+  const order = ctx.request.body
+  if (order && order.pageId && order.customerId) {
+    if (await orderRepository.update(order)) ctx.status = 200
   }
 }
 
 export default {
   findCategories,
+  findCustomer,
   findPage,
   findProduct,
   findProducts,
   findShop,
+  createCustomer,
   createOrder,
   updateOrder,
 }
