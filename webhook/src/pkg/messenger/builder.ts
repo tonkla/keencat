@@ -51,7 +51,11 @@ function buildProductElements(pageId: string, products: Product[]): GenericTempl
   }))
 }
 
-function buildConfirmation(pageId: string, product: Product): GenericTemplateElement[] {
+function buildConfirmation(
+  pageId: string,
+  customerId: string,
+  product: Product
+): GenericTemplateElement[] {
   return [
     {
       title: product.name,
@@ -64,9 +68,10 @@ function buildConfirmation(pageId: string, product: Product): GenericTemplateEle
           payload: JSON.stringify({
             action: 'confirm',
             pageId,
+            customerId,
+            shopId: product.shopId,
             productId: product.id,
             productName: product.name,
-            shopId: product.shopId,
             ownerId: product.ownerId,
           }),
         },
@@ -101,10 +106,10 @@ function requestDesire() {
   return { text: lang.requestDesire }
 }
 
-async function requestConfirm(pageId: string, productId: string) {
+async function requestConfirm(pageId: string, customerId: string, productId: string) {
   const product = await api.findProduct(pageId, productId)
   if (product) {
-    const elements = buildConfirmation(pageId, product)
+    const elements = buildConfirmation(pageId, customerId, product)
     return buildAttachmentTemplate(elements)
   }
 }

@@ -3,7 +3,7 @@ import { Icon, Layout, Menu } from 'antd'
 import { Link, useLocation } from 'react-router-dom'
 
 import { Shop } from '../typings'
-import { PATH_CUSTOMER, PATH_ORDER, PATH_SHOP } from '../constants'
+import { PATH_ORDER, PATH_SHOP } from '../constants'
 
 import logo from '../assets/images/logo.png'
 import './SiderMenu.scss'
@@ -54,14 +54,6 @@ const SiderMenu = ({ isCollapsed, activeShop }: Props) => {
               <Link to={PATH_ORDER}>
                 <Icon type="shopping-cart" />
                 <span>Orders</span>
-              </Link>
-            </Menu.Item>
-          )}
-          {activeShop && (
-            <Menu.Item key={PATH_CUSTOMER}>
-              <Link to={PATH_CUSTOMER}>
-                <Icon type="team" />
-                <span>Customers</span>
               </Link>
             </Menu.Item>
           )}

@@ -1,11 +1,11 @@
 import { Context } from 'koa'
 
-import categoryRepository from '../pkg/db/category'
-import customerRepository from '../pkg/db/customer'
-import orderRepository from '../pkg/db/order'
-import pageRepository from '../pkg/db/page'
-import productRepository from '../pkg/db/product'
-import shopRepository from '../pkg/db/shop'
+import categoryRepository from '../../pkg/db/category'
+import customerRepository from '../../pkg/db/customer'
+import orderRepository from '../../pkg/db/order'
+import pageRepository from '../../pkg/db/page'
+import productRepository from '../../pkg/db/product'
+import shopRepository from '../../pkg/db/shop'
 
 async function findCategories(ctx: Context) {
   const { pageId } = ctx.request.body

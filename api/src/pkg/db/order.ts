@@ -1,4 +1,5 @@
 import admin from '../firebase/index'
+import utils from '../utils'
 import { Order, OrderInput } from '../../typings'
 
 const db = admin.firestore()
@@ -78,27 +79,28 @@ async function update(input: OrderInput) {
     docs.forEach(doc => {
       orders.push(doc.data() as Order)
     })
-    if (orders.length > 0) {
-      const order = { ...orders[0], updatedAt: new Date().toISOString() }
-
-      if (input.attachments) {
-        order.attachments = order.attachments
-          ? [...input.attachments, ...order.attachments]
-          : input.attachments
-        order.status = 'approving'
-      }
-
-      if (input.customerAddress) {
-        order.customerAddress = input.customerAddress
-      }
-
-      await db
-        .collection('orders')
-        .doc(order.id)
-        .set(order)
+    if (orders.length > 0 && input.attachments) {
+      const order = orders[0]
+      input.attachments.forEach(async url => {
+        if (order.productId) {
+          const newUrl = await utils.copyImage(order.shopId, order.productId, url)
+          console.log('newurl=', newUrl)
+        }
+      })
+      // const order = { ...orders[0], updatedAt: new Date().toISOString() }
+      // order.attachments = order.attachments
+      //   ? [...input.attachments, ...order.attachments]
+      //   : input.attachments
+      // order.status = 'approving'
+      // await db
+      //   .collection('orders')
+      //   .doc(order.id)
+      //   .set(order)
+      return true
     }
-    return true
+    return false
   } catch (e) {
+    console.log(e)
     return false
   }
 }
