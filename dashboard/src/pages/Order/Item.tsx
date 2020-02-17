@@ -38,6 +38,15 @@ const OrderItem = () => {
     })()
   }, [order])
 
+  function displayAttatchments(attatchments?: string[]) {
+    if (!attatchments) return <span />
+    return attatchments.map((a, idx) => (
+      <a key={idx} href={a} target="_blank" rel="noopener noreferrer">
+        <img src={a} alt="attachment" className="attatchment" />
+      </a>
+    ))
+  }
+
   function displayStatusTag(status: OrderStatus) {
     const color =
       status === 'unpaid'
@@ -66,7 +75,7 @@ const OrderItem = () => {
               <Descriptions.Item label="Product">
                 <Link to={`${PATH_PRODUCT}/${order.productId}`}>{order.productName}</Link>
               </Descriptions.Item>
-              <Descriptions.Item label="Amount">{order.amount}</Descriptions.Item>
+              <Descriptions.Item label="Amount">{order.amount.toLocaleString()}</Descriptions.Item>
               <Descriptions.Item label="Customer">
                 {customer ? (
                   <div>
@@ -82,7 +91,9 @@ const OrderItem = () => {
               <Descriptions.Item label="Date">
                 {moment(order.createdAt).format('YYYY-MM-DD HH:mm:ss')}
               </Descriptions.Item>
-              <Descriptions.Item label="Attatchments">{order.attachments}</Descriptions.Item>
+              <Descriptions.Item label="Attatchments">
+                {displayAttatchments(order.attachments)}
+              </Descriptions.Item>
               <Descriptions.Item label="Status">{displayStatusTag(order.status)}</Descriptions.Item>
             </Descriptions>
           </div>
