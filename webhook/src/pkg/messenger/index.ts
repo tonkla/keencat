@@ -7,7 +7,7 @@ import dialogflow from '../dialogflow'
 import builder from './builder'
 import { MessageEvent, WebhookEvent, WebhookParams, PostbackPayload } from './typings/request'
 import { Message } from './typings/response'
-import { Order } from '../../typings'
+import { Customer, Order } from '../../typings'
 
 function verify({ mode, verifyToken, challenge }: WebhookParams): string {
   const token = process.env.MSG_VERIFY_TOKEN || ''
@@ -40,31 +40,57 @@ async function handleMessage(event: MessageEvent): Promise<void> {
     message: {},
   }
 
+  const customer = await api.findCustomer(customerId)
+  if (!customer) {
+    const customer: Customer = {
+      id: customerId,
+      source: 'messenger',
+    }
+    if (await api.createCustomer(customer)) {
+      cache.setCustomer(customerId, customer)
+    }
+  }
+
   // const step = cache.getConversationStep(pageId, customerId)
 
   if (text) {
     const intent = await dialogflow.detectIntent(text)
     if (!intent) {
-      const message = builder.respondFallbackMessage()
+      const message = builder.respondUnknown()
       await send(pageId, { ...response, message })
       return
     }
 
     if (intent.type === 'greeting') {
-      const message = await builder.respondGreeting(pageId, customerId, intent.text)
+      const message = await builder.respondGreeting(intent.text, customer)
       await send(pageId, { ...response, message })
       cache.setConversationStep(pageId, customerId, 'greeting')
-    } else if (intent.type === 'address') {
-      const shop = await api.findShop(pageId)
-      if (shop) {
-        const order: Order = {
-          pageId,
-          customerId,
-          shopId: shop.id,
-          customerAddress: event.message.text,
+
+      await typingOn(event)
+      setTimeout(async () => {
+        const message = await builder.respondWelcome(pageId)
+        if (message) await send(pageId, { ...response, message })
+        else {
+          const message = builder.respondFailure()
+          await send(pageId, { ...response, message })
+          return
         }
-        await api.updateOrder(order)
-      }
+
+        await typingOn(event)
+        setTimeout(async () => {
+          const message = builder.requestDesire()
+          await send(pageId, { ...response, message })
+        }, 1000)
+      }, 1000)
+    } else if (intent.type === 'name') {
+      if (customer) await api.updateCustomer({ ...customer, name: text })
+      cache.setConversationStep(pageId, customerId, 'name')
+    } else if (intent.type === 'phone') {
+      if (customer) await api.updateCustomer({ ...customer, phone: text })
+      cache.setConversationStep(pageId, customerId, 'phone')
+    } else if (intent.type === 'address') {
+      if (customer) await api.updateCustomer({ ...customer, address: text })
+      cache.setConversationStep(pageId, customerId, 'address')
 
       const message = builder.requestPayment()
       await send(pageId, { ...response, message })
@@ -73,9 +99,8 @@ async function handleMessage(event: MessageEvent): Promise<void> {
       setTimeout(async () => {
         const message = builder.requestTransferSlip()
         await send(pageId, { ...response, message })
+        cache.setConversationStep(pageId, customerId, 'transferSlip')
       }, 1000)
-
-      cache.setConversationStep(pageId, customerId, 'transferSlip')
     }
   } else if (attachments) {
     const attachment = attachments[0]
@@ -99,7 +124,7 @@ async function handleMessage(event: MessageEvent): Promise<void> {
       await typingOff(event)
     }
   } else {
-    const message = builder.respondFallbackMessage()
+    const message = builder.respondUnknown()
     await send(pageId, { ...response, message })
   }
 }
@@ -123,6 +148,17 @@ async function handlePostback(event: MessageEvent): Promise<void> {
     return
   }
 
+  const customer = await api.findCustomer(customerId)
+  if (!customer) {
+    const customer: Customer = {
+      id: customerId,
+      source: 'messenger',
+    }
+    if (await api.createCustomer(customer)) {
+      cache.setCustomer(customerId, customer)
+    }
+  }
+
   const payload: PostbackPayload = JSON.parse(event.postback.payload)
 
   if (payload.action === 'listProducts') {
@@ -140,6 +176,9 @@ async function handlePostback(event: MessageEvent): Promise<void> {
       await typingOff(event)
     }
   } else if (payload.action === 'confirm') {
+    const customer: Customer = { id: payload.customerId, source: 'messenger' }
+    await api.createCustomer(customer)
+
     const orderId = await api.createOrder(payload)
     if (orderId) {
       const message = builder.respondCreateOrderSucceeded(orderId)
@@ -155,7 +194,7 @@ async function handlePostback(event: MessageEvent): Promise<void> {
     const message = builder.respondCancel()
     await send(pageId, { ...response, message })
   } else {
-    const message = builder.respondFallbackMessage()
+    const message = builder.respondUnknown()
     await send(pageId, { ...response, message })
   }
 }

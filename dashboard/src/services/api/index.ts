@@ -16,6 +16,7 @@ interface APICallParams {
   shop?: Shop
   file?: any
   ownerId?: string
+  createdDate?: string
 }
 
 async function call(path: string, params: APICallParams) {

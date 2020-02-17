@@ -107,6 +107,24 @@ async function updateOrder(order: Order): Promise<boolean> {
   }
 }
 
+async function createCustomer(customer: Customer): Promise<boolean> {
+  try {
+    const resp = await api.post(`${url}/create-customer`, customer)
+    return resp.status === 200
+  } catch (e) {
+    return false
+  }
+}
+
+async function updateCustomer(customer: Customer): Promise<boolean> {
+  try {
+    const resp = await api.post(`${url}/update-customer`, customer)
+    return resp.status === 200
+  } catch (e) {
+    return false
+  }
+}
+
 export default {
   findPage,
   findShop,
@@ -115,5 +133,7 @@ export default {
   findProduct,
   findProducts,
   createOrder,
+  createCustomer,
   updateOrder,
+  updateCustomer,
 }

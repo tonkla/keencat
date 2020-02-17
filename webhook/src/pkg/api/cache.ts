@@ -1,32 +1,32 @@
 import { ConversationStep, Customer, Page, Shop } from '../../typings'
 
-const page = new Map<string, Page>()
-const shop = new Map<string, Shop>()
+const cachedPage = new Map<string, Page>()
+const cachedShop = new Map<string, Shop>()
+const cachedCustomer = new Map<string, Customer>()
 const conversation = new Map<string, ConversationStep>()
-const customer = new Map<string, Customer>()
 
 function getPage(pageId: string) {
-  return page.get(pageId)
+  return cachedPage.get(pageId)
 }
 
-function setPage(pageId: string, data: Page) {
-  return page.set(pageId, data)
+function setPage(pageId: string, page: Page) {
+  return cachedPage.set(pageId, page)
 }
 
 function getShop(pageId: string) {
-  return shop.get(pageId)
+  return cachedShop.get(pageId)
 }
 
-function setShop(pageId: string, data: Shop) {
-  return shop.set(pageId, data)
+function setShop(pageId: string, shop: Shop) {
+  return cachedShop.set(pageId, shop)
 }
 
 function getCustomer(customerId: string) {
-  return customer.get(customerId)
+  return cachedCustomer.get(customerId)
 }
 
-function setCustomer(customerId: string, data: Customer) {
-  return customer.set(customerId, data)
+function setCustomer(customerId: string, customer: Customer) {
+  return cachedCustomer.set(customerId, customer)
 }
 
 function getConversationStep(pageId: string, customerId: string) {

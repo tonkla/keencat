@@ -3,12 +3,25 @@ import { Order, OrderInput } from '../../typings'
 
 const db = admin.firestore()
 
-async function findByShop(shopId: string): Promise<Order[]> {
+async function find(id: string): Promise<Order | null> {
+  try {
+    const doc = await db
+      .collection('orders')
+      .doc(id)
+      .get()
+    return doc.exists ? (doc.data() as Order) : null
+  } catch (e) {
+    return null
+  }
+}
+
+async function findByShop(shopId: string, createdDate: string): Promise<Order[]> {
   try {
     const orders: Order[] = []
     const docs = await db
       .collection('orders')
       .where('shopId', '==', shopId)
+      .where('createdDate', '==', createdDate)
       .orderBy('createdAt', 'desc')
       .limit(30)
       .get()
@@ -38,6 +51,7 @@ async function create(input: OrderInput): Promise<string | null> {
       productName: input.productName,
       status: 'unpaid',
       createdAt,
+      createdDate: createdAt.split('T')[0],
     }
     await db
       .collection('orders')
@@ -90,6 +104,7 @@ async function update(input: OrderInput) {
 }
 
 export default {
+  find,
   findByShop,
   create,
   update,

@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import auth from './pkg/auth'
-import { category, order, page, product, shop } from './routes/dashboard'
+import { category, customer, order, page, product, shop } from './routes/dashboard'
 import webhook from './routes/webhook'
 
 async function handleError(ctx: Context, next: Function) {
@@ -67,6 +67,8 @@ r2.post('/update-order', webhook.updateOrder)
 const r3 = new Router()
 r3.post('/find-category', category.find)
 r3.post('/find-categories', category.findByIds)
+r3.post('/find-customer', customer.find)
+r3.post('/find-order', order.find)
 r3.post('/find-orders', order.findByShop)
 r3.post('/find-product', product.find)
 r3.post('/find-products', product.findByIds)

@@ -60,6 +60,13 @@ async function createCustomer(ctx: Context) {
   }
 }
 
+async function updateCustomer(ctx: Context) {
+  const customer = ctx.request.body
+  if (customer && customer.id) {
+    if (await customerRepository.update(customer)) ctx.status = 200
+  }
+}
+
 async function createOrder(ctx: Context) {
   const order = ctx.request.body
   if (order && order.pageId && order.customerId) {
@@ -84,5 +91,6 @@ export default {
   findShop,
   createCustomer,
   createOrder,
+  updateCustomer,
   updateOrder,
 }
