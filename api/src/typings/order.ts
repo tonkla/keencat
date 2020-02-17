@@ -8,8 +8,8 @@ export interface Order {
   productId?: string
   productName?: string
   attachments?: string[]
-  customerAddress?: string
   createdAt: string
+  createdDate: string
   updatedAt?: string
 }
 
@@ -21,5 +21,4 @@ export interface OrderInput {
   productId?: string
   productName?: string
   attachments?: string[]
-  customerAddress?: string
 }

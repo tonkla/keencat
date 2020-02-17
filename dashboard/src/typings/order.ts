@@ -8,9 +8,11 @@ export interface Order {
   productId: string
   productName: string
   status: OrderStatus
+  amount: number
   pageId?: string
   attachments?: string[]
   customerAddress?: string
   createdAt: string
+  createdDate: string
   updatedAt?: string
 }

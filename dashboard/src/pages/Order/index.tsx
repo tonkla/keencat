@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, Table, Tag } from 'antd'
+import { Card, DatePicker, Table, Tag } from 'antd'
+import moment from 'moment'
 
 import { useStoreActions, useStoreState } from '../../store'
 import { orderRepository } from '../../services/repositories'
-import Loading from '../../components/Loading'
 import { PATH_ORDER } from '../../constants'
 import { OrderStatus } from '../../typings'
+
+import Loading from '../../components/Loading'
+import './Order.scss'
 
 const OrderIndex = () => {
   const [isLoading, setLoading] = useState(false)
@@ -19,13 +22,20 @@ const OrderIndex = () => {
   const setOrders = useStoreActions(s => s.orderState.setOrders)
 
   useEffect(() => {
-    if (!activeShop || (process.env.NODE_ENV === 'development' && orders.length > 0)) return
+    if (!activeShop) return
     ;(async () => {
       setLoading(true)
-      setOrders(await orderRepository.findByShop(activeShop.id))
+      const today = new Date().toISOString().split('T')[0]
+      setOrders(await orderRepository.findByShop(activeShop.id, today))
       setLoading(false)
     })()
-  }, [activeShop, orders.length, setOrders])
+  }, [activeShop, setOrders])
+
+  async function handleChangeDate(_: any, dateString: string) {
+    if (!activeShop) return
+    const orders = await orderRepository.findByShop(activeShop.id, dateString)
+    setOrders(orders)
+  }
 
   function renderStatusTag(status: OrderStatus) {
     const color =
@@ -84,7 +94,17 @@ const OrderIndex = () => {
         {isLoading ? (
           <Loading position="center" />
         ) : (
-          <Table columns={columns} dataSource={dataSource} />
+          <div>
+            <div className="date-picker">
+              <span>Date:</span>
+              <DatePicker defaultValue={moment()} onChange={handleChangeDate} />
+            </div>
+            <Table
+              columns={columns}
+              dataSource={dataSource}
+              pagination={{ defaultPageSize: 30, total: orders.length }}
+            />
+          </div>
         )}
       </Card>
     </div>

@@ -1,6 +1,6 @@
 import api from '../api'
 import th from '../../lang/th'
-import { Category, Product } from '../../typings'
+import { Category, Customer, Product } from '../../typings'
 import { GenericTemplateElement, ResponseMessage } from './typings/response'
 
 const lang = th
@@ -97,12 +97,24 @@ function buildAttachmentTemplate(elements: GenericTemplateElement[]): ResponseMe
   }
 }
 
+function requestDesire() {
+  return { text: lang.requestDesire }
+}
+
 async function requestConfirm(pageId: string, productId: string) {
   const product = await api.findProduct(pageId, productId)
   if (product) {
     const elements = buildConfirmation(pageId, product)
     return buildAttachmentTemplate(elements)
   }
+}
+
+function requestName() {
+  return { text: lang.requestCustomerName }
+}
+
+function requestPhone() {
+  return { text: lang.requestCustomerPhone }
 }
 
 function requestAddress() {
@@ -117,16 +129,25 @@ function requestTransferSlip() {
   return { text: lang.requestTransferSlip }
 }
 
-async function respondGreeting(pageId: string, customerId: string, intentText: string) {
-  const customer = await api.findCustomer(customerId)
-  const shop = await api.findShop(pageId)
-  if (shop) {
-    const text = customer
-      ? `${shop.name} ${intentText} ${lang.namePrefix}${customer.name} 😀`
-      : `${shop.name} ${intentText} 😀`
+async function respondGreeting(intentText: string, customer?: Customer | null) {
+  if (customer) {
+    const name = customer.nickname || customer.name
+    const text = name
+      ? `${intentText} ${lang.namePrefix}${name}`
+      : `${intentText} ${lang.existingCustomer}`
+    return { text }
+  } else {
+    const text = `${intentText} ${lang.newCustomer}`
     return { text }
   }
-  return respondFallbackMessage()
+}
+
+async function respondWelcome(pageId: string) {
+  const shop = await api.findShop(pageId)
+  if (shop) {
+    const text = `${shop.name} ${lang.welcome} 😀`
+    return { text }
+  }
 }
 
 async function respondCategories(pageId: string) {
@@ -158,21 +179,37 @@ function respondApproving() {
   return { text: lang.respondApproving }
 }
 
-function respondFallbackMessage(): ResponseMessage {
-  return { text: 'TODO: Show Help' }
+function respondFailure(): ResponseMessage {
+  return { text: lang.failure }
+}
+
+function respondNotFound(): ResponseMessage {
+  return { text: lang.notFound }
+}
+
+function respondUnknown(): ResponseMessage {
+  return { text: lang.unknown }
 }
 
 export default {
+  requestDesire,
   requestConfirm,
+  requestName,
+  requestPhone,
   requestAddress,
   requestPayment,
   requestTransferSlip,
+
   respondGreeting,
+  respondWelcome,
   respondCategories,
   respondProducts,
   respondConfirm,
   respondCancel,
   respondCreateOrderSucceeded,
   respondApproving,
-  respondFallbackMessage,
+
+  respondFailure,
+  respondNotFound,
+  respondUnknown,
 }

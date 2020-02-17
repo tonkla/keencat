@@ -27,7 +27,20 @@ async function create(customer: Customer): Promise<boolean> {
   }
 }
 
+async function update(customer: Customer): Promise<boolean> {
+  try {
+    await db
+      .collection('customers')
+      .doc(customer.id)
+      .set(customer)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
 export default {
   find,
   create,
+  update,
 }
