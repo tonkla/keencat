@@ -112,6 +112,9 @@ const OrderItem = () => {
         ) : (
           <div>
             <Descriptions title={`Order: ${order.id}`} column={1} size="middle" bordered>
+              <Descriptions.Item label="Date">
+                {moment(order.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+              </Descriptions.Item>
               <Descriptions.Item label="Product">
                 <Link to={`${PATH_PRODUCT}/${order.productId}`}>{order.productName}</Link>
               </Descriptions.Item>
@@ -129,9 +132,6 @@ const OrderItem = () => {
                 ) : (
                   <span>{order.customerId}</span>
                 )}
-              </Descriptions.Item>
-              <Descriptions.Item label="Date">
-                {moment(order.createdAt).format('YYYY-MM-DD HH:mm:ss')}
               </Descriptions.Item>
               <Descriptions.Item label="Attatchments">
                 {displayAttatchments(order.attachments)}
