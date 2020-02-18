@@ -135,7 +135,7 @@ async function handleMessage(event: MessageEvent): Promise<void> {
           pageId,
           customerId,
           shopId: shop.id,
-          attachments: [attachment.payload.url],
+          attachment: attachment.payload.url,
         }
         await api.updateOrder(order)
 

@@ -4,16 +4,14 @@ import productRepository from '../../pkg/db/product'
 
 async function find(ctx: Context) {
   const { id, ownerId } = ctx.request.body
-  if (!id) {
-    ctx.status = 400
-    return
+  if (!id) ctx.status = 400
+  else {
+    const product = await productRepository.find(id)
+    if (product) {
+      if (product.ownerId !== ownerId) ctx.status = 401
+      else ctx.body = product
+    }
   }
-  const product = await productRepository.find(id)
-  if (product && product.ownerId !== ownerId) {
-    ctx.status = 401
-    return
-  }
-  ctx.body = product
 }
 
 async function findByIds(ctx: Context) {

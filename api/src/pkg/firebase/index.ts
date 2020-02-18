@@ -1,5 +1,11 @@
 import admin from 'firebase-admin'
+import dotenv from 'dotenv'
 
-admin.initializeApp({ credential: admin.credential.cert('./key.json') })
+dotenv.config()
+
+admin.initializeApp({
+  credential: admin.credential.cert('./key.json'),
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || '',
+})
 
 export default admin

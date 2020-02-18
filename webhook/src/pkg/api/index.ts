@@ -103,7 +103,6 @@ async function updateOrder(order: Order): Promise<boolean> {
     const resp = await api.post(`${url}/update-order`, order)
     return resp.status === 200
   } catch (e) {
-    console.log(e)
     return false
   }
 }
