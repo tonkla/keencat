@@ -24,7 +24,6 @@ async function findByShop(shopId: string, createdDate: string): Promise<Order[]>
       .where('shopId', '==', shopId)
       .where('createdDate', '==', createdDate)
       .orderBy('createdAt', 'desc')
-      .limit(30)
       .get()
     docs.forEach(d => {
       orders.push(d.data() as Order)
