@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Card, Descriptions, Tag } from 'antd'
+import { Card, Descriptions, Modal, Tag } from 'antd'
 import moment from 'moment'
 
 import { useStoreState } from '../../store'
@@ -14,6 +14,8 @@ import Back from '../../components/Back'
 const OrderItem = () => {
   const [order, setOrder] = useState<Order>()
   const [customer, setCustomer] = useState<Customer>()
+  const [imgSrc, setImgSrc] = useState('')
+
   const { id } = useParams()
 
   const orders = useStoreState(s => s.orderState.orders)
@@ -40,10 +42,14 @@ const OrderItem = () => {
 
   function displayAttatchments(attatchments?: string[]) {
     if (!attatchments) return <span />
-    return attatchments.map((a, idx) => (
-      <a key={idx} href={a} target="_blank" rel="noopener noreferrer">
-        <img src={a} alt="attachment" className="attatchment" />
-      </a>
+    return attatchments.map((src, idx) => (
+      <img
+        key={idx}
+        src={src}
+        alt="attachment"
+        className="attatchment"
+        onClick={() => setImgSrc(src)}
+      />
     ))
   }
 
@@ -101,6 +107,11 @@ const OrderItem = () => {
           </div>
         )}
       </Card>
+      <Modal footer={null} visible={imgSrc !== ''} onCancel={() => setImgSrc('')}>
+        <div className="modal-body">
+          <img src={imgSrc} alt="attachment" />
+        </div>
+      </Modal>
     </div>
   )
 }
