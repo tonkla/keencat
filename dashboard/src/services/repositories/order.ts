@@ -11,7 +11,13 @@ async function findByShop(shopId: string, createdDate: string): Promise<Order[]>
   return resp && resp.data ? resp.data : []
 }
 
+async function update(order: Order): Promise<boolean> {
+  const resp = await api.call('/update-order', { order })
+  return resp !== null && resp.status === 200
+}
+
 export default {
   find,
   findByShop,
+  update,
 }

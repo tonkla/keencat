@@ -1,13 +1,14 @@
 import axios from 'axios'
 
 import auth from '../firebase/auth'
-import { Category, Page, Product, Shop } from '../../typings'
+import { Category, Order, Page, Product, Shop } from '../../typings'
 
 interface APICallParams {
   id?: string
   ids?: string[]
   categoryId?: string
   category?: Category
+  order?: Order
   pageId?: string
   page?: Page
   productId?: string
