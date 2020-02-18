@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Card, Input, Modal } from 'antd'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Button, Card, Input, Modal, Switch } from 'antd'
 
 import { useStoreState, useStoreActions } from '../../store'
 import { pageRepository } from '../../services/repositories'
@@ -31,9 +31,20 @@ const ShopIndex = () => {
   const shopId = useStoreState(s => s.activeState.shopId)
   const activeShop = shops.find(s => s.id === shopId)
 
-  const availablePages = pages.filter(
-    p => shops.length < 1 || shops.filter(s => s.pageId !== p.id).length > 0
-  )
+  const getAvailablePages = useCallback((): FBPage[] => {
+    const availablePages: FBPage[] = []
+    for (const page of pages) {
+      let matched = false
+      for (const shop of shops) {
+        if (shop.pageId === page.id) {
+          matched = true
+          break
+        }
+      }
+      if (!matched) availablePages.push(page)
+    }
+    return availablePages
+  }, [pages, shops])
 
   useEffect(() => {
     // Note: Work when the component is unmounted
@@ -55,10 +66,16 @@ const ShopIndex = () => {
 
     const shop: Shop = {
       id: utils.genId(),
-      name: values.name,
-      pageId: values.pageId,
-      categoryIds: [],
       ownerId: user.firebaseId,
+      categoryIds: [],
+      isActive: true,
+      pageId: values.pageId,
+      name: values.name,
+      phoneNumber: values.phoneNumber,
+      promptPay: values.promptPay,
+      bank: values.bank,
+      bankAccountNumber: values.bankAccountNumber,
+      bankAccountName: values.bankAccountName,
     }
     createShop(shop)
 
@@ -94,6 +111,10 @@ const ShopIndex = () => {
     }
   }
 
+  async function handleToggle(isActive: boolean) {
+    if (activeShop) updateShop({ ...activeShop, isActive })
+  }
+
   function renderShopTitle(shop: Shop) {
     return (
       <div className="title">
@@ -106,6 +127,7 @@ const ShopIndex = () => {
             title="Delete Shop"
             onClick={() => showDeletingConfirm(true)}
           />
+          <Switch defaultChecked={shop.isActive} onChange={handleToggle} />
         </div>
         <Modal
           title="Are you sure you want to delete?"
@@ -144,9 +166,9 @@ const ShopIndex = () => {
           )}
           {step === 1 && (
             <div>
-              {shops.length === 0 || availablePages.length > 0 ? (
+              {shops.length === 0 || getAvailablePages().length > 0 ? (
                 <Form
-                  pages={availablePages}
+                  pages={getAvailablePages}
                   callback={handleCreateShop}
                   cancel={() => setStep(0)}
                 />
@@ -175,7 +197,6 @@ const ShopIndex = () => {
             <Card title={renderShopTitle(activeShop)} bordered={false}>
               <ul>
                 <li>Phone: 08-1234-5678</li>
-                <li>Status: Open</li>
               </ul>
             </Card>
             <CategoryList user={user} shop={activeShop} />
