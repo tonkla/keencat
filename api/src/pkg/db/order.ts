@@ -1,5 +1,5 @@
-import admin from '../firebase/index'
-import utils from '../utils'
+import admin from '../firebase'
+import storage from '../storage'
 import { Order, OrderInput } from '../../typings'
 
 const db = admin.firestore()
@@ -79,28 +79,26 @@ async function update(input: OrderInput) {
     docs.forEach(doc => {
       orders.push(doc.data() as Order)
     })
-    if (orders.length > 0 && input.attachments) {
+    if (orders.length > 0 && input.attachment) {
       const order = orders[0]
-      input.attachments.forEach(async url => {
-        if (order.productId) {
-          const newUrl = await utils.copyImage(order.shopId, order.productId, url)
-          console.log('newurl=', newUrl)
+      const mediaLink = await storage.copyImage(order.shopId, order.id, input.attachment)
+      if (mediaLink) {
+        const attachments = order.attachments ? [mediaLink, ...order.attachments] : [mediaLink]
+        const _order: Order = {
+          ...order,
+          attachments,
+          status: 'approving',
+          updatedAt: new Date().toISOString(),
         }
-      })
-      // const order = { ...orders[0], updatedAt: new Date().toISOString() }
-      // order.attachments = order.attachments
-      //   ? [...input.attachments, ...order.attachments]
-      //   : input.attachments
-      // order.status = 'approving'
-      // await db
-      //   .collection('orders')
-      //   .doc(order.id)
-      //   .set(order)
-      return true
+        await db
+          .collection('orders')
+          .doc(_order.id)
+          .set(_order)
+        return true
+      }
     }
     return false
   } catch (e) {
-    console.log(e)
     return false
   }
 }

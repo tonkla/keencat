@@ -125,7 +125,7 @@ const ProductItem = () => {
       <Back />
       {!product ? (
         <Card>
-          <Loading />
+          <Loading position="center" />
         </Card>
       ) : isFormEnabled ? (
         <Form product={product} callback={handleUpdateProduct} cancel={() => enableForm(false)} />

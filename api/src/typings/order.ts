@@ -20,5 +20,5 @@ export interface OrderInput {
   ownerId?: string
   productId?: string
   productName?: string
-  attachments?: string[]
+  attachment?: string
 }

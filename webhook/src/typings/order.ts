@@ -6,6 +6,6 @@ export interface Order {
   productName?: string
   categoryId?: string
   ownerId?: string
-  attachments?: string[]
+  attachment?: string
   customerAddress?: string
 }

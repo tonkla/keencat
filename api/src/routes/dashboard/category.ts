@@ -4,16 +4,14 @@ import categoryRepository from '../../pkg/db/category'
 
 async function find(ctx: Context) {
   const { id, ownerId } = ctx.request.body
-  if (!id) {
-    ctx.status = 400
-    return
+  if (!id) ctx.status = 400
+  else {
+    const category = await categoryRepository.find(id)
+    if (category) {
+      if (category.ownerId !== ownerId) ctx.status = 401
+      else ctx.body = category
+    }
   }
-  const category = await categoryRepository.find(id)
-  if (category && category.ownerId !== ownerId) {
-    ctx.status = 401
-    return
-  }
-  ctx.body = category
 }
 
 async function findByIds(ctx: Context) {

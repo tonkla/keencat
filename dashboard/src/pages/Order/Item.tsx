@@ -75,7 +75,9 @@ const OrderItem = () => {
               <Descriptions.Item label="Product">
                 <Link to={`${PATH_PRODUCT}/${order.productId}`}>{order.productName}</Link>
               </Descriptions.Item>
-              <Descriptions.Item label="Amount">{order.amount.toLocaleString()}</Descriptions.Item>
+              <Descriptions.Item label="Amount">
+                {order.amount ? order.amount.toLocaleString() : 0}
+              </Descriptions.Item>
               <Descriptions.Item label="Customer">
                 {customer ? (
                   <div>

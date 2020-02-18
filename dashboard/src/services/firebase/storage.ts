@@ -1,4 +1,5 @@
 import firebase from './index'
+import utils from '../utils'
 
 async function uploadImage(file: File, productId: string, shopId: string): Promise<string | null> {
   return new Promise(resolve => {
@@ -6,16 +7,14 @@ async function uploadImage(file: File, productId: string, shopId: string): Promi
     if (file.type === 'image/jpeg') ext = 'jpg'
     else if (file.type === 'image/png') ext = 'png'
     else return null
-    const filepath = `public/${shopId}/${productId}`
-    const datetime = new Date()
-      .toISOString()
-      .replace(/[-T:]/g, '')
-      .split('.')[0]
-    const filename = `${productId}-${datetime}.${ext}`
+
+    const date = new Date().toISOString().split('-')
+    const month = `${date[0]}${date[1]}`
+    const filepath = `public/${month}/${shopId}/${productId}/${productId}-${utils.genId(3)}.${ext}`
     const uploadTask = firebase
       .storage()
       .ref()
-      .child(`${filepath}/${filename}`)
+      .child(filepath)
       .put(file)
     uploadTask.on(
       'state_changed',
