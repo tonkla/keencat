@@ -83,7 +83,7 @@ const OrderIndex = () => {
       id: <Link to={`${PATH_ORDER}/${order.id}`}>{id}</Link>,
       product: order.productName,
       createdAt: new Date(order.createdAt).toLocaleString('th', { timeZone: 'Asia/Bangkok' }),
-      amount: 123,
+      amount: order.amount ? order.amount.toLocaleString() : 0,
       status: renderStatusTag(order.status),
     }
   })
