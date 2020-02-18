@@ -29,6 +29,7 @@ const Home: React.FC = ({ children }) => {
   useEffect(() => {
     // Note: In development, do not fetch shops everytime the component is mounted
     if (utils.isDev()) return
+
     if (!user) return
     ;(async () => {
       setLoading(true)

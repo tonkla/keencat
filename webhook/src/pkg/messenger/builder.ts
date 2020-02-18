@@ -150,7 +150,7 @@ async function respondGreeting(intentText: string, customer?: Customer | null) {
 async function respondWelcome(pageId: string) {
   const shop = await api.findShop(pageId)
   if (shop) {
-    const text = `${shop.name} ${lang.welcome} 😀`
+    const text = `${shop.name} ${lang.welcome}`
     return { text }
   }
 }

@@ -42,6 +42,7 @@ const ProductList = ({ category }: Props) => {
     if (!user) return
     const product: Product = {
       id: utils.genId(),
+      type: values.type,
       name: values.name,
       description: values.description,
       categoryId: category.id,
