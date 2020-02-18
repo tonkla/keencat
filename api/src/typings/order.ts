@@ -1,9 +1,11 @@
+export type OrderStatus = 'unpaid' | 'approving' | 'paid' | 'rejected' | 'canceled'
+
 export interface Order {
   id: string
   shopId: string
   ownerId: string
   customerId: string
-  status: 'unpaid' | 'approving' | 'rejected' | 'paid' | 'canceled'
+  status: OrderStatus
   pageId?: string
   productId?: string
   productName?: string
@@ -21,4 +23,5 @@ export interface OrderInput {
   productId?: string
   productName?: string
   attachment?: string
+  status?: string
 }

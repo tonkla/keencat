@@ -28,7 +28,27 @@ async function findByShop(ctx: Context) {
   ctx.body = orders
 }
 
+function isValid(ctx: Context): boolean {
+  const { order, ownerId } = ctx.request.body
+  if (!order) {
+    ctx.status = 400
+    return false
+  }
+  if (!ownerId || ownerId !== order.ownerId) {
+    ctx.status = 401
+    return false
+  }
+  return true
+}
+
+async function update(ctx: Context) {
+  if (!isValid(ctx)) return
+  const { order } = ctx.request.body
+  if (await orderRepository.update(order)) ctx.status = 200
+}
+
 export default {
   find,
   findByShop,
+  update,
 }

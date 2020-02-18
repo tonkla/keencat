@@ -63,9 +63,9 @@ async function create(input: OrderInput): Promise<string | null> {
   }
 }
 
-async function update(input: OrderInput) {
+async function update(input: OrderInput): Promise<boolean> {
   try {
-    if (!input.shopId) return
+    if (!input.shopId) return false
 
     let orders: Order[] = []
     const docs = await db
@@ -78,21 +78,31 @@ async function update(input: OrderInput) {
     docs.forEach(doc => {
       orders.push(doc.data() as Order)
     })
-    if (orders.length > 0 && input.attachment) {
+    if (orders.length > 0) {
       const order = orders[0]
-      const mediaLink = await storage.copyImage(order.shopId, order.id, input.attachment)
-      if (mediaLink) {
-        const attachments = order.attachments ? [mediaLink, ...order.attachments] : [mediaLink]
-        const _order: Order = {
-          ...order,
-          attachments,
-          status: 'approving',
-          updatedAt: new Date().toISOString(),
+
+      if (input.attachment) {
+        const mediaLink = await storage.copyImage(order.shopId, order.id, input.attachment)
+        if (mediaLink) {
+          const attachments = order.attachments ? [mediaLink, ...order.attachments] : [mediaLink]
+          await db
+            .collection('orders')
+            .doc(order.id)
+            .set({
+              ...order,
+              attachments,
+              status: 'approving',
+              updatedAt: new Date().toISOString(),
+            })
+          return true
         }
+      }
+
+      if (input.status) {
         await db
           .collection('orders')
-          .doc(_order.id)
-          .set(_order)
+          .doc(order.id)
+          .set({ ...order, status: input.status, updatedAt: new Date().toISOString() })
         return true
       }
     }

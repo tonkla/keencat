@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Card, Descriptions, Modal, Tag } from 'antd'
+import { Card, Descriptions, message, Modal, Select, Tag } from 'antd'
 import moment from 'moment'
 
 import { useStoreState } from '../../store'
 import { customerRepository, orderRepository } from '../../services/repositories'
 import { PATH_CUSTOMER, PATH_PRODUCT } from '../../constants'
-import { Customer, Order, OrderStatus } from '../../typings'
+import { Customer, Order, OrderStatus, OrderStatusEnum } from '../../typings'
 
 import Loading from '../../components/Loading'
 import Back from '../../components/Back'
@@ -40,6 +40,27 @@ const OrderItem = () => {
     })()
   }, [order])
 
+  async function handleChangeStatus(value: string) {
+    if (!order) return
+    const status: OrderStatus =
+      value === OrderStatusEnum.Paid
+        ? OrderStatusEnum.Paid
+        : value === OrderStatusEnum.Rejected
+        ? OrderStatusEnum.Rejected
+        : value === OrderStatusEnum.Canceled
+        ? OrderStatusEnum.Canceled
+        : value === OrderStatusEnum.Unpaid
+        ? OrderStatusEnum.Unpaid
+        : OrderStatusEnum.Approving
+    const newOrder = { ...order, status }
+    if (await orderRepository.update(newOrder)) {
+      setOrder(newOrder)
+      message.success('The order status has been updated.')
+    } else {
+      message.error('Cannot update the order status.')
+    }
+  }
+
   function displayAttatchments(attatchments?: string[]) {
     if (!attatchments) return <span />
     return attatchments.map((src, idx) => (
@@ -67,6 +88,19 @@ const OrderItem = () => {
         ? 'purple'
         : ''
     return <Tag color={color}>{status.toUpperCase()}</Tag>
+  }
+
+  function displayStatusOptions() {
+    const { Option } = Select
+    return (
+      <Select placeholder="Update Status" onChange={handleChangeStatus} style={{ width: 150 }}>
+        <Option value={OrderStatusEnum.Unpaid}>Unpaid</Option>
+        <Option value={OrderStatusEnum.Approving}>Approving</Option>
+        <Option value={OrderStatusEnum.Paid}>Paid</Option>
+        <Option value={OrderStatusEnum.Rejected}>Rejected</Option>
+        <Option value={OrderStatusEnum.Canceled}>Cancel</Option>
+      </Select>
+    )
   }
 
   return (
@@ -102,7 +136,10 @@ const OrderItem = () => {
               <Descriptions.Item label="Attatchments">
                 {displayAttatchments(order.attachments)}
               </Descriptions.Item>
-              <Descriptions.Item label="Status">{displayStatusTag(order.status)}</Descriptions.Item>
+              <Descriptions.Item label="Status">
+                {displayStatusTag(order.status)}
+                {displayStatusOptions()}
+              </Descriptions.Item>
             </Descriptions>
           </div>
         )}

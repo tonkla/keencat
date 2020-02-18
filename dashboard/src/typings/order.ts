@@ -1,4 +1,12 @@
-export type OrderStatus = 'unpaid' | 'approving' | 'rejected' | 'paid' | 'canceled'
+export type OrderStatus = 'unpaid' | 'approving' | 'paid' | 'rejected' | 'canceled'
+
+export enum OrderStatusEnum {
+  Unpaid = 'unpaid',
+  Approving = 'approving',
+  Paid = 'paid',
+  Rejected = 'rejected',
+  Canceled = 'canceled',
+}
 
 export interface Order {
   id: string
