@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Button, Card, Input, Modal, Switch } from 'antd'
+import { Button, Card, Descriptions, Input, message, Modal, Switch } from 'antd'
 
 import { useStoreState, useStoreActions } from '../../store'
 import { pageRepository } from '../../services/repositories'
@@ -112,7 +112,10 @@ const ShopIndex = () => {
   }
 
   async function handleToggle(isActive: boolean) {
-    if (activeShop) updateShop({ ...activeShop, isActive })
+    if (!activeShop) return
+    updateShop({ ...activeShop, isActive })
+    const text = isActive ? 'Chatbot is ON.' : 'Chatbot is OFF.'
+    message.success(text)
   }
 
   function renderShopTitle(shop: Shop) {
@@ -120,6 +123,7 @@ const ShopIndex = () => {
       <div className="title">
         <span>{shop.name}</span>
         <div className="actions">
+          <Switch defaultChecked={shop.isActive} onChange={handleToggle} />
           <Button icon="edit" shape="circle" title="Edit Shop" onClick={() => enableForm(true)} />
           <Button
             icon="delete"
@@ -127,7 +131,6 @@ const ShopIndex = () => {
             title="Delete Shop"
             onClick={() => showDeletingConfirm(true)}
           />
-          <Switch defaultChecked={shop.isActive} onChange={handleToggle} />
         </div>
         <Modal
           title="Are you sure you want to delete?"
@@ -195,9 +198,13 @@ const ShopIndex = () => {
         activeShop && (
           <div>
             <Card title={renderShopTitle(activeShop)} bordered={false}>
-              <ul>
-                <li>Phone: 08-1234-5678</li>
-              </ul>
+              <Descriptions bordered column={1} size="small">
+                <Descriptions.Item label="Phone Number">{activeShop.phoneNumber}</Descriptions.Item>
+                <Descriptions.Item label="PromptPay ID">{activeShop.promptPay}</Descriptions.Item>
+                <Descriptions.Item label="Bank Account">
+                  {activeShop.bank} {activeShop.bankAccountNumber} {activeShop.bankAccountName}
+                </Descriptions.Item>
+              </Descriptions>
             </Card>
             <CategoryList user={user} shop={activeShop} />
           </div>

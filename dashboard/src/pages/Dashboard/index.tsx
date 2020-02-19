@@ -11,9 +11,7 @@ const Dashboard = () => {
   return shops.length === 0 ? (
     <Redirect to={PATH_SHOP} />
   ) : (
-    <Card title="Dashboard" bordered={false}>
-      .
-    </Card>
+    <Card title="Dashboard" bordered={false}></Card>
   )
 }
 

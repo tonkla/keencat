@@ -12,8 +12,6 @@ interface FormProps {
 }
 
 const ShopForm = ({ form, callback, cancel, pages, shop }: FormProps) => {
-  const { getFieldDecorator } = form
-
   function handleSubmit(e: any) {
     e.preventDefault()
     form.validateFieldsAndScroll((err: any, values: any) => {
@@ -25,13 +23,18 @@ const ShopForm = ({ form, callback, cancel, pages, shop }: FormProps) => {
 
   const banks = [
     { code: 'BKKBTHBK', name: 'ธนาคารกรุงเทพ' },
+    { code: 'KRTHTHBK', name: 'ธนาคารกรุงไทย' },
     { code: 'AYUDTHBK', name: 'ธนาคารกรุงศรีอยุธยา' },
     { code: 'KASITHBK', name: 'ธนาคารกสิกรไทย' },
-    { code: 'KRTHTHBK', name: 'ธนาคารกรุงไทย' },
     { code: 'SICOTHBK', name: 'ธนาคารไทยพาณิชย์' },
+    { code: 'TMBKTHBK', name: 'ธนาคารทหารไทย' },
     { code: 'GSBATHBK', name: 'ธนาคารออมสิน' },
   ]
 
+  const regexNumeric = /(^\d+$|^$)/
+
+  const { getFieldDecorator } = form
+  const { Option } = Select
   const formItemLayout = {
     labelCol: {
       sm: { span: 4 },
@@ -40,7 +43,6 @@ const ShopForm = ({ form, callback, cancel, pages, shop }: FormProps) => {
       sm: { span: 8 },
     },
   }
-
   const tailFormItemLayout = {
     wrapperCol: {
       sm: {
@@ -49,8 +51,6 @@ const ShopForm = ({ form, callback, cancel, pages, shop }: FormProps) => {
       },
     },
   }
-
-  const { Option } = Select
 
   return (
     <Form {...formItemLayout} onSubmit={handleSubmit}>
@@ -89,7 +89,7 @@ const ShopForm = ({ form, callback, cancel, pages, shop }: FormProps) => {
         {getFieldDecorator('phoneNumber', {
           initialValue: shop ? shop.phoneNumber : '',
           getValueFromEvent: (e: React.FormEvent<HTMLInputElement>) => {
-            return /^(\d+|\s?)$/.test(e.currentTarget.value)
+            return regexNumeric.test(e.currentTarget.value)
               ? e.currentTarget.value
               : form.getFieldValue('phoneNumber')
           },
@@ -99,7 +99,7 @@ const ShopForm = ({ form, callback, cancel, pages, shop }: FormProps) => {
         {getFieldDecorator('promptPay', {
           initialValue: shop ? shop.promptPay : '',
           getValueFromEvent: (e: React.FormEvent<HTMLInputElement>) => {
-            return /^(\d+|\s?)$/.test(e.currentTarget.value)
+            return regexNumeric.test(e.currentTarget.value)
               ? e.currentTarget.value
               : form.getFieldValue('promptPay')
           },
@@ -122,7 +122,7 @@ const ShopForm = ({ form, callback, cancel, pages, shop }: FormProps) => {
         {getFieldDecorator('bankAccountNumber', {
           initialValue: shop ? shop.bankAccountNumber : '',
           getValueFromEvent: (e: React.FormEvent<HTMLInputElement>) => {
-            return /^(\d+|\s?)$/.test(e.currentTarget.value)
+            return regexNumeric.test(e.currentTarget.value)
               ? e.currentTarget.value
               : form.getFieldValue('bankAccountNumber')
           },

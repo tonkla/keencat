@@ -1,2 +1,34 @@
-// .products {
-// }
+@import '../../styles/shared';
+
+.products {
+  .cover {
+    height: 100px;
+    width: 100px;
+    background-color: #f0f0f0;
+    background-position: center center;
+    background-size: cover;
+  }
+
+  .description {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ant-list-item-meta-title a {
+    color: $linkColor;
+  }
+
+  .ant-list-item-meta-content {
+    padding-top: 5px;
+  }
+
+  .ant-tag {
+    margin-left: 10px;
+  }
+}
+
+.product {
+  .ant-descriptions-item-label {
+    width: 15%;
+  }
+}

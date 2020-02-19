@@ -112,9 +112,7 @@ const CategoryItem = () => {
         />
       ) : (
         <div>
-          <Card title={renderCategoryTitle(category)} bordered={false}>
-            <span>.</span>
-          </Card>
+          <Card title={renderCategoryTitle(category)} bordered={false}></Card>
           <ProductList category={category} />
         </div>
       )}

@@ -14,5 +14,8 @@ export interface Product {
   shopId: string
   pageId: string
   ownerId: string
+  isActive: boolean
+  price: number
+  amount: number
   images?: string[]
 }
