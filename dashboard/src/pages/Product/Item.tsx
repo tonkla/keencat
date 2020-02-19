@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
-import { Alert, Button, Card, Input, Modal } from 'antd'
+import { Alert, Button, Card, Descriptions, Input, message, Modal, Switch } from 'antd'
 
 import { useStoreActions, useStoreState } from '../../store'
 import { productRepository } from '../../services/repositories'
@@ -10,6 +10,7 @@ import Back from '../../components/Back'
 import Loading from '../../components/Loading'
 import Upload from '../../components/Upload'
 import Form from './Form'
+import './Product.scss'
 
 const ProductItem = () => {
   const [product, setProduct] = useState<Product>()
@@ -80,11 +81,19 @@ const ProductItem = () => {
     updateProduct(newProduct)
   }
 
+  async function handleToggle(isActive: boolean) {
+    if (!product) return
+    updateProduct({ ...product, isActive })
+    const text = isActive ? 'Product is available.' : 'Product is unavailable.'
+    message.success(text)
+  }
+
   function renderProductTitle(product: Product) {
     return (
       <div className="title">
         <span>{product.name}</span>
         <div className="actions">
+          <Switch defaultChecked={product.isActive} onChange={handleToggle} />
           <Button
             icon="edit"
             shape="circle"
@@ -131,7 +140,11 @@ const ProductItem = () => {
         <Form product={product} callback={handleUpdateProduct} cancel={() => enableForm(false)} />
       ) : (
         <Card title={renderProductTitle(product)} bordered={false}>
-          <span>{product.description}</span>
+          <Descriptions bordered column={1} size="small">
+            <Descriptions.Item label="Description">{product.description}</Descriptions.Item>
+            <Descriptions.Item label="Price">{product.price}</Descriptions.Item>
+            <Descriptions.Item label="Available Amount">{product.amount}</Descriptions.Item>
+          </Descriptions>
           <Upload
             product={product}
             onSuccess={handleUploadSuccess}

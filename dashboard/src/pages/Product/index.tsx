@@ -42,13 +42,16 @@ const ProductList = ({ category }: Props) => {
     if (!user) return
     const product: Product = {
       id: utils.genId(),
-      type: values.type,
-      name: values.name,
-      description: values.description,
+      isActive: true,
       categoryId: category.id,
       shopId: category.shopId,
       pageId: category.pageId,
       ownerId: user.firebaseId,
+      type: values.type,
+      name: values.name,
+      description: values.description,
+      price: values.price,
+      amount: values.amount,
     }
     createProduct(product)
     enableForm(false)
@@ -68,6 +71,7 @@ const ProductList = ({ category }: Props) => {
 
   return (
     <div className="products">
+      {isFormEnabled && <Form callback={handleCreateProduct} cancel={() => enableForm(false)} />}
       <Card title={renderProductsTitle()} bordered={false}>
         {isLoading ? (
           <Loading />
@@ -77,7 +81,6 @@ const ProductList = ({ category }: Props) => {
           <span>There is no product, please add a new one.</span>
         )}
       </Card>
-      {isFormEnabled && <Form callback={handleCreateProduct} cancel={() => enableForm(false)} />}
     </div>
   )
 }

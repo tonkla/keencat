@@ -11,6 +11,23 @@ interface FormProps {
 }
 
 const ProductForm = ({ form, callback, cancel, product }: FormProps) => {
+  function handleSubmit(e: any) {
+    e.preventDefault()
+    form.validateFieldsAndScroll((err: any, values: any) => {
+      if (!err) {
+        const _val = {
+          ...values,
+          price: parseFloat(values.price) || 0,
+          amount: parseInt(values.amount) || 0,
+        }
+        product ? callback({ ...product, ..._val }) : callback(_val)
+      }
+    })
+  }
+
+  const regexPrice = /(^\d+\.?\d{0,2}$|^$)/
+  const regexNumeric = /(^\d+$|^$)/
+
   const { getFieldDecorator } = form
   const formItemLayout = {
     labelCol: {
@@ -29,19 +46,8 @@ const ProductForm = ({ form, callback, cancel, product }: FormProps) => {
     },
   }
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault()
-    form.validateFieldsAndScroll((err: any, values: any) => {
-      if (!err) {
-        product ? callback({ ...product, ...values }) : callback(values)
-      }
-    })
-  }
-
-  const formTitle = product ? 'Edit Product' : 'Add Product'
-
   return (
-    <Card title={formTitle} bordered={false}>
+    <Card title={product ? 'Edit Product' : 'Add Product'} bordered={false}>
       <Form {...formItemLayout} onSubmit={handleSubmit}>
         <Form.Item label="Product Name">
           {getFieldDecorator('name', {
@@ -63,7 +69,39 @@ const ProductForm = ({ form, callback, cancel, product }: FormProps) => {
                 message: 'Please input a product description',
               },
             ],
-          })(<Input.TextArea rows={4} />)}
+          })(<Input.TextArea rows={3} />)}
+        </Form.Item>
+        <Form.Item label="Price">
+          {getFieldDecorator('price', {
+            initialValue: product ? product.price : '',
+            rules: [
+              {
+                required: true,
+                message: 'Please input a product price',
+              },
+            ],
+            getValueFromEvent: (e: React.FormEvent<HTMLInputElement>) => {
+              return regexPrice.test(e.currentTarget.value)
+                ? e.currentTarget.value
+                : form.getFieldValue('price')
+            },
+          })(<Input placeholder="Input a number" />)}
+        </Form.Item>
+        <Form.Item label="Available Amount">
+          {getFieldDecorator('amount', {
+            initialValue: product ? product.amount : '',
+            rules: [
+              {
+                required: true,
+                message: 'Please input a product available amount',
+              },
+            ],
+            getValueFromEvent: (e: React.FormEvent<HTMLInputElement>) => {
+              return regexNumeric.test(e.currentTarget.value)
+                ? e.currentTarget.value
+                : form.getFieldValue('amount')
+            },
+          })(<Input placeholder="Input a number" />)}
         </Form.Item>
         <Form.Item {...tailFormItemLayout}>
           <Button type="primary" htmlType="submit">
