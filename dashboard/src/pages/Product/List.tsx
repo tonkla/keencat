@@ -40,10 +40,10 @@ const ProductList = ({ products }: Props) => {
               </Link>
             }
             description={
-              <div className="description">
-                <span>{item.description}</span>
-                <span>Price: {item.price || 0}</span>
-                <span>Amount: {item.amount || 0}</span>
+              <div className="details">
+                <span className="description">{item.description}</span>
+                <span className="price">Price: {item.price || 0}</span>
+                <span className="amount">Amount: {item.amount || 0}</span>
               </div>
             }
           />

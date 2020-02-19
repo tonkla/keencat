@@ -17,6 +17,7 @@ const ProductItem = () => {
   const [isFormEnabled, enableForm] = useState(false)
   const [deletingConfirm, showDeletingConfirm] = useState(false)
   const [confirmCode, setConfirmCode] = useState('')
+  const [isDeleted, setDeleted] = useState(false)
   const [error, setError] = useState<Error>()
 
   const shops = useStoreState(s => s.shopState.shops)
@@ -27,16 +28,16 @@ const ProductItem = () => {
   const deleteProduct = useStoreActions(a => a.productState.remove)
   const products = useStoreState(s => s.productState.products)
 
-  const [productsLength] = useState(products ? products.length : 0)
-
   const history = useHistory()
   const { id } = useParams()
 
   useEffect(() => {
     if (!activeShop || !id) return
 
-    // Product has been deleted
-    if (products.length !== productsLength) history.goBack()
+    if (isDeleted) {
+      history.goBack()
+      return
+    }
 
     const p = products.find(p => p.id === id)
     if (p) setProduct(p)
@@ -46,7 +47,7 @@ const ProductItem = () => {
         if (p) setProduct(p)
       })()
     }
-  }, [activeShop, products, productsLength, id, history])
+  }, [activeShop, id, isDeleted, products, history])
 
   function handleUpdateProduct(product: Product) {
     enableForm(false)
@@ -56,7 +57,10 @@ const ProductItem = () => {
 
   function handleDeleteProduct(product: Product) {
     showDeletingConfirm(false)
-    if (product.name === confirmCode) deleteProduct(product)
+    if (product.name === confirmCode) {
+      setDeleted(true)
+      deleteProduct(product)
+    }
   }
 
   function handleUploadSuccess(imageUrl: string) {

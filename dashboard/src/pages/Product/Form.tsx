@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Card, Form, Input } from 'antd'
+import { Button, Card, Form, Input, Radio } from 'antd'
 
 import { Product } from '../../typings'
 
@@ -49,7 +49,23 @@ const ProductForm = ({ form, callback, cancel, product }: FormProps) => {
   return (
     <Card title={product ? 'Edit Product' : 'Add Product'} bordered={false}>
       <Form {...formItemLayout} onSubmit={handleSubmit}>
-        <Form.Item label="Product Name">
+        <Form.Item label="Type">
+          {getFieldDecorator('type', {
+            initialValue: product ? product.type : 'goods',
+            rules: [
+              {
+                required: true,
+                message: 'Please choose a product type',
+              },
+            ],
+          })(
+            <Radio.Group buttonStyle="solid">
+              <Radio.Button value="goods">Goods</Radio.Button>
+              <Radio.Button value="service">Service</Radio.Button>
+            </Radio.Group>
+          )}
+        </Form.Item>
+        <Form.Item label="Name">
           {getFieldDecorator('name', {
             initialValue: product ? product.name : '',
             rules: [
@@ -60,7 +76,7 @@ const ProductForm = ({ form, callback, cancel, product }: FormProps) => {
             ],
           })(<Input />)}
         </Form.Item>
-        <Form.Item label="Product Description">
+        <Form.Item label="Description">
           {getFieldDecorator('description', {
             initialValue: product ? product.description : '',
             rules: [

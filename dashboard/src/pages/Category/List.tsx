@@ -12,7 +12,7 @@ const CategoryList = ({ categories }: Props) => {
   return (
     <ul className="categories">
       {categories.map(c => (
-        <li key={c.id} className="category">
+        <li key={c.id}>
           <Link to={`${PATH_CATEGORY}/${c.id}`}>
             {c.name} ({c.productIds.length})
           </Link>

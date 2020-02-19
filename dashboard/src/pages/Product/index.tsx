@@ -29,7 +29,7 @@ const ProductList = ({ category }: Props) => {
     ;(async () => {
       setLoading(true)
       if (
-        (category.productIds.length > 0 && category.productIds.length !== products.length) ||
+        category.productIds.length !== products.length ||
         (products.length > 0 && products[0].categoryId !== category.id)
       ) {
         setProducts(await productRepository.findByIds(category.productIds))

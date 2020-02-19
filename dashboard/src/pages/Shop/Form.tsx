@@ -54,17 +54,6 @@ const ShopForm = ({ form, callback, cancel, pages, shop }: FormProps) => {
 
   return (
     <Form {...formItemLayout} onSubmit={handleSubmit}>
-      <Form.Item label="Shop Name">
-        {getFieldDecorator('name', {
-          initialValue: shop ? shop.name : '',
-          rules: [
-            {
-              required: true,
-              message: 'Please input a shop name',
-            },
-          ],
-        })(<Input />)}
-      </Form.Item>
       {!shop && (
         <Form.Item label="Facebook Page">
           {getFieldDecorator('pageId', {
@@ -85,6 +74,17 @@ const ShopForm = ({ form, callback, cancel, pages, shop }: FormProps) => {
           )}
         </Form.Item>
       )}
+      <Form.Item label="Name">
+        {getFieldDecorator('name', {
+          initialValue: shop ? shop.name : '',
+          rules: [
+            {
+              required: true,
+              message: 'Please input a shop name',
+            },
+          ],
+        })(<Input />)}
+      </Form.Item>
       <Form.Item label="Phone Number">
         {getFieldDecorator('phoneNumber', {
           initialValue: shop ? shop.phoneNumber : '',

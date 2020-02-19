@@ -29,7 +29,7 @@ const CategoryList = ({ shop, user }: Props) => {
     ;(async () => {
       setLoading(true)
       if (
-        (shop.categoryIds.length > 0 && shop.categoryIds.length !== categories.length) ||
+        shop.categoryIds.length !== categories.length ||
         (categories.length > 0 && categories[0].shopId !== shop.id)
       ) {
         setCategories(await categoryRepository.findByIds(shop.categoryIds))

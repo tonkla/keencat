@@ -16,6 +16,7 @@ const CategoryItem = () => {
   const [isFormEnabled, enableForm] = useState(false)
   const [deletingConfirm, showDeletingConfirm] = useState(false)
   const [confirmCode, setConfirmCode] = useState('')
+  const [isDeleted, setDeleted] = useState(false)
 
   const shops = useStoreState(s => s.shopState.shops)
   const shopId = useStoreState(s => s.activeState.shopId)
@@ -25,16 +26,16 @@ const CategoryItem = () => {
   const deleteCategory = useStoreActions(a => a.categoryState.remove)
   const categories = useStoreState(s => s.categoryState.categories)
 
-  const [categoriesLength] = useState(categories ? categories.length : 0)
-
   const history = useHistory()
   const { id } = useParams()
 
   useEffect(() => {
     if (!activeShop || !id) return
 
-    // Category has been deleted
-    if (categories.length !== categoriesLength) history.goBack()
+    if (isDeleted) {
+      history.goBack()
+      return
+    }
 
     const c = categories.find(c => c.id === id)
     if (c) setCategory(c)
@@ -44,7 +45,7 @@ const CategoryItem = () => {
         if (c) setCategory(c)
       })()
     }
-  }, [activeShop, categories, categoriesLength, id, history])
+  }, [activeShop, id, isDeleted, categories, history])
 
   function handleUpdateCategory(category: Category) {
     enableForm(false)
@@ -54,7 +55,10 @@ const CategoryItem = () => {
 
   function handleDeleteCateogory(category: Category) {
     showDeletingConfirm(false)
-    if (category.name === confirmCode) deleteCategory(category)
+    if (category.name === confirmCode) {
+      setDeleted(true)
+      deleteCategory(category)
+    }
   }
 
   function renderCategoryTitle(category: Category) {
@@ -112,7 +116,7 @@ const CategoryItem = () => {
         />
       ) : (
         <div>
-          <Card title={renderCategoryTitle(category)} bordered={false}></Card>
+          <Card title={renderCategoryTitle(category)} className="detail" bordered={false}></Card>
           <ProductList category={category} />
         </div>
       )}

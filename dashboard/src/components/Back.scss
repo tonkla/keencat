@@ -5,15 +5,17 @@
   color: $linkColor;
   cursor: pointer;
   display: flex;
+  font-size: 1em;
   padding-bottom: 10px;
   user-select: none;
 
   .anticon {
-    font-size: 14px;
+    font-size: 0.8em;
     padding-right: 5px;
   }
 
-  span {
-    padding-top: 1px;
-  }
+  // For Prompt font only
+  // span {
+  //   padding-top: 1px;
+  // }
 }
