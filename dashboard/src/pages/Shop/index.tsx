@@ -171,7 +171,7 @@ const ShopIndex = () => {
             <div>
               {shops.length === 0 || getAvailablePages().length > 0 ? (
                 <Form
-                  pages={getAvailablePages}
+                  pages={getAvailablePages()}
                   callback={handleCreateShop}
                   cancel={() => setStep(0)}
                 />

@@ -1,9 +1,4 @@
-export type ProductType = 'product' | 'service'
-
-export enum ProductTypeEnum {
-  Product = 'product',
-  Service = 'service',
-}
+export type ProductType = 'goods' | 'service'
 
 export interface Product {
   id: string

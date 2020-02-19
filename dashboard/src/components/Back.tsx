@@ -9,7 +9,7 @@ const Back = () => {
   return (
     <div className="back" onClick={() => history.goBack()}>
       <Icon type="left" />
-      <span>Back</span>
+      <span>BACK</span>
     </div>
   )
 }

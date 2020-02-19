@@ -43,7 +43,7 @@ const CategoryForm = ({ form, callback, cancel, category }: FormProps) => {
   return (
     <Card title={formTitle} bordered={false}>
       <Form {...formItemLayout} onSubmit={handleSubmit}>
-        <Form.Item label="Category Name">
+        <Form.Item label="Name">
           {getFieldDecorator('name', {
             initialValue: category ? category.name : '',
             rules: [

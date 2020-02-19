@@ -13,7 +13,7 @@
     margin-bottom: 20px;
 
     .ant-card-head {
-      color: rgba(0, 0, 0, 0.77);
+      color: rgba(0, 0, 0, 0.85);
       display: flex;
     }
 
@@ -43,8 +43,12 @@
   }
 
   .ant-card-head-title {
-    font-weight: 600;
+    font-weight: 500;
     padding: 10px 0;
+  }
+
+  .ant-descriptions-title {
+    color: rgba(0, 0, 0, 0.8);
   }
 
   .ant-form-item:last-child {
@@ -52,7 +56,7 @@
   }
 
   .ant-modal-title {
-    font-weight: 600;
+    font-weight: 500;
   }
 
   .buttons {

@@ -33,12 +33,12 @@ const productState: ProductStateModel = {
           productIds: [product.id, ...category.productIds],
         })
       }
-      actions._create(product)
+      // Note: let categoryState updates products
+      // actions._create(product)
     }
   }),
   update: thunk(async (actions, product) => {
-    await productRepository.update(product)
-    actions._update(product)
+    if (await productRepository.update(product)) actions._update(product)
   }),
   remove: thunk(async (actions, product, { getStoreActions, getStoreState }) => {
     if (await productRepository.remove(product)) {
@@ -54,7 +54,8 @@ const productState: ProductStateModel = {
           productIds: category.productIds.filter(id => id !== product.id),
         })
       }
-      actions._remove(product)
+      // Note: let categoryState updates products
+      // actions._remove(product)
     }
   }),
   removeByCategory: thunk(async (actions, category) => {

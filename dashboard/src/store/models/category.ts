@@ -32,7 +32,8 @@ const categoryState: CategoryStateModel = {
           categoryIds: [category.id, ...shop.categoryIds],
         })
       }
-      actions._create(category)
+      // Note: let a shopState updates categories
+      // actions._create(category)
     }
   }),
   update: thunk(async (actions, category) => {
@@ -51,8 +52,8 @@ const categoryState: CategoryStateModel = {
           categoryIds: shop.categoryIds.filter(id => id !== category.id),
         })
       }
-
-      actions._remove(category)
+      // Note: let a shopState updates categories
+      // actions._remove(category)
     }
   }),
   removeByShop: thunk(async (actions, shop) => {
