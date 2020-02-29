@@ -11,6 +11,6 @@ export interface Product {
   ownerId: string
   isActive: boolean
   price: number
-  amount: number
+  quantity: number
   images?: string[]
 }

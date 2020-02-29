@@ -67,8 +67,8 @@ const OrderIndex = () => {
       dataIndex: 'createdAt',
     },
     {
-      title: 'Price',
-      dataIndex: 'price',
+      title: 'Amount',
+      dataIndex: 'amount',
     },
     {
       title: 'Status',
@@ -83,7 +83,7 @@ const OrderIndex = () => {
       id: <Link to={`${PATH_ORDER}/${order.id}`}>{id}</Link>,
       product: order.productName,
       createdAt: new Date(order.createdAt).toLocaleString('th', { timeZone: 'Asia/Bangkok' }),
-      price: order.price ? order.price.toLocaleString() : 0,
+      amount: order.amount ? order.amount.toLocaleString() : 0,
       status: renderStatusTag(order.status),
     }
   })

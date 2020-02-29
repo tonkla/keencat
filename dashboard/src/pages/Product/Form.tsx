@@ -18,7 +18,7 @@ const ProductForm = ({ form, callback, cancel, product }: FormProps) => {
         const _val = {
           ...values,
           price: parseFloat(values.price) || 0,
-          amount: parseInt(values.amount) || 0,
+          quantity: parseInt(values.quantity) || 0,
         }
         product ? callback({ ...product, ..._val }) : callback(_val)
       }
@@ -103,19 +103,19 @@ const ProductForm = ({ form, callback, cancel, product }: FormProps) => {
             },
           })(<Input placeholder="Input a number" />)}
         </Form.Item>
-        <Form.Item label="Available Amount">
-          {getFieldDecorator('amount', {
-            initialValue: product ? product.amount : '',
+        <Form.Item label="Quantity">
+          {getFieldDecorator('quantity', {
+            initialValue: product ? product.quantity : '',
             rules: [
               {
                 required: true,
-                message: 'Please input a product available amount',
+                message: 'Please input a product quantity',
               },
             ],
             getValueFromEvent: (e: React.FormEvent<HTMLInputElement>) => {
               return regexNumeric.test(e.currentTarget.value)
                 ? e.currentTarget.value
-                : form.getFieldValue('amount')
+                : form.getFieldValue('quantity')
             },
           })(<Input placeholder="Input a number" />)}
         </Form.Item>

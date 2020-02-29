@@ -106,8 +106,10 @@ const ShopIndex = () => {
     showDeletingConfirm(false)
     if (shop.name === confirmCode) {
       deleteShop(shop)
-      setCreateShop(true)
-      setStep(0)
+      if (shops.length < 1) {
+        setCreateShop(true)
+        setStep(0)
+      }
     }
   }
 

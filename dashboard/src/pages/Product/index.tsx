@@ -51,7 +51,7 @@ const ProductList = ({ category }: Props) => {
       name: values.name,
       description: values.description,
       price: values.price,
-      amount: values.amount,
+      quantity: values.quantity,
     }
     createProduct(product)
     enableForm(false)
