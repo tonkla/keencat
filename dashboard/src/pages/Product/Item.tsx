@@ -147,7 +147,7 @@ const ProductItem = () => {
           <Descriptions bordered column={1} size="small">
             <Descriptions.Item label="Description">{product.description}</Descriptions.Item>
             <Descriptions.Item label="Price">{product.price}</Descriptions.Item>
-            <Descriptions.Item label="Available Amount">{product.amount}</Descriptions.Item>
+            <Descriptions.Item label="Quantity">{product.quantity}</Descriptions.Item>
           </Descriptions>
           <Upload
             product={product}

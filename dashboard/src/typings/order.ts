@@ -16,7 +16,7 @@ export interface Order {
   productId: string
   productName: string
   status: OrderStatus
-  price: number
+  amount: number
   pageId?: string
   attachments?: string[]
   customerAddress?: string

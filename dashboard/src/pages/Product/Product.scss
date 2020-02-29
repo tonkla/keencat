@@ -21,7 +21,7 @@
       padding-bottom: 5px;
     }
     .price,
-    .amount {
+    .quantity {
       font-size: 0.75rem;
     }
   }
@@ -33,11 +33,5 @@
 
   .ant-tag {
     margin-left: 10px;
-  }
-}
-
-.product {
-  .ant-descriptions-item-label {
-    width: 15%;
   }
 }

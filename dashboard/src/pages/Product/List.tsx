@@ -43,7 +43,7 @@ const ProductList = ({ products }: Props) => {
               <div className="details">
                 <span className="description">{item.description}</span>
                 <span className="price">Price: {item.price || 0}</span>
-                <span className="amount">Amount: {item.amount || 0}</span>
+                <span className="quantity">Quantity: {item.quantity || 0}</span>
               </div>
             }
           />
