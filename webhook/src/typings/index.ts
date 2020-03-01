@@ -6,11 +6,11 @@ export * from './product'
 export * from './shop'
 
 export type ConversationStep =
-  | 'blank'
+  | ''
   | 'respondGreeting'
   | 'respondCategories'
   | 'respondProducts'
   | 'requestName'
   | 'requestPhone'
   | 'requestAddress'
-  | 'requestTransferSlip'
+  | 'requestPayment'

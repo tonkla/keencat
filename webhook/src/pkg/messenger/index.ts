@@ -27,6 +27,9 @@ async function reply(body: WebhookEvent): Promise<void> {
 }
 
 async function handleMessage(event: MessageEvent): Promise<void> {
+  const shop = await api.findShop(event.recipient.id)
+  if (!shop || !shop.isActive) return
+
   await markSeen(event)
   await typingOn(event)
 
@@ -62,9 +65,14 @@ async function handleMessage(event: MessageEvent): Promise<void> {
     }
 
     if (intent.type === 'greeting') {
+      if (step === 'respondGreeting') {
+        const message = { text: '😊' }
+        await send(pageId, { ...response, message })
+        return
+      }
+
       const message = await builder.respondGreeting(intent.text, customer)
       await send(pageId, { ...response, message })
-      cache.setConversationStep(pageId, customerId, 'respondGreeting')
 
       await typingOn(event)
       setTimeout(async () => {
@@ -80,13 +88,24 @@ async function handleMessage(event: MessageEvent): Promise<void> {
         setTimeout(async () => {
           const message = builder.requestDesire()
           await send(pageId, { ...response, message })
+
+          cache.setConversationStep(pageId, customerId, 'respondGreeting')
         }, 1000)
       }, 1000)
+
+      return
+    }
+    // The customer asks for what categories we have
+    else if (intent.type === 'category') {
+      const message = await builder.respondCategories(pageId)
+      await send(pageId, { ...response, message })
+      return
     }
     // The customer asks for what products we have
     else if (intent.type === 'product') {
       const message = await builder.respondProducts(pageId)
       await send(pageId, { ...response, message })
+      return
     }
     // The customer told their name
     else if (step === 'requestName' || intent.type === 'name') {
@@ -103,6 +122,7 @@ async function handleMessage(event: MessageEvent): Promise<void> {
       const message = builder.requestPhone()
       await send(pageId, { ...response, message })
       cache.setConversationStep(pageId, customerId, 'requestPhone')
+      return
     }
     // The customer told their phone number
     else if (step === 'requestPhone' || intent.type === 'phone') {
@@ -117,18 +137,21 @@ async function handleMessage(event: MessageEvent): Promise<void> {
 
       await typingOn(event)
       setTimeout(async () => {
-        const message = builder.requestTransferSlip()
+        const message = builder.requestPayment()
         await send(pageId, { ...response, message })
-        cache.setConversationStep(pageId, customerId, 'requestTransferSlip')
+        cache.setConversationStep(pageId, customerId, 'requestPayment')
       }, 1000)
+
+      return
     }
-    // Fallback
-    else {
-      await typingOff(event)
-    }
-  } else if (attachments) {
+  }
+  // Attachment: Image
+  else if (attachments) {
     const attachment = attachments[0]
-    if (attachment && attachment.type === 'image') {
+    if (attachment && attachment.type === 'image' && step === 'requestPayment') {
+      // Reject stricker and GIF
+      if (attachment.payload.sticker_id || /\.gif/.test(attachment.payload.url)) return
+
       const shop = await api.findShop(pageId)
       if (shop) {
         const order: Order = {
@@ -139,23 +162,22 @@ async function handleMessage(event: MessageEvent): Promise<void> {
         }
         await api.updateOrder(order)
 
-        // if (step === 'requestTransferSlip') {
         const message = builder.respondApproving()
         await send(pageId, { ...response, message })
-        // }
-      } else {
-        await typingOff(event)
+        return
       }
-    } else {
-      await typingOff(event)
     }
-  } else {
-    const message = builder.respondUnknown()
-    await send(pageId, { ...response, message })
   }
+
+  // Fallback
+  const message = builder.respondUnknown()
+  await send(pageId, { ...response, message })
 }
 
 async function handlePostback(event: MessageEvent): Promise<void> {
+  const shop = await api.findShop(event.recipient.id)
+  if (!shop || !shop.isActive) return
+
   await markSeen(event)
   await typingOn(event)
 
@@ -190,16 +212,14 @@ async function handlePostback(event: MessageEvent): Promise<void> {
   if (payload.action === 'listProducts') {
     const message = await builder.respondProducts(pageId, payload.categoryId)
     await send(pageId, { ...response, message })
+    return
   } else if (payload.action === 'buy') {
     if (payload.productId) {
       const message = await builder.requestConfirm(pageId, customerId, payload.productId)
       if (message) {
         await send(pageId, { ...response, message })
-      } else {
-        await typingOff(event)
+        return
       }
-    } else {
-      await typingOff(event)
     }
   } else if (payload.action === 'confirm') {
     const orderId = await api.createOrder(payload)
@@ -213,14 +233,16 @@ async function handlePostback(event: MessageEvent): Promise<void> {
         await send(pageId, { ...response, message })
         cache.setConversationStep(pageId, customerId, 'requestName')
       }, 1000)
-    } else typingOff(event)
+      return
+    }
   } else if (payload.action === 'cancel') {
     const message = builder.respondCancel()
     await send(pageId, { ...response, message })
-  } else {
-    const message = builder.respondUnknown()
-    await send(pageId, { ...response, message })
+    return
   }
+
+  const message = builder.respondUnknown()
+  await send(pageId, { ...response, message })
 }
 
 async function markSeen(event: MessageEvent): Promise<void> {
