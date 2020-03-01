@@ -24,6 +24,7 @@ export interface Postback {
 
 export interface MultimediaPayload {
   url: string
+  sticker_id?: number
 }
 
 export interface LocationPayload {

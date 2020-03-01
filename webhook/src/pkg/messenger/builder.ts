@@ -24,6 +24,10 @@ function buildCategoryElements(pageId: string, categories: Category[]): GenericT
 }
 
 function buildProductElements(pageId: string, products: Product[]): GenericTemplateElement[] {
+  const domain =
+    (process.env.NODE_ENV === 'development'
+      ? process.env.WEBVIEW_DOMAIN_DEV
+      : process.env.WEBVIEW_DOMAIN) || ''
   return products.map(p => ({
     title: p.name,
     image_url: p.images && p.images.length > 0 ? p.images[0] : '',
@@ -31,7 +35,7 @@ function buildProductElements(pageId: string, products: Product[]): GenericTempl
     buttons: [
       {
         type: 'web_url',
-        url: `https://public.keencat.co/${p.shopId}/${p.id}/index.html`,
+        url: `${domain}/${p.shopId}/${p.id}`,
         title: lang.viewDetails,
         webview_height_ratio: 'TALL',
       },
@@ -130,8 +134,8 @@ function requestPayment() {
   return { text: lang.requestPayment }
 }
 
-function requestTransferSlip() {
-  return { text: lang.requestTransferSlip }
+function requestPaymentSlip() {
+  return { text: lang.requestPayment }
 }
 
 async function respondGreeting(intentText: string, customer?: Customer | null) {
@@ -203,7 +207,7 @@ export default {
   requestPhone,
   requestAddress,
   requestPayment,
-  requestTransferSlip,
+  requestPaymentSlip,
 
   respondGreeting,
   respondWelcome,
