@@ -5,4 +5,6 @@ export interface Product {
   shopId: string
   pageId: string
   ownerId: string
+  isActive: boolean
+  quantity: number
 }
