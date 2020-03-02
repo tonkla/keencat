@@ -1,0 +1,24 @@
+.product {
+  width: 512px;
+
+  .image {
+    height: 200px;
+    width: 200px;
+    background-color: #f0f0f0;
+    background-position: center center;
+    background-size: cover;
+    margin-top: 10px;
+  }
+
+  .form {
+    margin-top: 20px;
+  }
+
+  .ant-input-number {
+    width: 55px;
+  }
+
+  .ant-btn {
+    margin-left: 5px;
+  }
+}
