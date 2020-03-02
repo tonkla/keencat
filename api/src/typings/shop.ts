@@ -4,4 +4,5 @@ export interface Shop {
   pageId: string
   categoryIds: string[]
   ownerId: string
+  isActive: boolean
 }

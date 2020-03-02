@@ -9,6 +9,7 @@ dotenv.config()
 import auth from './pkg/auth'
 import { category, customer, order, page, product, shop } from './routes/dashboard'
 import webhook from './routes/webhook'
+import webview from './routes/webview'
 
 async function handleError(ctx: Context, next: Function) {
   try {
@@ -25,6 +26,10 @@ async function authorize(ctx: Context, next: Function) {
   const { path } = ctx.request
   if (path.indexOf('/webhook') === 0) {
     const accessToken = process.env.API_ACCESS_TOKEN || ''
+    const { authorization } = ctx.headers
+    if (authorization && authorization === accessToken) return await next()
+  } else if (path.indexOf('/webview') === 0) {
+    const accessToken = process.env.API_ACCESS_TOKEN_PUBLIC || ''
     const { authorization } = ctx.headers
     if (authorization && authorization === accessToken) return await next()
   } else if (path.indexOf('/dashboard') === 0) {
@@ -65,27 +70,33 @@ r2.post('/create-order', webhook.createOrder)
 r2.post('/update-order', webhook.updateOrder)
 
 const r3 = new Router()
-r3.post('/find-category', category.find)
-r3.post('/find-categories', category.findByIds)
-r3.post('/find-customer', customer.find)
-r3.post('/find-order', order.find)
-r3.post('/find-orders', order.findByShop)
-r3.post('/find-product', product.find)
-r3.post('/find-products', product.findByIds)
-r3.post('/find-shops', shop.findByOwner)
-r3.post('/create-category', category.create)
-r3.post('/create-page', page.create)
-r3.post('/create-product', product.create)
-r3.post('/create-shop', shop.create)
-r3.post('/update-category', category.update)
-r3.post('/update-order', order.update)
-r3.post('/update-product', product.update)
-r3.post('/update-shop', shop.update)
-r3.post('/delete-category', category.remove)
-r3.post('/delete-categories', category.removeByShop)
-r3.post('/delete-product', product.remove)
-r3.post('/delete-products', product.removeByCategory)
-r3.post('/delete-shop', shop.remove)
+r3.post('/find-categories', webview.findCategories)
+r3.post('/find-product', webview.findProduct)
+r3.post('/find-products', webview.findProducts)
+r3.post('/find-shop', webview.findShop)
+
+const r4 = new Router()
+r4.post('/find-category', category.find)
+r4.post('/find-categories', category.findByIds)
+r4.post('/find-customer', customer.find)
+r4.post('/find-order', order.find)
+r4.post('/find-orders', order.findByShop)
+r4.post('/find-product', product.find)
+r4.post('/find-products', product.findByIds)
+r4.post('/find-shops', shop.findByOwner)
+r4.post('/create-category', category.create)
+r4.post('/create-page', page.create)
+r4.post('/create-product', product.create)
+r4.post('/create-shop', shop.create)
+r4.post('/update-category', category.update)
+r4.post('/update-order', order.update)
+r4.post('/update-product', product.update)
+r4.post('/update-shop', shop.update)
+r4.post('/delete-category', category.remove)
+r4.post('/delete-categories', category.removeByShop)
+r4.post('/delete-product', product.remove)
+r4.post('/delete-products', product.removeByCategory)
+r4.post('/delete-shop', shop.remove)
 
 new Koa()
   .use(cors())
@@ -94,5 +105,6 @@ new Koa()
   .use(r1.routes())
   .use(authorize)
   .use(r2.mount('/webhook'))
-  .use(r3.mount('/dashboard'))
+  .use(r3.mount('/webview'))
+  .use(r4.mount('/dashboard'))
   .listen({ port: 8080 }, () => console.log('🚀 API Launched'))

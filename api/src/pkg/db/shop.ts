@@ -3,7 +3,17 @@ import { Shop } from '../../typings'
 
 const db = admin.firestore()
 
-async function find(id: string) {}
+async function find(id: string): Promise<Shop | null> {
+  try {
+    const doc = await db
+      .collection('shops')
+      .doc(id)
+      .get()
+    return doc.exists ? (doc.data() as Shop) : null
+  } catch (e) {
+    return null
+  }
+}
 
 async function findByOwner(ownerId: string): Promise<Shop[]> {
   try {
