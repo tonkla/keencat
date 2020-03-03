@@ -39,7 +39,7 @@ async function handleMessage(event: MessageEvent): Promise<void> {
 
   const response: Message = {
     recipient: { id: customerId },
-    messaging_type: 'RESPONSE',
+    messaging_type: 'response',
     message: {},
   }
 
@@ -97,7 +97,7 @@ async function handleMessage(event: MessageEvent): Promise<void> {
     }
     // The customer asks for what categories we have
     else if (intent.type === 'category') {
-      const message = await builder.respondCategories(pageId)
+      const message = await builder.respondCategories(pageId, customerId)
       await send(pageId, { ...response, message })
       return
     }
@@ -186,7 +186,7 @@ async function handlePostback(event: MessageEvent): Promise<void> {
 
   const response: Message = {
     recipient: { id: customerId },
-    messaging_type: 'RESPONSE',
+    messaging_type: 'response',
     message: {},
   }
 
@@ -248,7 +248,7 @@ async function handlePostback(event: MessageEvent): Promise<void> {
 async function markSeen(event: MessageEvent): Promise<void> {
   const response: Message = {
     recipient: { id: event.sender.id },
-    messaging_type: 'RESPONSE',
+    messaging_type: 'response',
     message: {},
   }
   await send(event.recipient.id, { ...response, sender_action: 'mark_seen' })
@@ -257,7 +257,7 @@ async function markSeen(event: MessageEvent): Promise<void> {
 async function typingOn(event: MessageEvent): Promise<void> {
   const response: Message = {
     recipient: { id: event.sender.id },
-    messaging_type: 'RESPONSE',
+    messaging_type: 'response',
     message: {},
   }
   await send(event.recipient.id, { ...response, sender_action: 'typing_on' })
@@ -266,7 +266,7 @@ async function typingOn(event: MessageEvent): Promise<void> {
 async function typingOff(event: MessageEvent): Promise<void> {
   const response: Message = {
     recipient: { id: event.sender.id },
-    messaging_type: 'RESPONSE',
+    messaging_type: 'response',
     message: {},
   }
   await send(event.recipient.id, { ...response, sender_action: 'typing_off' })
@@ -285,8 +285,19 @@ async function send(pageId: string, message: Message): Promise<void> {
       }
     }
   } catch (e) {
-    console.log('Error=', e.response.data.error)
+    try {
+      const _message: Message = { ...message, message: {}, sender_action: 'typing_off' }
+      const page = await api.findPage(pageId)
+      if (page && page.accessToken) {
+        await axios.post(
+          'https://graph.facebook.com/v6.0/me/messages',
+          qs.stringify({ access_token: page.accessToken, ..._message })
+        )
+      }
+    } catch (e) {}
+
     // TODO: log
+    console.log('Error=', e.response.data.error)
     // https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes
     // e.response.data = { error:
     // { message: string, type: string, code: number, error_subcode?: number, fbtrace_id: string }}
@@ -300,4 +311,5 @@ async function send(pageId: string, message: Message): Promise<void> {
 export default {
   reply,
   verify,
+  send,
 }

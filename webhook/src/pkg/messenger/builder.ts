@@ -1,58 +1,61 @@
+import qs from 'qs'
+
 import api from '../api'
 import th from '../../lang/th'
-import { Category, Customer, Product } from '../../typings'
-import { GenericTemplateElement, ResponseMessage } from './typings/response'
+import { Customer, Product, Shop } from '../../typings'
+import { ButtonTemplateButton, GenericTemplateElement, ResponseMessage } from './typings/response'
 
 const lang = th
 
-function buildCategoryElements(pageId: string, categories: Category[]): GenericTemplateElement[] {
-  return categories.map(c => ({
-    title: c.name,
-    subtitle: '',
-    buttons: [
-      {
-        type: 'postback',
-        title: lang.showProducts,
-        payload: JSON.stringify({
-          action: 'listProducts',
-          pageId,
-          categoryId: c.id,
-        }),
-      },
-    ],
-  }))
+const webviewDomain =
+  (process.env.NODE_ENV === 'development'
+    ? process.env.WEBVIEW_DOMAIN_DEV
+    : process.env.WEBVIEW_DOMAIN) || ''
+const token = process.env.WEBVIEW_PUBLIC_TOKEN || ''
+
+function buildCategoryButton(pageId: string, customerId: string, shop: Shop): ButtonTemplateButton {
+  const params = qs.stringify({ token, pageId, customerId })
+  return {
+    type: 'web_url',
+    title: lang.viewDetails,
+    url: `${webviewDomain}/s/${shop.id}/c?${params}`,
+    webview_height_ratio: 'full',
+    webview_share_button: 'hide',
+    messenger_extensions: true,
+  }
 }
 
 function buildProductElements(pageId: string, products: Product[]): GenericTemplateElement[] {
-  const domain =
-    (process.env.NODE_ENV === 'development'
-      ? process.env.WEBVIEW_DOMAIN_DEV
-      : process.env.WEBVIEW_DOMAIN) || ''
-  return products.map(p => ({
-    title: p.name,
-    image_url: p.images && p.images.length > 0 ? p.images[0] : '',
-    subtitle: p.description,
-    buttons: [
-      {
-        type: 'web_url',
-        url: `${domain}/${p.shopId}/${p.id}`,
-        title: lang.viewDetails,
-        webview_height_ratio: 'TALL',
-      },
-      {
-        type: 'postback',
-        title: lang.buy,
-        payload: JSON.stringify({
-          action: 'buy',
-          pageId,
-          productId: p.id,
-          productName: p.name,
-          shopId: p.shopId,
-          ownerId: p.ownerId,
-        }),
-      },
-    ],
-  }))
+  // const domain =
+  //   (process.env.NODE_ENV === 'development'
+  //     ? process.env.WEBVIEW_DOMAIN_DEV
+  //     : process.env.WEBVIEW_DOMAIN) || ''
+  // return products.map(p => ({
+  //   title: p.name,
+  //   image_url: p.images && p.images.length > 0 ? p.images[0] : '',
+  //   subtitle: p.description,
+  //   buttons: [
+  //     {
+  //       type: 'web_url',
+  //       url: `${domain}/${p.shopId}/${p.id}`,
+  //       title: lang.viewDetails,
+  //       webview_height_ratio: 'TALL',
+  //     },
+  //     {
+  //       type: 'postback',
+  //       title: lang.buy,
+  //       payload: JSON.stringify({
+  //         action: 'buy',
+  //         pageId,
+  //         productId: p.id,
+  //         productName: p.name,
+  //         shopId: p.shopId,
+  //         ownerId: p.ownerId,
+  //       }),
+  //     },
+  //   ],
+  // }))
+  return []
 }
 
 function buildConfirmation(
@@ -94,7 +97,20 @@ function buildConfirmation(
   ]
 }
 
-function buildAttachmentTemplate(elements: GenericTemplateElement[]): ResponseMessage {
+function buildButtonTemplate(text: string, buttons: ButtonTemplateButton[]): ResponseMessage {
+  return {
+    attachment: {
+      type: 'template',
+      payload: {
+        template_type: 'button',
+        text,
+        buttons,
+      },
+    },
+  }
+}
+
+function buildGenericTemplate(elements: GenericTemplateElement[]): ResponseMessage {
   return {
     attachment: {
       type: 'template',
@@ -114,7 +130,7 @@ async function requestConfirm(pageId: string, customerId: string, productId: str
   const product = await api.findProduct(pageId, productId)
   if (product) {
     const elements = buildConfirmation(pageId, customerId, product)
-    return buildAttachmentTemplate(elements)
+    return buildGenericTemplate(elements)
   }
 }
 
@@ -159,16 +175,19 @@ async function respondWelcome(pageId: string) {
   }
 }
 
-async function respondCategories(pageId: string) {
-  const categories = await api.findCategories(pageId)
-  const elements = buildCategoryElements(pageId, categories)
-  return buildAttachmentTemplate(elements)
+async function respondCategories(pageId: string, customerId: string) {
+  const shop = await api.findShop(pageId)
+  if (shop) {
+    const button = buildCategoryButton(pageId, customerId, shop)
+    return buildButtonTemplate(lang.category, [button])
+  }
+  return respondFailure()
 }
 
 async function respondProducts(pageId: string, categoryId?: string) {
   const products = await api.findProducts(pageId, categoryId)
   const elements = buildProductElements(pageId, products)
-  return buildAttachmentTemplate(elements)
+  return buildGenericTemplate(elements)
 }
 
 async function respondConfirm(pageId: string, productId: string) {

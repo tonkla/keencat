@@ -1,11 +1,13 @@
-import dotenv from 'dotenv'
 import Koa, { Context } from 'koa'
 import bodyParser from 'koa-bodyparser'
+import cors from '@koa/cors'
 import Router from 'koa-tree-router'
+import dotenv from 'dotenv'
 
 dotenv.config()
 
 import msg from './pkg/messenger'
+import { Message } from './pkg/messenger/typings/response'
 
 async function handleGetMessenger(ctx: Context) {
   ctx.body = msg.verify({
@@ -32,6 +34,26 @@ async function handleGetWebview(ctx: Context) {
   }
 }
 
+async function handlePostWebview(ctx: Context) {
+  const { authorization } = ctx.headers
+  if (!authorization || authorization !== process.env.WEBVIEW_PUBLIC_TOKEN) {
+    ctx.status = 401
+    return
+  }
+  const { pageId, customerId } = ctx.request.body
+  if (pageId && customerId) {
+    const message: Message = {
+      recipient: { id: customerId },
+      messaging_type: 'response',
+      message: { text: 'hello ' },
+    }
+    await msg.send(pageId, message)
+    ctx.status = 200
+    return
+  }
+  ctx.status = 400
+}
+
 async function handleError(ctx: Context, next: Function) {
   try {
     await next()
@@ -45,11 +67,13 @@ const r = new Router()
 r.get('/msg', handleGetMessenger)
 r.post('/msg', handlePostMessenger)
 r.get('/webview', handleGetWebview)
+r.post('/webview', handlePostWebview)
 r.get('/ping', (ctx: Context) => (ctx.body = 'pong'))
 
 const port = process.env.NODE_ENV === 'development' ? 8081 : 8080
 
 new Koa()
+  .use(cors())
   .use(bodyParser())
   .use(handleError)
   .use(r.routes())

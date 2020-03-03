@@ -1,5 +1,3 @@
-import { IntentResponse } from '../../dialogflow/typings'
-
 export interface Sender {
   id: string
 }

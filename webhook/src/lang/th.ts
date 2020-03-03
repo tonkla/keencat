@@ -5,6 +5,7 @@ export default {
   welcome: 'ยินดีต้อนรับค่ะ',
 
   baht: 'บาท',
+  category: 'หมวดหมู่สินค้า',
   description: 'คำอธิบาย',
   price: 'ราคา',
   product: 'สินค้า',

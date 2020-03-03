@@ -5,7 +5,7 @@ import { Category, Product, Shop } from '../typings'
 async function call(path: string, params: any) {
   try {
     const url = process.env.REACT_APP_API_URL || ''
-    const authorization = process.env.REACT_APP_ACCESS_TOKEN || ''
+    const authorization = process.env.REACT_APP_API_TOKEN || ''
     return await axios.create({ headers: { authorization } }).post(`${url}/${path}`, params)
   } catch (e) {
     return { data: null }
