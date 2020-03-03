@@ -81,6 +81,9 @@ export interface UrlButton {
   type: 'web_url'
   url: string
   title: string
+  webview_height_ratio?: 'compact' | 'tall' | 'full'
+  webview_share_button?: 'hide'
+  messenger_extensions?: boolean
 }
 
 export interface PostbackButton {
@@ -111,15 +114,11 @@ export interface GamePlayButton {
   game_metadata: { player_id: string } | { context_id: string }
 }
 
-export type ImageAspectRatio = 'horizontal' | 'square'
-export type MessagingType = 'RESPONSE' | 'UPDATE' | 'MESSAGE_TAG'
-export type SenderAction = 'typing_on' | 'typing_off' | 'mark_seen'
-
 export interface Message {
-  messaging_type: MessagingType
   recipient: Recipient
   message: ResponseMessage
-  sender_action?: SenderAction
+  messaging_type: 'response' | 'update' | 'message_tag'
+  sender_action?: 'typing_on' | 'typing_off' | 'mark_seen'
 }
 
 export interface ResponseMessage {
@@ -139,18 +138,13 @@ export interface GenericTemplate {
   template_type: 'generic'
   elements: GenericTemplateElement[]
   sharable?: boolean
-  image_aspect_ratio?: ImageAspectRatio
+  image_aspect_ratio?: 'horizontal' | 'square'
 }
 
 export interface GenericTemplateElement {
   title: string
   image_url?: string
   subtitle?: string
-  default_action?: {
-    type: 'web_url'
-    url: string
-    webview_height_ratio: 'COMPACT' | 'TALL' | 'FULL'
-    messenger_extensions?: boolean
-  }
+  default_action?: UrlButton
   buttons?: GenericTemplateButton[]
 }

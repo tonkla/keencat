@@ -6,16 +6,16 @@ const Index = () => {
     <div>
       <ul>
         <li>
-          <Link to="/s/xdaEuLfs2is68FK1?t=dev">Shop</Link>
+          <Link to="/s/xdaEuLfs2is68FK1?token=dev">Shop</Link>
         </li>
         <li>
-          <Link to="/s/xdaEuLfs2is68FK1/c?t=dev">Categories</Link>
+          <Link to="/s/xdaEuLfs2is68FK1/c?token=dev">Categories</Link>
         </li>
         <li>
-          <Link to="/c/D9T0u10vkSFtvlkd/p?t=dev">Products</Link>
+          <Link to="/c/D9T0u10vkSFtvlkd/p?token=dev">Products</Link>
         </li>
         <li>
-          <Link to="/p/k3ZqzOy0LBRenGoB?t=dev">Product</Link>
+          <Link to="/p/k3ZqzOy0LBRenGoB?token=dev">Product</Link>
         </li>
       </ul>
     </div>

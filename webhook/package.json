@@ -8,6 +8,7 @@
     "start": "ts-node-dev --respawn --transpileOnly --no-notify src/index.ts"
   },
   "dependencies": {
+    "@koa/cors": "^3.0.0",
     "axios": "^0.19.2",
     "dialogflow": "^1.2.0",
     "dotenv": "^8.2.0",
@@ -21,6 +22,7 @@
     "@types/dialogflow": "^0.11.0",
     "@types/koa": "^2.11.0",
     "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa__cors": "^3.0.1",
     "@types/nanoid": "^2.1.0",
     "@types/node": "^13.7.0",
     "@types/qs": "^6.9.1",
