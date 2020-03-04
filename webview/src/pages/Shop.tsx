@@ -5,7 +5,6 @@ import api from '../services/api'
 import { Shop } from '../typings'
 
 import Loading from '../components/Loading'
-import Header from '../components/Header'
 import CategoryList from '../components/CategoryList'
 
 import './Shop.scss'
@@ -29,7 +28,6 @@ const ShopIndex = () => {
     </div>
   ) : (
     <>
-      <Header />
       <main>
         <div className="shop">
           <div className="name">

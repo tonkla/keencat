@@ -4,27 +4,29 @@ import { Button } from 'antd'
 
 import api from '../services/api'
 import utils from '../services/utils'
-import { useStoreActions, useStoreState } from '../store'
+import { useStoreActions } from '../store'
 import { CartItem, Product } from '../typings'
 
-import Header from '../components/Header'
 import InputNumber from '../components/InputNumber'
 import Loading from '../components/Loading'
 
 import './ProductItem.scss'
 
 const ProductItem = () => {
+  const [height, setHeight] = useState()
   const [product, setProduct] = useState<Product>()
   const [quantity, setQuantity] = useState(1)
 
   const updateCart = useStoreActions(a => a.cartState.update)
-  const customerId = useStoreState(s => s.sessionState.customerId)
 
   const history = useHistory()
   const { pid } = useParams()
 
   useEffect(() => {
     if (!pid) return
+    const elMain = document.getElementById('container')
+    const height = elMain ? elMain.offsetHeight - 75 : '85%'
+    setHeight(height)
     ;(async () => {
       const product = await api.findProduct(pid)
       if (product) setProduct(product)
@@ -36,30 +38,24 @@ const ProductItem = () => {
   }
 
   function handleClickAddToCart() {
-    if (!product || !customerId) return
+    if (!product) return
     const item: CartItem = {
       id: utils.genId(),
       product,
       quantity,
       amount: product.price * quantity,
-      shopId: product.shopId,
-      pageId: product.pageId,
-      customerId,
       updatedAt: new Date().toISOString(),
     }
     updateCart(item)
   }
 
   function handleClickBuyNow() {
-    if (!product || !customerId) return
+    if (!product) return
     const item: CartItem = {
       id: utils.genId(),
       product,
       quantity,
       amount: product.price * quantity,
-      shopId: product.shopId,
-      pageId: product.pageId,
-      customerId,
       updatedAt: new Date().toISOString(),
     }
     updateCart(item)
@@ -68,16 +64,12 @@ const ProductItem = () => {
 
   function handleClickBookNow() {}
 
-  const elMain = document.getElementById('container')
-  const height = elMain ? elMain.offsetHeight - 75 : '90%'
-
   return !product ? (
     <div className="mt40">
       <Loading />
     </div>
   ) : (
     <>
-      <Header />
       <main style={{ height }}>
         <div className="product" style={{ height }}>
           <h1>{product.name}</h1>

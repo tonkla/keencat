@@ -5,8 +5,5 @@ export interface CartItem {
   product: Product
   quantity: number
   amount: number
-  shopId: string
-  pageId: string
-  customerId: string
   updatedAt: string
 }

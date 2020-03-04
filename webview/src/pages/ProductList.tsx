@@ -4,7 +4,6 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import api from '../services/api'
 import { Product } from '../typings'
 
-import Header from '../components/Header'
 import Loading from '../components/Loading'
 
 import './ProductList.scss'
@@ -28,7 +27,6 @@ const ProductList = () => {
     </div>
   ) : (
     <>
-      <Header />
       <main>
         <ul className="product-list">
           <span>Products</span>
