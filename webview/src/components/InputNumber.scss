@@ -1,0 +1,20 @@
+.input-number {
+  display: flex;
+  align-items: center;
+  button {
+    background-color: #fff;
+    border: 1px solid #f0f0f0;
+    height: 30px;
+    outline: none;
+    padding: 0 10px;
+  }
+  input {
+    height: 30px;
+    width: 40px;
+    text-align: center;
+    border: 1px solid #f0f0f0;
+    border-left: none;
+    border-right: none;
+    outline: none;
+  }
+}

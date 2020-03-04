@@ -1,5 +1,22 @@
 .product {
-  width: 512px;
+  position: fixed;
+  top: 35px;
+  left: 0;
+  width: 100%;
+  overflow-y: scroll;
+  padding: 10px;
+
+  .description {
+    margin: 20px 0;
+  }
+
+  .price {
+    font-size: 1.5em;
+  }
+
+  .quantity {
+    font-size: 1.2em;
+  }
 
   .image {
     height: 200px;
@@ -17,6 +34,24 @@
   .ant-input-number {
     width: 55px;
   }
+
+  .ant-btn {
+    margin-left: 5px;
+  }
+}
+
+.container footer {
+  min-height: 40px;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+
+  background-color: #fff;
+  border-top: 1px solid #f0f0f0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   .ant-btn {
     margin-left: 5px;

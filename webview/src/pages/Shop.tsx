@@ -5,6 +5,8 @@ import api from '../services/api'
 import { Shop } from '../typings'
 
 import Loading from '../components/Loading'
+import Header from '../components/Header'
+import CategoryList from '../components/CategoryList'
 
 import './Shop.scss'
 
@@ -22,27 +24,51 @@ const ShopIndex = () => {
   }, [sid])
 
   return !shop ? (
-    <Loading />
-  ) : (
-    <div>
-      <div>{shop.name}</div>
-      <div>
-        <span>Phone Number: </span>
-        <span>{shop.phoneNumber}</span>
-      </div>
-      <div>
-        <span>Bank: </span>
-        <div>
-          <span>{shop.bank}</span>
-        </div>
-        <div>
-          <span>{shop.bankAccountNumber}</span>
-        </div>
-        <div>
-          <span>{shop.bankAccountName}</span>
-        </div>
-      </div>
+    <div className="mt40">
+      <Loading />
     </div>
+  ) : (
+    <>
+      <Header />
+      <main>
+        <div className="shop">
+          <div className="name">
+            <span>{shop.name}</span>
+          </div>
+          {shop.phoneNumber && (
+            <div>
+              <span>Phone: </span>
+              <span>{shop.phoneNumber}</span>
+            </div>
+          )}
+          {shop.promptPay && (
+            <div>
+              <span>PromptPay: </span>
+              <span>{shop.promptPay}</span>
+            </div>
+          )}
+          {shop.bank && (
+            <div>
+              <span>Bank: </span>
+              <span>{shop.bank}</span>
+            </div>
+          )}
+          {shop.bankAccountNumber && (
+            <div>
+              <span>Account Number: </span>
+              <span>{shop.bankAccountNumber}</span>
+            </div>
+          )}
+          {shop.bankAccountName && (
+            <div>
+              <span>Account Name: </span>
+              <span>{shop.bankAccountName}</span>
+            </div>
+          )}
+        </div>
+        <CategoryList />
+      </main>
+    </>
   )
 }
 

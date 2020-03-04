@@ -9,7 +9,7 @@ const AuthorizedRoute = ({ component: Component, ...rest }: any) => {
   function verifyToken(str: string): boolean {
     if (process.env.NODE_ENV === 'development') return true
     const params = new URLSearchParams(str)
-    return params.get('token') === process.env.REACT_APP_PUBLIC_TOKEN
+    return params.get('token') === process.env.REACT_APP_WEBHOOK_TOKEN
   }
 
   return (
