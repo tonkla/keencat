@@ -5,10 +5,10 @@ import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-d
 import store from './store'
 
 import AuthorizedRoute from './components/AuthorizedRoute'
+import Cart from './pages/Cart'
 import Index from './pages/Index'
-import CategoryList from './pages/CategoryList'
-import ProductList from './pages/ProductList'
 import ProductItem from './pages/ProductItem'
+import ProductList from './pages/ProductList'
 import Shop from './pages/Shop'
 
 import 'antd/dist/antd.css'
@@ -20,9 +20,9 @@ const App = () => (
       <Switch>
         <Route path="/" exact component={Index} />
         <AuthorizedRoute path="/s/:sid" exact component={Shop} />
-        <AuthorizedRoute path="/s/:sid/c" exact component={CategoryList} />
         <AuthorizedRoute path="/c/:cid/p" exact component={ProductList} />
         <AuthorizedRoute path="/p/:pid" exact component={ProductItem} />
+        <AuthorizedRoute path="/cart" exact component={Cart} />
         <Redirect to="/" />
       </Switch>
     </Router>

@@ -4,7 +4,7 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import api from '../services/api'
 import { Category } from '../typings'
 
-import Loading from '../components/Loading'
+import Loading from './Loading'
 
 import './CategoryList.scss'
 
@@ -22,13 +22,17 @@ const CategoryList = () => {
   }, [sid])
 
   return !categories ? (
-    <Loading />
+    <div className="mt40">
+      <Loading />
+    </div>
   ) : (
-    <ul>
+    <ul className="category-list">
       <span>Categories</span>
       {categories.map((category, idx) => (
         <li key={idx}>
-          <Link to={`/c/${category.id}/p${location.search}`}>{category.name}</Link>
+          <Link to={`/c/${category.id}/p${location.search}`}>
+            {category.name} ({category.productIds.length})
+          </Link>
         </li>
       ))}
     </ul>

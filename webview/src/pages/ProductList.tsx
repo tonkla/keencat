@@ -4,6 +4,7 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import api from '../services/api'
 import { Product } from '../typings'
 
+import Header from '../components/Header'
 import Loading from '../components/Loading'
 
 import './ProductList.scss'
@@ -22,16 +23,23 @@ const ProductList = () => {
   }, [cid])
 
   return !products ? (
-    <Loading />
+    <div className="mt40">
+      <Loading />
+    </div>
   ) : (
-    <ul>
-      <span>Products</span>
-      {products.map((product, idx) => (
-        <li key={idx}>
-          <Link to={`/p/${product.id}${location.search}`}>{product.name}</Link>
-        </li>
-      ))}
-    </ul>
+    <>
+      <Header />
+      <main>
+        <ul className="product-list">
+          <span>Products</span>
+          {products.map((product, idx) => (
+            <li key={idx}>
+              <Link to={`/p/${product.id}${location.search}`}>{product.name}</Link>
+            </li>
+          ))}
+        </ul>
+      </main>
+    </>
   )
 }
 

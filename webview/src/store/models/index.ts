@@ -1,12 +1,11 @@
-import { persist } from 'easy-peasy'
+import cartState, { CartStateModel } from './cart'
+import sessionState, { SessionStateModel } from './session'
 
-export interface Injections {}
+export interface StoreModel {
+  cartState: CartStateModel
+  sessionState: SessionStateModel
+}
 
-export interface StoreModel {}
-
-const storeModel: StoreModel = persist({
-  storage: 'localStorage',
-  whitelist: [],
-})
+const storeModel: StoreModel = { cartState, sessionState }
 
 export default storeModel

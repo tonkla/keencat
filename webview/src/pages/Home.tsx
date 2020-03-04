@@ -1,37 +1,27 @@
-import React from 'react'
-import { Button } from 'antd'
-import axios from 'axios'
+import React, { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+
+import { useStoreActions } from '../store'
+
+import './Home.scss'
 
 const Home: React.FC = ({ children }) => {
   const location = useLocation()
 
-  function handleSubmit() {
-    if (!(window as any).MessengerExtensions) return
-    ;(window as any).MessengerExtensions.requestCloseBrowser(
-      async function success() {
-        const url = process.env.REACT_APP_WEBHOOK_URL || ''
-        if (url === '') return
-        try {
-          const authorization = process.env.REACT_APP_PUBLIC_TOKEN || ''
-          const params = new URLSearchParams(location.search)
-          const pageId = params.get('pageId')
-          const customerId = params.get('customerId')
-          await axios.create({ headers: { authorization } }).post(url, { pageId, customerId })
-        } catch (e) {}
-      },
-      function error(err: any) {}
-    )
-  }
+  const setPageId = useStoreActions(a => a.sessionState.setPageId)
+  const setCustomerId = useStoreActions(a => a.sessionState.setCustomerId)
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const pageId = params.get('pageId')
+    const customerId = params.get('customerId')
+    if (pageId) setPageId(pageId)
+    if (customerId) setCustomerId(customerId)
+  }, [location.search, setPageId, setCustomerId])
 
   return (
-    <div>
+    <div className="container" id="container">
       {children}
-      <div>
-        <Button type="primary" onClick={handleSubmit}>
-          Submit
-        </Button>
-      </div>
     </div>
   )
 }
