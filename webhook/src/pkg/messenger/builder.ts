@@ -11,14 +11,14 @@ const webviewDomain =
   (process.env.NODE_ENV === 'development'
     ? process.env.WEBVIEW_DOMAIN_DEV
     : process.env.WEBVIEW_DOMAIN) || ''
-const token = process.env.WEBVIEW_PUBLIC_TOKEN || ''
+const token = process.env.WEBVIEW_TOKEN || ''
 
 function buildCategoryButton(pageId: string, customerId: string, shop: Shop): ButtonTemplateButton {
   const params = qs.stringify({ token, pageId, customerId })
   return {
     type: 'web_url',
     title: lang.viewDetails,
-    url: `${webviewDomain}/s/${shop.id}/c?${params}`,
+    url: `${webviewDomain}/s/${shop.id}?${params}`,
     webview_height_ratio: 'full',
     webview_share_button: 'hide',
     messenger_extensions: true,
