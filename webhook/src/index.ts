@@ -37,19 +37,17 @@ async function handleGetWebview(ctx: Context) {
 async function handlePostWebview(ctx: Context) {
   const { authorization } = ctx.headers
   if (!authorization || authorization !== process.env.WEBVIEW_TOKEN) {
-    ctx.status = 401
-    return
+    return (ctx.status = 401)
   }
-  const { pageId, customerId } = ctx.request.body
-  if (pageId && customerId) {
+  const { order } = ctx.request.body
+  if (order) {
     const message: Message = {
-      recipient: { id: customerId },
+      recipient: { id: order.customerId },
       messaging_type: 'response',
-      message: { text: 'hello ' },
+      message: { text: `Total Amount: ${order.totalAmount} THB.` },
     }
-    await msg.send(pageId, message)
-    ctx.status = 200
-    return
+    await msg.send(order.pageId, message)
+    return (ctx.status = 200)
   }
   ctx.status = 400
 }

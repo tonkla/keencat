@@ -32,8 +32,8 @@ const Header = () => {
       )}
       <div className="cart-icon" onClick={handleClickCart}>
         <ShoppingCartOutlined />
-        <Badge count={items.length} offset={[5, 10]} showZero>
-          <a href="#" />
+        <Badge count={items.length} offset={[5, 10]}>
+          <span />
         </Badge>
       </div>
     </header>

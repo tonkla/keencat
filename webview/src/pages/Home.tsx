@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 
 import { useStoreActions } from '../store'
 
+import Header from '../components/Header'
 import './Home.scss'
 
 const Home: React.FC = ({ children }) => {
@@ -21,6 +22,7 @@ const Home: React.FC = ({ children }) => {
 
   return (
     <div className="container" id="container">
+      <Header />
       {children}
     </div>
   )
