@@ -29,7 +29,7 @@ async function authorize(ctx: Context, next: Function) {
     const { authorization } = ctx.headers
     if (authorization && authorization === accessToken) return await next()
   } else if (path.indexOf('/webview') === 0) {
-    const accessToken = process.env.API_ACCESS_TOKEN_PUBLIC || ''
+    const accessToken = process.env.API_PUBLIC_TOKEN || ''
     const { authorization } = ctx.headers
     if (authorization && authorization === accessToken) return await next()
   } else if (path.indexOf('/dashboard') === 0) {

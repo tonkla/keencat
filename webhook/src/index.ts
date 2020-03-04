@@ -36,7 +36,7 @@ async function handleGetWebview(ctx: Context) {
 
 async function handlePostWebview(ctx: Context) {
   const { authorization } = ctx.headers
-  if (!authorization || authorization !== process.env.WEBVIEW_PUBLIC_TOKEN) {
+  if (!authorization || authorization !== process.env.WEBVIEW_TOKEN) {
     ctx.status = 401
     return
   }
