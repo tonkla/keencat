@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { ShopOutlined } from '@ant-design/icons'
 
 import { useStoreState } from '../store'
 import api from '../services/api'
@@ -12,6 +13,7 @@ import './Shop.scss'
 
 const ShopIndex = () => {
   const [shop, setShop] = useState<Shop>()
+  const [height, setHeight] = useState()
 
   const { sid } = useParams()
 
@@ -21,6 +23,9 @@ const ShopIndex = () => {
 
   useEffect(() => {
     if (!(sid && hmac && pageId && customerId)) return
+    const elMain = document.getElementById('container')
+    const height = elMain ? elMain.offsetHeight - 35 : '95%'
+    setHeight(height)
     ;(async () => {
       const headers: RequestHeader = {
         hmac,
@@ -39,42 +44,45 @@ const ShopIndex = () => {
   ) : (
     <>
       <main>
-        <div className="shop">
-          <div className="name">
-            <span>{shop.name}</span>
+        <div className="shop" style={{ height }}>
+          <div className="information">
+            <div className="name">
+              <ShopOutlined />
+              <span>{shop.name}</span>
+            </div>
+            {shop.phoneNumber && (
+              <div>
+                <label>Phone Number:</label>
+                <span>{shop.phoneNumber}</span>
+              </div>
+            )}
+            {shop.promptPay && (
+              <div>
+                <label>PromptPay ID:</label>
+                <span>{shop.promptPay}</span>
+              </div>
+            )}
+            {shop.bank && (
+              <div>
+                <label>Bank:</label>
+                <span>{shop.bank}</span>
+              </div>
+            )}
+            {shop.bankAccountNumber && (
+              <div>
+                <label>Account Number:</label>
+                <span>{shop.bankAccountNumber}</span>
+              </div>
+            )}
+            {shop.bankAccountName && (
+              <div>
+                <label>Account Name:</label>
+                <span>{shop.bankAccountName}</span>
+              </div>
+            )}
           </div>
-          {shop.phoneNumber && (
-            <div>
-              <span>Phone: </span>
-              <span>{shop.phoneNumber}</span>
-            </div>
-          )}
-          {shop.promptPay && (
-            <div>
-              <span>PromptPay: </span>
-              <span>{shop.promptPay}</span>
-            </div>
-          )}
-          {shop.bank && (
-            <div>
-              <span>Bank: </span>
-              <span>{shop.bank}</span>
-            </div>
-          )}
-          {shop.bankAccountNumber && (
-            <div>
-              <span>Account Number: </span>
-              <span>{shop.bankAccountNumber}</span>
-            </div>
-          )}
-          {shop.bankAccountName && (
-            <div>
-              <span>Account Name: </span>
-              <span>{shop.bankAccountName}</span>
-            </div>
-          )}
+          <CategoryList />
         </div>
-        <CategoryList />
       </main>
     </>
   )
