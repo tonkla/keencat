@@ -44,7 +44,7 @@ const ShopIndex = () => {
   ) : (
     <>
       <main>
-        <div className="shop" style={{ height }}>
+        <div className="content shop" style={{ height }}>
           <div className="information">
             <div className="name">
               <ShopOutlined />
