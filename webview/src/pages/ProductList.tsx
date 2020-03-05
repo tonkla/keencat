@@ -42,7 +42,7 @@ const ProductList = () => {
   ) : (
     <>
       <main>
-        <ul className="product-list" style={{ height }}>
+        <ul className="content product-list" style={{ height }}>
           <h1>Products</h1>
           {products.map(product => (
             <li key={product.id}>

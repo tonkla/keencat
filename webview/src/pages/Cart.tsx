@@ -61,7 +61,7 @@ const Cart = () => {
   return (
     <>
       <main>
-        <div className="cart" style={{ height }}>
+        <div className="content cart" style={{ height }}>
           <h1>Cart</h1>
           {items.length > 0 && (
             <ul>

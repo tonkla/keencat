@@ -10,14 +10,38 @@
     position: fixed;
     top: $headerHeight;
 
+    .content {
+      position: fixed;
+      top: $headerHeight;
+      left: 0;
+      width: 100%;
+      overflow-y: scroll;
+      margin: 0;
+      padding: 10px;
+    }
+
     h1 {
       border-bottom: 1px solid #f0f0f0;
       color: rgba(0, 0, 0, 0.8);
       font-size: 1.2em;
+    }
+
+    h2 {
+      border-bottom: 1px dashed #f0f0f0;
+      color: rgba(0, 0, 0, 0.8);
+      font-size: 1em;
     }
   }
 }
 
 .mt60 {
   margin-top: 60px;
+}
+
+.ml5 {
+  margin-left: 5px;
+}
+
+.ml10 {
+  margin-left: 10px;
 }

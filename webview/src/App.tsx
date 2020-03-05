@@ -10,6 +10,7 @@ import Index from './pages/Index'
 import ProductItem from './pages/ProductItem'
 import ProductList from './pages/ProductList'
 import Shop from './pages/Shop'
+import Customer from './pages/Customer'
 
 import 'antd/dist/antd.css'
 import './App.scss'
@@ -23,6 +24,7 @@ const App = () => (
         <AuthorizedRoute path="/c/:cid/p" exact component={ProductList} />
         <AuthorizedRoute path="/p/:pid" exact component={ProductItem} />
         <AuthorizedRoute path="/cart" exact component={Cart} />
+        <AuthorizedRoute path="/customer" exact component={Customer} />
         <Redirect to="/" />
       </Switch>
     </Router>

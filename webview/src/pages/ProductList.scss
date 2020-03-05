@@ -1,14 +1,4 @@
-@import '../styles/shared';
-
 .container main ul.product-list {
-  position: fixed;
-  top: $headerHeight;
-  left: 0;
-  width: 100%;
-  overflow-y: scroll;
-  margin: 0;
-  padding: 10px;
-
   li {
     list-style-type: none;
     margin: 0;

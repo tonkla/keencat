@@ -80,7 +80,7 @@ const ProductItem = () => {
   ) : (
     <>
       <main style={{ height }}>
-        <div className="product" style={{ height }}>
+        <div className="content product" style={{ height }}>
           <h1>{product.name}</h1>
           <div className="description">{product.description}</div>
           <div>
