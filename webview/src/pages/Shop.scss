@@ -1,17 +1,37 @@
-.shop {
-  margin: 10px;
-  padding: 10px;
-  border: 1px solid #f0f0f0;
-  border-radius: 2px;
-  padding: 10px;
-  font-size: 14px;
+@import '../styles/shared';
 
-  .name {
-    font-size: 16px;
-    margin-bottom: 5px;
+.shop {
+  position: fixed;
+  top: $headerHeight;
+  left: 0;
+  width: 100%;
+  overflow-y: scroll;
+  margin: 0;
+  padding: 10px;
+
+  .information {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #f0f0f0;
+    border-radius: 2px;
+    padding: 10px;
+    font-size: 14px;
   }
 
-  .bank span {
+  .name {
+    font-size: 1.2em;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 8px;
+
+    .anticon {
+      color: rgba(0, 0, 0, 0.7);
+      margin-right: 7px;
+      font-size: 1.2em;
+    }
+  }
+
+  label {
+    font-size: 0.85em;
     margin-right: 5px;
   }
 }

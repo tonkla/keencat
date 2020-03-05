@@ -1,8 +1,57 @@
+@import '../styles/shared';
+
 .cart {
   position: fixed;
-  top: 35px;
+  top: $headerHeight;
   left: 0;
   width: 100%;
   overflow-y: scroll;
   padding: 10px;
+
+  h1 {
+    font-size: 1.3em;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  ul {
+    padding-inline-start: 0;
+  }
+
+  li {
+    list-style-type: none;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 10px 0;
+    display: flex;
+  }
+
+  .cover {
+    height: 120px;
+    width: 120px;
+    background-color: #f0f0f0;
+    background-position: center center;
+    background-size: cover;
+  }
+
+  .details {
+    padding-left: 10px;
+  }
+
+  .price .number {
+    font-size: 0.75em;
+  }
+
+  label {
+    font-size: 0.75em;
+    margin-right: 5px;
+  }
+}
+
+footer {
+  .total-amount {
+    margin-right: 5px;
+    .number {
+      font-size: 1.5em;
+      padding: 0 5px;
+    }
+  }
 }

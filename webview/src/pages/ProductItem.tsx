@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory, useLocation, useParams } from 'react-router-dom'
 import { Button } from 'antd'
 
 import { useStoreActions, useStoreState } from '../store'
@@ -13,16 +13,17 @@ import Loading from '../components/Loading'
 import './ProductItem.scss'
 
 const ProductItem = () => {
-  const [height, setHeight] = useState()
   const [product, setProduct] = useState<Product>()
   const [quantity, setQuantity] = useState(1)
+  const [height, setHeight] = useState()
 
-  const updateCart = useStoreActions(a => a.cartState.update)
+  const addToCart = useStoreActions(a => a.cartState.add)
   const hmac = useStoreState(s => s.sessionState.hmac)
   const pageId = useStoreState(s => s.sessionState.pageId)
   const customerId = useStoreState(s => s.sessionState.customerId)
 
   const history = useHistory()
+  const location = useLocation()
   const { pid } = useParams()
 
   useEffect(() => {
@@ -54,7 +55,7 @@ const ProductItem = () => {
       amount: product.price * quantity,
       updatedAt: new Date().toISOString(),
     }
-    updateCart(item)
+    addToCart(item)
   }
 
   function handleClickBuyNow() {
@@ -66,8 +67,8 @@ const ProductItem = () => {
       amount: product.price * quantity,
       updatedAt: new Date().toISOString(),
     }
-    updateCart(item)
-    history.push('/cart')
+    addToCart(item)
+    history.push(`/cart${location.search}`)
   }
 
   function handleClickBookNow() {}
@@ -83,17 +84,13 @@ const ProductItem = () => {
           <h1>{product.name}</h1>
           <div className="description">{product.description}</div>
           <div>
-            <span className="label">Price: </span>
+            <label>Price:</label>
             <span className="price">{product.price}</span>
           </div>
           <div>
-            <span className="label">Quantity: </span>
+            <label>Quantity:</label>
             <span className="quantity">{product.quantity}</span>
           </div>
-          {product.images &&
-            product.images.map((img, idx) => (
-              <div key={idx} className="image" style={{ backgroundImage: `url(${img})` }} />
-            ))}
           {product.images &&
             product.images.map((img, idx) => (
               <div key={idx} className="image" style={{ backgroundImage: `url(${img})` }} />

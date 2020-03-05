@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
+import { TagsOutlined } from '@ant-design/icons'
 
 import { useStoreState } from '../store'
 import api from '../services/api'
@@ -37,11 +38,14 @@ const CategoryList = () => {
     </div>
   ) : (
     <ul className="category-list">
-      <span>Categories</span>
-      {categories.map((category, idx) => (
-        <li key={idx}>
+      <h1>Categories</h1>
+      {categories.map(category => (
+        <li key={category.id}>
           <Link to={`/c/${category.id}/p${location.search}`}>
-            {category.name} ({category.productIds.length})
+            <TagsOutlined />
+            <span>
+              {category.name} ({category.productIds.length})
+            </span>
           </Link>
         </li>
       ))}
