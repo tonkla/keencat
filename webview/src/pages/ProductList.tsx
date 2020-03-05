@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
+import { useStoreState } from '../store'
 import api from '../services/api'
-import { Product } from '../typings'
+import { Product, RequestHeader } from '../typings'
 
 import Loading from '../components/Loading'
 
@@ -14,15 +15,24 @@ const ProductList = () => {
   const location = useLocation()
   const { cid } = useParams()
 
+  const hmac = useStoreState(s => s.sessionState.hmac)
+  const pageId = useStoreState(s => s.sessionState.pageId)
+  const customerId = useStoreState(s => s.sessionState.customerId)
+
   useEffect(() => {
-    if (!cid) return
+    if (!(cid && hmac && pageId && customerId)) return
     ;(async () => {
-      setProducts(await api.findProducts(cid))
+      const headers: RequestHeader = {
+        hmac,
+        pageId,
+        customerId,
+      }
+      setProducts(await api.findProducts(headers, cid))
     })()
-  }, [cid])
+  }, [cid, hmac, pageId, customerId])
 
   return !products ? (
-    <div className="mt40">
+    <div className="mt60">
       <Loading />
     </div>
   ) : (

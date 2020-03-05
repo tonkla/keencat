@@ -1,6 +1,7 @@
 import qs from 'qs'
 
 import api from '../api'
+import utils from '../utils'
 import th from '../../lang/th'
 import { Customer, Product, Shop } from '../../typings'
 import { ButtonTemplateButton, GenericTemplateElement, ResponseMessage } from './typings/response'
@@ -8,13 +9,11 @@ import { ButtonTemplateButton, GenericTemplateElement, ResponseMessage } from '.
 const lang = th
 
 const webviewDomain =
-  (process.env.NODE_ENV === 'development'
-    ? process.env.WEBVIEW_DOMAIN_DEV
-    : process.env.WEBVIEW_DOMAIN) || ''
-const token = process.env.WEBVIEW_TOKEN || ''
+  (utils.isDev() ? process.env.WEBVIEW_DOMAIN_DEV : process.env.WEBVIEW_DOMAIN) || ''
 
 function buildCategoryButton(pageId: string, customerId: string, shop: Shop): ButtonTemplateButton {
-  const params = qs.stringify({ token, pageId, customerId })
+  const hmac = utils.createHmac(pageId, customerId)
+  const params = qs.stringify({ hmac, pageId, customerId })
   return {
     type: 'web_url',
     title: lang.viewDetails,
@@ -27,7 +26,7 @@ function buildCategoryButton(pageId: string, customerId: string, shop: Shop): Bu
 
 function buildProductElements(pageId: string, products: Product[]): GenericTemplateElement[] {
   // const domain =
-  //   (process.env.NODE_ENV === 'development'
+  //   (utils.isDev()
   //     ? process.env.WEBVIEW_DOMAIN_DEV
   //     : process.env.WEBVIEW_DOMAIN) || ''
   // return products.map(p => ({

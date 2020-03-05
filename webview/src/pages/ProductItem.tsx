@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Button } from 'antd'
 
+import { useStoreActions, useStoreState } from '../store'
 import api from '../services/api'
 import utils from '../services/utils'
-import { useStoreActions } from '../store'
-import { CartItem, Product } from '../typings'
+import { CartItem, Product, RequestHeader } from '../typings'
 
 import InputNumber from '../components/InputNumber'
 import Loading from '../components/Loading'
@@ -18,20 +18,28 @@ const ProductItem = () => {
   const [quantity, setQuantity] = useState(1)
 
   const updateCart = useStoreActions(a => a.cartState.update)
+  const hmac = useStoreState(s => s.sessionState.hmac)
+  const pageId = useStoreState(s => s.sessionState.pageId)
+  const customerId = useStoreState(s => s.sessionState.customerId)
 
   const history = useHistory()
   const { pid } = useParams()
 
   useEffect(() => {
-    if (!pid) return
+    if (!(pid && hmac && pageId && customerId)) return
     const elMain = document.getElementById('container')
     const height = elMain ? elMain.offsetHeight - 75 : '85%'
     setHeight(height)
     ;(async () => {
-      const product = await api.findProduct(pid)
+      const headers: RequestHeader = {
+        hmac,
+        pageId,
+        customerId,
+      }
+      const product = await api.findProduct(headers, pid)
       if (product) setProduct(product)
     })()
-  }, [pid])
+  }, [pid, hmac, pageId, customerId])
 
   function handleChangeQuantity(qty: number) {
     setQuantity(qty)
@@ -65,7 +73,7 @@ const ProductItem = () => {
   function handleClickBookNow() {}
 
   return !product ? (
-    <div className="mt40">
+    <div className="mt60">
       <Loading />
     </div>
   ) : (

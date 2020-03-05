@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+import utils from './pkg/utils'
 import msg from './pkg/messenger'
 import { Message } from './pkg/messenger/typings/response'
 
@@ -35,19 +36,21 @@ async function handleGetWebview(ctx: Context) {
 }
 
 async function handlePostWebview(ctx: Context) {
-  const { authorization } = ctx.headers
-  if (!authorization || authorization !== process.env.WEBVIEW_TOKEN) {
-    return (ctx.status = 401)
-  }
-  const { order } = ctx.request.body
-  if (order) {
-    const message: Message = {
-      recipient: { id: order.customerId },
-      messaging_type: 'response',
-      message: { text: `Total Amount: ${order.totalAmount} THB.` },
+  const { hmac, pageid: pageId, customerid: customerId } = ctx.headers
+  if (hmac && pageId && customerId) {
+    if (hmac !== utils.createHmac(pageId, customerId)) {
+      return (ctx.status = 401)
     }
-    await msg.send(order.pageId, message)
-    return (ctx.status = 200)
+    const { order } = ctx.request.body
+    if (order) {
+      const message: Message = {
+        recipient: { id: customerId },
+        messaging_type: 'response',
+        message: { text: `Total Amount: ${order.totalAmount} THB.` },
+      }
+      await msg.send(pageId, message)
+      return (ctx.status = 200)
+    }
   }
   ctx.status = 400
 }
@@ -68,7 +71,7 @@ r.get('/webview', handleGetWebview)
 r.post('/webview', handlePostWebview)
 r.get('/ping', (ctx: Context) => (ctx.body = 'pong'))
 
-const port = process.env.NODE_ENV === 'development' ? 8081 : 8080
+const port = utils.isDev() ? 8081 : 8080
 
 new Koa()
   .use(cors())

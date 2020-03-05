@@ -2,12 +2,12 @@ import axios from 'axios'
 import dotenv from 'dotenv'
 
 import cache from './cache'
+import utils from '../utils'
 import { Category, Customer, Order, Page, Product, Shop } from '../../typings'
 
 dotenv.config()
 const accessToken = process.env.API_ACCESS_TOKEN || ''
-const url =
-  (process.env.NODE_ENV === 'development' ? process.env.API_URL_DEV : process.env.API_URL) || ''
+const url = (utils.isDev() ? process.env.API_URL_DEV : process.env.API_URL) || ''
 
 const api = axios.create({ headers: { authorization: accessToken } })
 

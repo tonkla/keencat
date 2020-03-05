@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import Koa, { Context } from 'koa'
 import bodyParser from 'koa-bodyparser'
 import cors from '@koa/cors'
@@ -28,27 +29,31 @@ async function authorize(ctx: Context, next: Function) {
     const accessToken = process.env.API_ACCESS_TOKEN || ''
     const { authorization } = ctx.headers
     if (authorization && authorization === accessToken) return await next()
-  } else if (path.indexOf('/webview') === 0) {
-    const accessToken = process.env.API_PUBLIC_TOKEN || ''
-    const { authorization } = ctx.headers
-    if (authorization && authorization === accessToken) return await next()
-  } else if (path.indexOf('/dashboard') === 0) {
+  }
+  // Webview
+  else if (path.indexOf('/webview') === 0) {
+    const key = process.env.PRIVATE_KEY
+    const { hmac, pageid: pageId, customerid: customerId } = ctx.headers
+    if (key && hmac && pageId && customerId) {
+      const _hmac = crypto
+        .createHmac('sha256', key)
+        .update(JSON.stringify({ pageId, customerId }))
+        .digest('hex')
+      if (hmac === _hmac) return await next()
+    }
+  }
+  // Dashboard
+  else if (path.indexOf('/dashboard') === 0) {
     const { authorization } = ctx.headers
     if (authorization) {
       const uid = await auth.authorize(authorization)
       if (uid) {
         // Verify owner of the incoming data
         const { ownerId } = ctx.request.body
-        if (ownerId && ownerId !== uid) {
-          ctx.status = 401
-          return
-        }
+        if (ownerId && ownerId !== uid) return (ctx.status = 401)
         // Pass uid to verify owner at object level
         else ctx.request.body = { ...ctx.request.body, ownerId: uid }
-
-        await next()
-
-        return
+        return await next()
       }
     }
   }
