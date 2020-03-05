@@ -3,6 +3,7 @@ import { Button } from 'antd'
 import axios from 'axios'
 
 import { useStoreState } from '../store'
+import { RequestHeader } from '../typings'
 
 import './Cart.scss'
 
@@ -10,6 +11,8 @@ const Cart = () => {
   const [height, setHeight] = useState()
 
   const items = useStoreState(s => s.cartState.items)
+  const hmac = useStoreState(s => s.sessionState.hmac)
+  const pageId = useStoreState(s => s.sessionState.pageId)
   const customerId = useStoreState(s => s.sessionState.customerId)
 
   useEffect(() => {
@@ -24,14 +27,15 @@ const Cart = () => {
     ;(window as any).MessengerExtensions.requestCloseBrowser(
       async function success() {
         try {
-          const authorization = process.env.REACT_APP_WEBHOOK_TOKEN || ''
-          const url = process.env.REACT_APP_WEBHOOK_URL || ''
-          if (url) {
+          const url = process.env.REACT_APP_WEBHOOK_URL
+          if (url && hmac && pageId && customerId) {
+            const headers: RequestHeader = {
+              hmac,
+              pageId,
+              customerId,
+            }
             const totalAmount = items.reduce((accum, item) => accum + item.amount, 0)
-            const pageId = items[0].product.pageId
-            await axios
-              .create({ headers: { authorization } })
-              .post(url, { order: { items, totalAmount, pageId, customerId } })
+            await axios.create({ headers }).post(url, { order: { items, totalAmount } })
           }
         } catch (e) {}
       },

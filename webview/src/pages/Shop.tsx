@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
+import { useStoreState } from '../store'
 import api from '../services/api'
-import { Shop } from '../typings'
+import { RequestHeader, Shop } from '../typings'
 
 import Loading from '../components/Loading'
 import CategoryList from '../components/CategoryList'
@@ -14,16 +15,25 @@ const ShopIndex = () => {
 
   const { sid } = useParams()
 
+  const hmac = useStoreState(s => s.sessionState.hmac)
+  const pageId = useStoreState(s => s.sessionState.pageId)
+  const customerId = useStoreState(s => s.sessionState.customerId)
+
   useEffect(() => {
-    if (!sid) return
+    if (!(sid && hmac && pageId && customerId)) return
     ;(async () => {
-      const shop = await api.findShop(sid)
+      const headers: RequestHeader = {
+        hmac,
+        pageId,
+        customerId,
+      }
+      const shop = await api.findShop(headers, sid)
       if (shop) setShop(shop)
     })()
-  }, [sid])
+  }, [sid, hmac, pageId, customerId])
 
   return !shop ? (
-    <div className="mt40">
+    <div className="mt60">
       <Loading />
     </div>
   ) : (
