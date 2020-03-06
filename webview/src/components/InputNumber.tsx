@@ -30,9 +30,13 @@ const InputNumber = ({ defaultValue, min, max, callback }: Props) => {
 
   return (
     <div className="input-number">
-      <button onClick={decrease}>-</button>
+      <button onClick={decrease} disabled={value === min}>
+        -
+      </button>
       <input value={value} disabled />
-      <button onClick={increase}>+</button>
+      <button onClick={increase} disabled={value === max}>
+        +
+      </button>
     </div>
   )
 }

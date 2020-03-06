@@ -15,7 +15,8 @@ import './ProductItem.scss'
 const ProductItem = () => {
   const [product, setProduct] = useState<Product>()
   const [quantity, setQuantity] = useState(1)
-  const [height, setHeight] = useState()
+  const [height, setHeight] = useState(0)
+  const [width, setWidth] = useState(0)
 
   const addToCart = useStoreActions(a => a.cartState.add)
   const session = useStoreState(s => s.sessionState.session)
@@ -27,8 +28,10 @@ const ProductItem = () => {
   useEffect(() => {
     if (!(pid && session)) return
     const elMain = document.getElementById('container')
-    const height = elMain ? elMain.offsetHeight - 75 : '85%'
+    const height = elMain ? elMain.offsetHeight - 75 : 0
+    const width = elMain ? elMain.offsetWidth : 0
     setHeight(height)
+    setWidth(width)
     ;(async () => {
       const product = await api.findProduct(session, pid)
       if (product) setProduct(product)
@@ -66,28 +69,51 @@ const ProductItem = () => {
 
   function handleClickBookNow() {}
 
+  const itemUnit = product && product.quantity > 1 ? 'items' : 'item'
+
   return !product ? (
     <div className="mt60">
       <Loading />
     </div>
   ) : (
     <>
-      <main style={{ height }}>
-        <div className="content product" style={{ height }}>
-          <h1>{product.name}</h1>
-          <div className="description">{product.description}</div>
-          <div>
-            <label>Price:</label>
-            <span className="price">{product.price}</span>
+      <main>
+        <div className="content product" style={{ height: height > 0 ? height : '85%' }}>
+          <div className="gallery">
+            {product.images && product.images.length > 0 ? (
+              product.images.map((img, idx) => (
+                <div
+                  key={idx}
+                  className="img"
+                  style={{
+                    height: 300,
+                    width: width > 0 ? width - 20 : 300,
+                    backgroundImage: `url(${img})`,
+                  }}
+                />
+              ))
+            ) : (
+              <div
+                className="img"
+                style={{
+                  height: 300,
+                  width: width > 0 ? width - 20 : 300,
+                }}
+              />
+            )}
           </div>
-          <div>
-            <label>Quantity:</label>
-            <span className="quantity">{product.quantity}</span>
+          <div className="details">
+            <div className="wrapper">
+              <span className="price">฿{product.price.toLocaleString()}</span>
+              <span className="quantity">{`(Only ${product.quantity} ${itemUnit} left)`}</span>
+            </div>
+            <div className="name">
+              <span>{product.name}</span>
+            </div>
+            <div className="description">
+              <span>{product.description}</span>
+            </div>
           </div>
-          {product.images &&
-            product.images.map((img, idx) => (
-              <div key={idx} className="image" style={{ backgroundImage: `url(${img})` }} />
-            ))}
         </div>
       </main>
       <footer>

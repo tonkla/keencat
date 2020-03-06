@@ -1,6 +1,6 @@
 .cart {
   h1 {
-    font-size: 1.3em;
+    font-size: 16px;
     border-bottom: 1px solid #f0f0f0;
   }
 
@@ -27,22 +27,38 @@
     padding-left: 10px;
   }
 
-  .price .number {
-    font-size: 0.75em;
+  .name {
+    line-height: 1.2em;
+  }
+
+  .wrapper {
+    font-size: 14px;
+    line-height: 1.4em;
+    margin-top: 5px;
   }
 
   label {
-    font-size: 0.75em;
     margin-right: 5px;
+  }
+
+  .price {
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .input {
+    font-size: 14px;
+    margin-top: 5px;
   }
 }
 
 footer {
   .total-amount {
-    margin-right: 5px;
-    .number {
-      font-size: 1.5em;
-      padding: 0 5px;
+    display: flex;
+    margin-right: 10px;
+
+    .price {
+      font-size: 24px;
+      padding-left: 10px;
     }
   }
 }

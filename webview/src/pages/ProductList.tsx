@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { useHistory, useLocation, useParams } from 'react-router-dom'
 
 import { useStoreState } from '../store'
 import api from '../services/api'
@@ -11,8 +11,10 @@ import './ProductList.scss'
 
 const ProductList = () => {
   const [products, setProducts] = useState<Product[] | null>(null)
-  const [height, setHeight] = useState()
+  const [height, setHeight] = useState(0)
+  const [width, setWidth] = useState(0)
 
+  const history = useHistory()
   const location = useLocation()
   const { cid } = useParams()
 
@@ -21,8 +23,10 @@ const ProductList = () => {
   useEffect(() => {
     if (!(cid && session)) return
     const elMain = document.getElementById('container')
-    const height = elMain ? elMain.offsetHeight - 35 : '95%'
+    const height = elMain ? elMain.offsetHeight - 35 : 0
+    const width = elMain ? elMain.offsetWidth : 0
     setHeight(height)
+    setWidth(width)
     ;(async () => {
       setProducts(await api.findProducts(session, cid))
     })()
@@ -35,39 +39,40 @@ const ProductList = () => {
   ) : (
     <>
       <main>
-        <ul className="content product-list" style={{ height }}>
+        <div className="content product-list" style={{ height: height > 0 ? height : '95%' }}>
           <h1>Products</h1>
-          {products.map(product => (
-            <li key={product.id}>
-              <Link to={`/p/${product.id}${location.search}`}>
-                <div
-                  className="cover"
-                  style={{
-                    backgroundImage:
-                      product.images && product.images.length > 0
-                        ? `url(${product.images[0]})`
-                        : 'none',
-                  }}
-                />
-              </Link>
-              <div className="details">
-                <Link to={`/p/${product.id}${location.search}`}>
-                  <span>{product.name}</span>
-                </Link>
-                <div className="info">
-                  <div>
-                    <label>Price:</label>
-                    <span>{product.price}</span>
+          <ul>
+            {products.map(product => (
+              <li
+                key={product.id}
+                style={{ width: width > 0 ? (width - 20) / 2 : '48%' }}
+                onClick={() => history.push(`/p/${product.id}${location.search}`)}
+              >
+                <div className="cover">
+                  <div
+                    className="img"
+                    style={{
+                      height: 130,
+                      width: width > 0 ? (width - 20) / 2 - 10 : 130,
+                      backgroundImage:
+                        product.images && product.images.length > 0
+                          ? `url(${product.images[0]})`
+                          : 'none',
+                    }}
+                  />
+                </div>
+                <div className="details">
+                  <div className="name">
+                    <span>{product.name}</span>
                   </div>
-                  <div>
-                    <label>Quantity:</label>
-                    <span>{product.quantity}</span>
+                  <div className="price">
+                    <span>฿{product.price.toLocaleString()}</span>
                   </div>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        </div>
       </main>
     </>
   )

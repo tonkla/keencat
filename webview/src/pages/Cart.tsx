@@ -44,7 +44,7 @@ const Cart = () => {
 
     if (required.length > 0) {
       Modal.confirm({
-        title: 'Please input your info',
+        title: 'Please add your info',
         content: (
           <ul style={{ marginBottom: 0 }}>
             {required.includes('name') && <li>Name</li>}
@@ -52,7 +52,7 @@ const Cart = () => {
             {required.includes('address') && <li>Shipping Address</li>}
           </ul>
         ),
-        okText: 'Edit',
+        okText: 'Add',
         onOk() {
           history.push(`/customer${location.search}&edit=true`)
         },
@@ -88,9 +88,7 @@ const Cart = () => {
               try {
                 const url = process.env.REACT_APP_WEBHOOK_URL
                 if (url && session) {
-                  await axios
-                    .create({ headers: session })
-                    .post(url, { order: { items, totalAmount, customer } })
+                  await axios.create({ headers: session }).post(url, { items, customer })
                 }
               } catch (e) {}
             },
@@ -138,19 +136,21 @@ const Cart = () => {
                     <div className="name">
                       <span>{item.product.name}</span>
                     </div>
-                    <div className="price">
-                      <label>Price:</label>
-                      <span className="number">{item.product.price}</span>
+                    <div className="wrapper">
+                      <div className="price">
+                        <label>Price:</label>
+                        <span className="number">{item.product.price.toLocaleString()}</span>
+                      </div>
+                      <div className="quantity">
+                        <label>Quantity:</label>
+                        <span>{item.quantity}</span>
+                      </div>
+                      <div className="amount">
+                        <label>Amount:</label>
+                        <span>{item.amount.toLocaleString()}</span>
+                      </div>
                     </div>
-                    <div className="quantity">
-                      <label>Quantity:</label>
-                      <span>{item.quantity}</span>
-                    </div>
-                    <div className="amount">
-                      <label>Amount:</label>
-                      <span>{item.amount}</span>
-                    </div>
-                    <div>
+                    <div className="input">
                       <InputNumber
                         defaultValue={item.quantity}
                         min={0}
@@ -168,8 +168,7 @@ const Cart = () => {
       <footer>
         <div className="total-amount">
           <span>Total</span>
-          <span className="number">{totalAmount}</span>
-          <span>THB</span>
+          <span className="price">฿{totalAmount.toLocaleString()}</span>
         </div>
         <Button type="primary" onClick={handleClickConfirm}>
           Confirm

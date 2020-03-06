@@ -1,28 +1,42 @@
 .product {
-  .description {
-    margin: 20px 0;
+  .gallery {
+    display: block;
+    overflow-y: scroll;
+    height: 300px;
   }
 
-  label {
-    margin-right: 5px;
-    font-size: 0.85em;
+  .img {
+    background-color: #f0f0f0;
+    background-position: center center;
+    background-size: contain;
+  }
+
+  .details {
+    margin-top: 10px;
+  }
+
+  .wrapper {
+    display: flex;
+    align-content: center;
   }
 
   .price {
-    font-size: 1.2em;
+    font-size: 22px;
   }
 
   .quantity {
-    font-size: 1em;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+    margin-left: 10px;
   }
 
-  .image {
-    height: 200px;
-    width: 200px;
-    background-color: #f0f0f0;
-    background-position: center center;
-    background-size: cover;
+  .name {
     margin-top: 10px;
+  }
+
+  .description {
+    font-size: 14px;
+    margin: 10px 0;
   }
 }
 

@@ -3,25 +3,25 @@
     margin: 0;
     padding: 10px;
     border: 1px solid #f0f0f0;
-    border-radius: 2px;
     padding: 10px;
     font-size: 14px;
   }
 
   .name {
-    font-size: 1.2em;
+    font-size: 18px;
     border-bottom: 1px solid #f0f0f0;
     margin-bottom: 8px;
 
     .anticon {
       color: rgba(0, 0, 0, 0.7);
       margin-right: 7px;
-      font-size: 1.2em;
+      font-size: 20px;
     }
   }
 
   label {
-    font-size: 0.85em;
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 14px;
     margin-right: 5px;
   }
 }
