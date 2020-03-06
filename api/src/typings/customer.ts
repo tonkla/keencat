@@ -3,6 +3,6 @@ export interface Customer {
   name?: string
   nickname?: string
   address?: string
-  phone?: number
+  phoneNumber?: string
   source: 'messenger'
 }

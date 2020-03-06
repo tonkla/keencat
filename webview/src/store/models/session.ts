@@ -1,26 +1,16 @@
 import { Action, action } from 'easy-peasy'
 
+import { Session } from '../../typings'
+
 export interface SessionStateModel {
-  hmac: string | null
-  pageId: string | null
-  customerId: string | null
-  setHmac: Action<SessionStateModel, string>
-  setPageId: Action<SessionStateModel, string>
-  setCustomerId: Action<SessionStateModel, string>
+  session: Session | null
+  set: Action<SessionStateModel, Session>
 }
 
 const sessionState: SessionStateModel = {
-  hmac: null,
-  pageId: null,
-  customerId: null,
-  setHmac: action((state, hmac) => {
-    state.hmac = hmac
-  }),
-  setPageId: action((state, pageId) => {
-    state.pageId = pageId
-  }),
-  setCustomerId: action((state, customerId) => {
-    state.customerId = customerId
+  session: null,
+  set: action((state, session) => {
+    state.session = session
   }),
 }
 

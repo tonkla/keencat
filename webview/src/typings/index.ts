@@ -1,5 +1,6 @@
 export * from './cartItem'
 export * from './category'
+export * from './customer'
 export * from './product'
-export * from './requestHeader'
+export * from './session'
 export * from './shop'

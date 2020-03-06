@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { Button } from 'antd'
+import { Link, useHistory, useLocation } from 'react-router-dom'
+import { Button, Modal } from 'antd'
 import axios from 'axios'
 
 import { useStoreActions, useStoreState } from '../store'
-import { CartItem, RequestHeader } from '../typings'
+import { CartItem } from '../typings'
 
 import InputNumber from '../components/InputNumber'
 import './Cart.scss'
@@ -12,13 +12,13 @@ import './Cart.scss'
 const Cart = () => {
   const [height, setHeight] = useState()
 
+  const history = useHistory()
   const location = useLocation()
 
   const updateCart = useStoreActions(a => a.cartState.update)
   const items = useStoreState(s => s.cartState.items)
-  const hmac = useStoreState(s => s.sessionState.hmac)
-  const pageId = useStoreState(s => s.sessionState.pageId)
-  const customerId = useStoreState(s => s.sessionState.customerId)
+  const session = useStoreState(s => s.sessionState.session)
+  const customer = useStoreState(s => s.customerState.customer)
 
   useEffect(() => {
     const elMain = document.getElementById('container')
@@ -28,25 +28,81 @@ const Cart = () => {
 
   const totalAmount = useMemo(() => items.reduce((accum, item) => accum + item.amount, 0), [items])
 
-  function handleConfirm() {
+  function handleClickConfirm() {
     if (items.length < 1) return
-    if (!(window as any).MessengerExtensions) return
-    ;(window as any).MessengerExtensions.requestCloseBrowser(
-      async function success() {
-        try {
-          const url = process.env.REACT_APP_WEBHOOK_URL
-          if (url && hmac && pageId && customerId) {
-            const headers: RequestHeader = {
-              hmac,
-              pageId,
-              customerId,
-            }
-            await axios.create({ headers }).post(url, { order: { items, totalAmount } })
-          }
-        } catch (e) {}
-      },
-      function error(err: any) {}
-    )
+
+    const required = []
+    if (!customer || !customer.name) {
+      required.push('name')
+    }
+    if (!customer || !customer.phoneNumber) {
+      required.push('phoneNumber')
+    }
+    if ((!customer || !customer.address) && items.find(i => i.product.type === 'goods')) {
+      required.push('address')
+    }
+
+    if (required.length > 0) {
+      Modal.confirm({
+        title: 'Please input your info',
+        content: (
+          <ul style={{ marginBottom: 0 }}>
+            {required.includes('name') && <li>Name</li>}
+            {required.includes('phoneNumber') && <li>Phone Number</li>}
+            {required.includes('address') && <li>Shipping Address</li>}
+          </ul>
+        ),
+        okText: 'Edit',
+        onOk() {
+          history.push(`/customer${location.search}&edit=true`)
+        },
+        onCancel() {},
+      })
+    } else if (customer) {
+      Modal.confirm({
+        title: 'Please confirm your info',
+        content: (
+          <div>
+            {customer.name && (
+              <div>
+                <span>{customer.name}</span>
+              </div>
+            )}
+            {customer.phoneNumber && (
+              <div>
+                <span>{customer.phoneNumber}</span>
+              </div>
+            )}
+            {customer.address && (
+              <div>
+                <span>{customer.address}</span>
+              </div>
+            )}
+          </div>
+        ),
+        okText: 'Confirm',
+        onOk() {
+          if (!(window as any).MessengerExtensions) return
+          ;(window as any).MessengerExtensions.requestCloseBrowser(
+            async function success() {
+              try {
+                const url = process.env.REACT_APP_WEBHOOK_URL
+                if (url && session) {
+                  await axios
+                    .create({ headers: session })
+                    .post(url, { order: { items, totalAmount, customer } })
+                }
+              } catch (e) {}
+            },
+            function error(err: any) {}
+          )
+        },
+        cancelText: 'Edit',
+        onCancel() {
+          history.push(`/customer${location.search}&edit=true`)
+        },
+      })
+    }
   }
 
   function handleChangeQuantity(item: CartItem, quantity: number) {
@@ -115,7 +171,7 @@ const Cart = () => {
           <span className="number">{totalAmount}</span>
           <span>THB</span>
         </div>
-        <Button type="primary" onClick={handleConfirm}>
+        <Button type="primary" onClick={handleClickConfirm}>
           Confirm
         </Button>
       </footer>

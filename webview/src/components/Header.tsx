@@ -12,7 +12,7 @@ const Header = () => {
   const location = useLocation()
 
   const items = useStoreState(s => s.cartState.items)
-  const hmac = useStoreState(s => s.sessionState.hmac)
+  const session = useStoreState(s => s.sessionState.session)
 
   function handleBack() {
     history.goBack()
@@ -28,7 +28,7 @@ const Header = () => {
 
   const isShopHome = /^\/s\/\w+$/.test(location.pathname)
 
-  return !hmac ? (
+  return !session ? (
     <></>
   ) : (
     <header>

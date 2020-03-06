@@ -5,7 +5,7 @@ import { Button } from 'antd'
 import { useStoreActions, useStoreState } from '../store'
 import api from '../services/api'
 import utils from '../services/utils'
-import { CartItem, Product, RequestHeader } from '../typings'
+import { CartItem, Product } from '../typings'
 
 import InputNumber from '../components/InputNumber'
 import Loading from '../components/Loading'
@@ -18,29 +18,22 @@ const ProductItem = () => {
   const [height, setHeight] = useState()
 
   const addToCart = useStoreActions(a => a.cartState.add)
-  const hmac = useStoreState(s => s.sessionState.hmac)
-  const pageId = useStoreState(s => s.sessionState.pageId)
-  const customerId = useStoreState(s => s.sessionState.customerId)
+  const session = useStoreState(s => s.sessionState.session)
 
   const history = useHistory()
   const location = useLocation()
   const { pid } = useParams()
 
   useEffect(() => {
-    if (!(pid && hmac && pageId && customerId)) return
+    if (!(pid && session)) return
     const elMain = document.getElementById('container')
     const height = elMain ? elMain.offsetHeight - 75 : '85%'
     setHeight(height)
     ;(async () => {
-      const headers: RequestHeader = {
-        hmac,
-        pageId,
-        customerId,
-      }
-      const product = await api.findProduct(headers, pid)
+      const product = await api.findProduct(session, pid)
       if (product) setProduct(product)
     })()
-  }, [pid, hmac, pageId, customerId])
+  }, [pid, session])
 
   function handleChangeQuantity(qty: number) {
     setQuantity(qty)

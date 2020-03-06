@@ -1,6 +1,7 @@
 import { Context } from 'koa'
 
 import categoryRepository from '../../pkg/db/category'
+import customerRepository from '../../pkg/db/customer'
 import productRepository from '../../pkg/db/product'
 import shopRepository from '../../pkg/db/shop'
 
@@ -12,11 +13,19 @@ async function findCategories(ctx: Context) {
   }
 }
 
+async function findCustomer(ctx: Context) {
+  const { id } = ctx.request.body
+  if (id) {
+    const customer = await customerRepository.find(id)
+    ctx.body = customer ? customer : null
+  }
+}
+
 async function findProduct(ctx: Context) {
   const { id } = ctx.request.body
   if (id) {
     const product = await productRepository.find(id)
-    if (product && product.isActive && product.quantity > 0) ctx.body = product
+    ctx.body = product && product.isActive && product.quantity > 0 ? product : null
   }
 }
 
@@ -32,12 +41,13 @@ async function findShop(ctx: Context) {
   const { id } = ctx.request.body
   if (id) {
     const shop = await shopRepository.find(id)
-    if (shop && shop.isActive) ctx.body = shop
+    ctx.body = shop && shop.isActive ? shop : null
   }
 }
 
 export default {
   findCategories,
+  findCustomer,
   findProduct,
   findProducts,
   findShop,

@@ -4,7 +4,7 @@ import { TagsOutlined } from '@ant-design/icons'
 
 import { useStoreState } from '../store'
 import api from '../services/api'
-import { Category, RequestHeader } from '../typings'
+import { Category } from '../typings'
 
 import Loading from './Loading'
 
@@ -16,21 +16,14 @@ const CategoryList = () => {
   const location = useLocation()
   const { sid } = useParams()
 
-  const hmac = useStoreState(s => s.sessionState.hmac)
-  const pageId = useStoreState(s => s.sessionState.pageId)
-  const customerId = useStoreState(s => s.sessionState.customerId)
+  const session = useStoreState(s => s.sessionState.session)
 
   useEffect(() => {
-    if (!(sid && hmac && pageId && customerId)) return
+    if (!(sid && session)) return
     ;(async () => {
-      const headers: RequestHeader = {
-        hmac,
-        pageId,
-        customerId,
-      }
-      setCategories(await api.findCategories(headers, sid))
+      setCategories(await api.findCategories(session, sid))
     })()
-  }, [sid, hmac, pageId, customerId])
+  }, [sid, session])
 
   return !categories ? (
     <div className="mt60">
