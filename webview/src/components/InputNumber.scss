@@ -7,6 +7,9 @@
     height: 30px;
     outline: none;
     padding: 0 10px;
+    &:disabled {
+      color: #e0e0e0;
+    }
   }
   input {
     height: 30px;
