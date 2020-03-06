@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 
 import { useStoreState } from '../store'
 import api from '../services/api'
-import { Product, RequestHeader } from '../typings'
+import { Product } from '../typings'
 
 import Loading from '../components/Loading'
 
@@ -16,24 +16,17 @@ const ProductList = () => {
   const location = useLocation()
   const { cid } = useParams()
 
-  const hmac = useStoreState(s => s.sessionState.hmac)
-  const pageId = useStoreState(s => s.sessionState.pageId)
-  const customerId = useStoreState(s => s.sessionState.customerId)
+  const session = useStoreState(s => s.sessionState.session)
 
   useEffect(() => {
-    if (!(cid && hmac && pageId && customerId)) return
+    if (!(cid && session)) return
     const elMain = document.getElementById('container')
     const height = elMain ? elMain.offsetHeight - 35 : '95%'
     setHeight(height)
     ;(async () => {
-      const headers: RequestHeader = {
-        hmac,
-        pageId,
-        customerId,
-      }
-      setProducts(await api.findProducts(headers, cid))
+      setProducts(await api.findProducts(session, cid))
     })()
-  }, [cid, hmac, pageId, customerId])
+  }, [cid, session])
 
   return !products ? (
     <div className="mt60">

@@ -4,7 +4,7 @@ import { ShopOutlined } from '@ant-design/icons'
 
 import { useStoreState } from '../store'
 import api from '../services/api'
-import { RequestHeader, Shop } from '../typings'
+import { Shop } from '../typings'
 
 import Loading from '../components/Loading'
 import CategoryList from '../components/CategoryList'
@@ -17,25 +17,18 @@ const ShopIndex = () => {
 
   const { sid } = useParams()
 
-  const hmac = useStoreState(s => s.sessionState.hmac)
-  const pageId = useStoreState(s => s.sessionState.pageId)
-  const customerId = useStoreState(s => s.sessionState.customerId)
+  const session = useStoreState(s => s.sessionState.session)
 
   useEffect(() => {
-    if (!(sid && hmac && pageId && customerId)) return
+    if (!(sid && session)) return
     const elMain = document.getElementById('container')
     const height = elMain ? elMain.offsetHeight - 35 : '95%'
     setHeight(height)
     ;(async () => {
-      const headers: RequestHeader = {
-        hmac,
-        pageId,
-        customerId,
-      }
-      const shop = await api.findShop(headers, sid)
+      const shop = await api.findShop(session, sid)
       if (shop) setShop(shop)
     })()
-  }, [sid, hmac, pageId, customerId])
+  }, [sid, session])
 
   return !shop ? (
     <div className="mt60">
