@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
-import { Alert, Button, Card, Descriptions, Input, message, Modal, Switch } from 'antd'
+import { Alert, Button, Card, Input, message, Modal, Switch } from 'antd'
 
 import { useStoreActions, useStoreState } from '../../store'
 import { productRepository } from '../../services/repositories'
@@ -144,11 +144,15 @@ const ProductItem = () => {
         <Form product={product} callback={handleUpdateProduct} cancel={() => enableForm(false)} />
       ) : (
         <Card title={renderProductTitle(product)} bordered={false}>
-          <Descriptions bordered column={1} size="small">
-            <Descriptions.Item label="Description">{product.description}</Descriptions.Item>
-            <Descriptions.Item label="Price">{product.price}</Descriptions.Item>
-            <Descriptions.Item label="Quantity">{product.quantity}</Descriptions.Item>
-          </Descriptions>
+          <div>
+            <div className="pq">
+              <span className="price">฿{product.price.toLocaleString()}</span>
+              <span className="quantity">( {product.quantity} left )</span>
+            </div>
+            <div>
+              <div className="description">{product.description}</div>
+            </div>
+          </div>
           <Upload
             product={product}
             onSuccess={handleUploadSuccess}

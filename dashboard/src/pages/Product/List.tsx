@@ -41,9 +41,8 @@ const ProductList = ({ products }: Props) => {
             }
             description={
               <div className="details">
-                <span className="description">{item.description}</span>
-                <span className="price">Price: {item.price || 0}</span>
-                <span className="quantity">Quantity: {item.quantity || 0}</span>
+                <span className="price">฿{item.price.toLocaleString()}</span>
+                <span className="quantity">( {item.quantity || 0} left )</span>
               </div>
             }
           />
