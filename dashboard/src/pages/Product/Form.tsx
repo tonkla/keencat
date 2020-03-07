@@ -85,7 +85,7 @@ const ProductForm = ({ form, callback, cancel, product }: FormProps) => {
                 message: 'Please input a product description',
               },
             ],
-          })(<Input.TextArea rows={3} />)}
+          })(<Input.TextArea rows={4} />)}
         </Form.Item>
         <Form.Item label="Price">
           {getFieldDecorator('price', {

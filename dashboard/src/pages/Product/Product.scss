@@ -14,16 +14,14 @@
   }
 
   .details {
-    display: flex;
-    flex-direction: column;
-    .description {
-      color: rgba(0, 0, 0, 0.65);
-      padding-bottom: 5px;
-    }
-    .price,
+    font-size: 16px;
     .quantity {
-      font-size: 0.75rem;
+      margin-left: 10px;
     }
+  }
+
+  .ant-list-item-meta-content {
+    margin-top: 10px;
   }
 
   .ant-list-item-meta-title a {
@@ -33,5 +31,30 @@
 
   .ant-tag {
     margin-left: 10px;
+  }
+}
+
+.product {
+  .pq {
+    display: flex;
+    align-items: center;
+  }
+  .price {
+    font-size: 20px;
+  }
+  .x {
+    margin-left: 10px;
+  }
+  .quantity {
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 18px;
+    margin-left: 10px;
+  }
+  .description {
+    margin-top: 20px;
+    padding: 20px 0;
+    border-top: 1px dashed #f0f0f0;
+    border-bottom: 1px dashed #f0f0f0;
+    white-space: pre-line;
   }
 }
