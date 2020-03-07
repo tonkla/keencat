@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useHistory, useLocation } from 'react-router-dom'
-import { Button, Modal } from 'antd'
+import { Button, Empty, Modal } from 'antd'
 import axios from 'axios'
 
 import { useStoreActions, useStoreState } from '../store'
@@ -117,7 +117,7 @@ const Cart = () => {
       <main>
         <div className="content cart" style={{ height }}>
           <h1>Cart</h1>
-          {items.length > 0 && (
+          {items.length > 0 ? (
             <ul>
               {items.map(item => (
                 <li key={item.id}>
@@ -127,7 +127,7 @@ const Cart = () => {
                       style={{
                         backgroundImage:
                           item.product.images && item.product.images.length > 0
-                            ? `url(${item.product.images[0]})`
+                            ? `url('${item.product.images[0]}')`
                             : 'none',
                       }}
                     />
@@ -136,32 +136,30 @@ const Cart = () => {
                     <div className="name">
                       <span>{item.product.name}</span>
                     </div>
-                    <div className="wrapper">
-                      <div className="price">
-                        <label>Price:</label>
-                        <span className="number">{item.product.price.toLocaleString()}</span>
+                    <div className="mt10">
+                      <div className="wrapper">
+                        <span className="price">฿{item.product.price.toLocaleString()}</span>
+                        <span className="x">x</span>
+                        <span className="quantity">{item.quantity}</span>
+                        <div className="input">
+                          <InputNumber
+                            defaultValue={item.quantity}
+                            min={0}
+                            max={item.product.quantity}
+                            callback={(qty: number) => handleChangeQuantity(item, qty)}
+                          />
+                        </div>
                       </div>
-                      <div className="quantity">
-                        <label>Quantity:</label>
-                        <span>{item.quantity}</span>
+                      <div className="amount price">
+                        <span>฿{item.amount.toLocaleString()}</span>
                       </div>
-                      <div className="amount">
-                        <label>Amount:</label>
-                        <span>{item.amount.toLocaleString()}</span>
-                      </div>
-                    </div>
-                    <div className="input">
-                      <InputNumber
-                        defaultValue={item.quantity}
-                        min={0}
-                        max={item.product.quantity}
-                        callback={(qty: number) => handleChangeQuantity(item, qty)}
-                      />
                     </div>
                   </div>
                 </li>
               ))}
             </ul>
+          ) : (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Item" />
           )}
         </div>
       </main>

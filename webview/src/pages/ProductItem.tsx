@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory, useLocation, useParams } from 'react-router-dom'
-import { Button } from 'antd'
+import { Button, Carousel } from 'antd'
 
 import { useStoreActions, useStoreState } from '../store'
 import api from '../services/api'
@@ -79,33 +79,36 @@ const ProductItem = () => {
     <>
       <main>
         <div className="content product" style={{ height: height > 0 ? height : '85%' }}>
-          <div className="gallery">
+          <Carousel>
             {product.images && product.images.length > 0 ? (
               product.images.map((img, idx) => (
+                <div key={idx}>
+                  <div
+                    className="img"
+                    style={{
+                      height: 300,
+                      width: width > 0 ? width - 20 : 300,
+                      backgroundImage: `url('${img}')`,
+                    }}
+                  />
+                </div>
+              ))
+            ) : (
+              <div>
                 <div
-                  key={idx}
                   className="img"
                   style={{
                     height: 300,
                     width: width > 0 ? width - 20 : 300,
-                    backgroundImage: `url(${img})`,
                   }}
                 />
-              ))
-            ) : (
-              <div
-                className="img"
-                style={{
-                  height: 300,
-                  width: width > 0 ? width - 20 : 300,
-                }}
-              />
+              </div>
             )}
-          </div>
+          </Carousel>
           <div className="details">
             <div className="wrapper">
               <span className="price">฿{product.price.toLocaleString()}</span>
-              <span className="quantity">{`(Only ${product.quantity} ${itemUnit} left)`}</span>
+              <span className="quantity">{`(only ${product.quantity} ${itemUnit} left)`}</span>
             </div>
             <div className="name">
               <span>{product.name}</span>

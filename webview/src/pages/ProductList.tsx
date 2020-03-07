@@ -45,7 +45,7 @@ const ProductList = () => {
             {products.map(product => (
               <li
                 key={product.id}
-                style={{ width: width > 0 ? (width - 20) / 2 : '48%' }}
+                style={{ width: width > 0 ? (width - 22) / 2 : '48%' }}
                 onClick={() => history.push(`/p/${product.id}${location.search}`)}
               >
                 <div className="cover">
@@ -53,10 +53,10 @@ const ProductList = () => {
                     className="img"
                     style={{
                       height: 130,
-                      width: width > 0 ? (width - 20) / 2 - 10 : 130,
+                      width: width > 0 ? (width - 22) / 2 - 10 : 130,
                       backgroundImage:
                         product.images && product.images.length > 0
-                          ? `url(${product.images[0]})`
+                          ? `url('${product.images[0]}')`
                           : 'none',
                     }}
                   />
