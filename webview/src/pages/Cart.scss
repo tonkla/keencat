@@ -25,6 +25,7 @@
 
   .details {
     padding-left: 10px;
+    padding-top: 10px;
   }
 
   .name {
@@ -33,32 +34,34 @@
 
   .wrapper {
     font-size: 14px;
-    line-height: 1.4em;
     margin-top: 5px;
+    display: flex;
+    align-items: center;
+
+    .price {
+      color: rgba(0, 0, 0, 0.8);
+    }
   }
 
-  label {
-    margin-right: 5px;
-  }
-
-  .price {
-    color: rgba(0, 0, 0, 0.8);
+  .x {
+    margin: 0 5px;
   }
 
   .input {
-    font-size: 14px;
-    margin-top: 5px;
+    margin-left: 10px;
+  }
+
+  .amount {
+    font-size: 18px;
   }
 }
 
-footer {
-  .total-amount {
-    display: flex;
-    margin-right: 10px;
+footer .total-amount {
+  display: flex;
+  margin-right: 10px;
 
-    .price {
-      font-size: 24px;
-      padding-left: 10px;
-    }
+  .price {
+    font-size: 24px;
+    padding-left: 10px;
   }
 }

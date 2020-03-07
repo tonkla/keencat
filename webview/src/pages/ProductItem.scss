@@ -1,14 +1,15 @@
 .product {
-  .gallery {
-    display: block;
-    overflow-y: scroll;
+  .ant-carousel .slick-slide {
+    text-align: center;
     height: 300px;
+    line-height: 300px;
+    overflow: hidden;
   }
 
   .img {
     background-color: #f0f0f0;
     background-position: center center;
-    background-size: contain;
+    background-size: cover;
   }
 
   .details {
@@ -21,7 +22,7 @@
   }
 
   .price {
-    font-size: 22px;
+    font-size: 24px;
   }
 
   .quantity {

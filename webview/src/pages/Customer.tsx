@@ -66,7 +66,6 @@ const CustomerProfile = () => {
       <div className="content user">
         <h1>Profile</h1>
         <div>
-          <h2>Shipping Information</h2>
           <div className="form">
             <div className="row">
               <Input
@@ -86,7 +85,7 @@ const CustomerProfile = () => {
             </div>
             <div className="row">
               <Input.TextArea
-                placeholder="Address"
+                placeholder="Shipping Address"
                 disabled={!isEditing}
                 value={address}
                 onChange={e => setAddress(e.currentTarget.value)}
