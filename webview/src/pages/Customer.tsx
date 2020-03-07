@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Button, Input } from 'antd'
 
 import { useStoreActions, useStoreState } from '../store'
-import api from '../services/api'
 import { Customer } from '../typings'
 
 import './Customer.scss'
@@ -18,19 +17,11 @@ const CustomerProfile = () => {
   const customer = useStoreState(s => s.customerState.customer)
   const setCustomer = useStoreActions(a => a.customerState.set)
 
-  const [name, setName] = useState(customer?.name)
-  const [phoneNumber, setPhoneNumber] = useState(customer?.phoneNumber)
-  const [address, setAddress] = useState(customer?.address)
+  const [name, setName] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [address, setAddress] = useState('')
 
   const session = useStoreState(s => s.sessionState.session)
-
-  useEffect(() => {
-    if (!session || !session.customerId || customer) return
-    ;(async () => {
-      const c = await api.findCustomer(session, session.customerId)
-      if (c) setCustomer(c)
-    })()
-  }, [location.search, session, customer, setCustomer])
 
   function handleChangePhoneNumber(e: any) {
     const number = e.currentTarget.value
@@ -46,9 +37,8 @@ const CustomerProfile = () => {
       name: (name && name.trim()) || (customer ? customer.name : ''),
       phoneNumber: phoneNumber || (customer ? customer.phoneNumber : ''),
       address: (address && address.trim()) || (customer ? customer.address : ''),
-      source: 'messenger',
     }
-    setCustomer(c)
+    setCustomer({ customer: c, session })
     setEditing(false)
     if (callback) history.goBack()
   }
@@ -71,7 +61,7 @@ const CustomerProfile = () => {
               <Input
                 placeholder="Name"
                 disabled={!isEditing}
-                value={name}
+                value={name || customer?.name}
                 onChange={e => setName(e.currentTarget.value)}
               />
             </div>
@@ -79,7 +69,7 @@ const CustomerProfile = () => {
               <Input
                 placeholder="Phone Number"
                 disabled={!isEditing}
-                value={phoneNumber}
+                value={phoneNumber || customer?.phoneNumber}
                 onChange={handleChangePhoneNumber}
               />
             </div>
@@ -87,7 +77,7 @@ const CustomerProfile = () => {
               <Input.TextArea
                 placeholder="Shipping Address"
                 disabled={!isEditing}
-                value={address}
+                value={address || customer?.address}
                 onChange={e => setAddress(e.currentTarget.value)}
               />
             </div>

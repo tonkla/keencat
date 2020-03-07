@@ -1,6 +1,6 @@
 import admin from '../firebase'
 import storage from '../storage'
-import { Order, OrderInput } from '../../typings'
+import { Order, OrderCreate, OrderUpdate } from '../../typings'
 
 const db = admin.firestore()
 
@@ -34,7 +34,7 @@ async function findByShop(shopId: string, createdDate: string): Promise<Order[]>
   }
 }
 
-async function create(input: OrderInput): Promise<string | null> {
+async function create(input: OrderCreate): Promise<string | null> {
   try {
     if (!input.shopId || !input.ownerId) return null
 
@@ -43,12 +43,11 @@ async function create(input: OrderInput): Promise<string | null> {
 
     const order: Order = {
       id,
-      pageId: input.pageId,
-      customerId: input.customerId,
       shopId: input.shopId,
+      pageId: input.pageId,
       ownerId: input.ownerId,
-      productId: input.productId,
-      productName: input.productName,
+      customerId: input.customerId,
+      items: input.items,
       status: 'unpaid',
       createdAt,
       createdDate: createdAt.split('T')[0],
@@ -63,10 +62,9 @@ async function create(input: OrderInput): Promise<string | null> {
   }
 }
 
-async function update(input: OrderInput): Promise<boolean> {
+async function updateAttachment(input: OrderUpdate): Promise<boolean> {
+  if (!input.shopId || !input.attachment) return false
   try {
-    if (!input.shopId) return false
-
     let orders: Order[] = []
     const docs = await db
       .collection('orders')
@@ -78,35 +76,36 @@ async function update(input: OrderInput): Promise<boolean> {
     docs.forEach(doc => {
       orders.push(doc.data() as Order)
     })
-    if (orders.length > 0) {
-      const order = orders[0]
-
-      if (input.attachment) {
-        const mediaLink = await storage.copyImage(order.shopId, order.id, input.attachment)
-        if (mediaLink) {
-          const attachments = order.attachments ? [mediaLink, ...order.attachments] : [mediaLink]
-          await db
-            .collection('orders')
-            .doc(order.id)
-            .set({
-              ...order,
-              attachments,
-              status: 'approving',
-              updatedAt: new Date().toISOString(),
-            })
-          return true
-        }
-      }
-
-      if (input.status) {
-        await db
-          .collection('orders')
-          .doc(order.id)
-          .set({ ...order, status: input.status, updatedAt: new Date().toISOString() })
-        return true
-      }
-    }
+    if (orders.length < 1) return false
+    const order = orders[0]
+    const mediaLink = await storage.copyImage(order.shopId, order.id, input.attachment)
+    if (!mediaLink) return false
+    const attachments = order.attachments ? [mediaLink, ...order.attachments] : [mediaLink]
+    await db
+      .collection('orders')
+      .doc(order.id)
+      .set(
+        {
+          attachments,
+          status: 'approving',
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      )
+    return true
+  } catch (e) {
     return false
+  }
+}
+
+async function updateStatus(input: OrderUpdate): Promise<boolean> {
+  if (!input.id || !input.status) return false
+  try {
+    await db
+      .collection('orders')
+      .doc(input.id)
+      .set({ status: input.status, updatedAt: new Date().toISOString() }, { merge: true })
+    return true
   } catch (e) {
     return false
   }
@@ -116,5 +115,6 @@ export default {
   find,
   findByShop,
   create,
-  update,
+  updateAttachment,
+  updateStatus,
 }

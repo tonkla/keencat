@@ -3,7 +3,7 @@ import qs from 'qs'
 import api from '../api'
 import utils from '../utils'
 import th from '../../lang/th'
-import { Customer, Product, Shop } from '../../typings'
+import { Customer, Shop } from '../../typings'
 import { ButtonTemplateButton, GenericTemplateElement, ResponseMessage } from './typings/response'
 
 const lang = th
@@ -11,89 +11,17 @@ const lang = th
 const webviewDomain =
   (utils.isDev() ? process.env.WEBVIEW_DOMAIN_DEV : process.env.WEBVIEW_DOMAIN) || ''
 
-function buildCategoryButton(pageId: string, customerId: string, shop: Shop): ButtonTemplateButton {
+function buildWebviewButton(pageId: string, customerId: string, shop: Shop): ButtonTemplateButton {
   const hmac = utils.createHmac(pageId, customerId)
   const params = qs.stringify({ hmac, pageId, customerId })
   return {
     type: 'web_url',
-    title: lang.viewDetails,
+    title: lang.viewProductsAndServices,
     url: `${webviewDomain}/s/${shop.id}?${params}`,
     webview_height_ratio: 'full',
     webview_share_button: 'hide',
     messenger_extensions: true,
   }
-}
-
-function buildProductElements(pageId: string, products: Product[]): GenericTemplateElement[] {
-  // const domain =
-  //   (utils.isDev()
-  //     ? process.env.WEBVIEW_DOMAIN_DEV
-  //     : process.env.WEBVIEW_DOMAIN) || ''
-  // return products.map(p => ({
-  //   title: p.name,
-  //   image_url: p.images && p.images.length > 0 ? p.images[0] : '',
-  //   subtitle: p.description,
-  //   buttons: [
-  //     {
-  //       type: 'web_url',
-  //       url: `${domain}/${p.shopId}/${p.id}`,
-  //       title: lang.viewDetails,
-  //       webview_height_ratio: 'TALL',
-  //     },
-  //     {
-  //       type: 'postback',
-  //       title: lang.buy,
-  //       payload: JSON.stringify({
-  //         action: 'buy',
-  //         pageId,
-  //         productId: p.id,
-  //         productName: p.name,
-  //         shopId: p.shopId,
-  //         ownerId: p.ownerId,
-  //       }),
-  //     },
-  //   ],
-  // }))
-  return []
-}
-
-function buildConfirmation(
-  pageId: string,
-  customerId: string,
-  product: Product
-): GenericTemplateElement[] {
-  return [
-    {
-      title: product.name,
-      image_url: product.images && product.images.length > 0 ? product.images[0] : '',
-      subtitle: product.description,
-      buttons: [
-        {
-          type: 'postback',
-          title: lang.buyConfirm,
-          payload: JSON.stringify({
-            action: 'confirm',
-            pageId,
-            customerId,
-            shopId: product.shopId,
-            productId: product.id,
-            productName: product.name,
-            ownerId: product.ownerId,
-          }),
-        },
-        {
-          type: 'postback',
-          title: lang.cancel,
-          payload: JSON.stringify({
-            action: 'cancel',
-            pageId,
-            productId: product.id,
-            productName: product.name,
-          }),
-        },
-      ],
-    },
-  ]
 }
 
 function buildButtonTemplate(text: string, buttons: ButtonTemplateButton[]): ResponseMessage {
@@ -121,48 +49,40 @@ function buildGenericTemplate(elements: GenericTemplateElement[]): ResponseMessa
   }
 }
 
-function requestDesire() {
-  return { text: lang.requestDesire }
+function respondOrderSummary(totalAmount: number) {
+  return { text: `${lang.orderSummary} ฿${totalAmount.toLocaleString()}` }
 }
 
-async function requestConfirm(pageId: string, customerId: string, productId: string) {
-  const product = await api.findProduct(pageId, productId)
-  if (product) {
-    const elements = buildConfirmation(pageId, customerId, product)
-    return buildGenericTemplate(elements)
+async function requestPayment(pageId: string) {
+  const shop = await api.findShop(pageId)
+  if (shop) {
+    const text = `${lang.requestPayment}
+${lang.promptPayId} ${shop.promptPay}
+
+${lang.or}
+
+${shop.bank}
+${lang.bankAccountNumber} ${shop.bankAccountNumber}
+${lang.bankAccountName} ${shop.bankAccountName}
+
+${lang.shopPhoneNumber} ${shop.phoneNumber}
+`
+    return { text }
   }
-}
-
-function requestName() {
-  return { text: lang.requestCustomerName }
-}
-
-function requestPhone() {
-  return { text: lang.requestCustomerPhone }
-}
-
-function requestAddress() {
-  return { text: lang.requestCustomerAddress }
-}
-
-function requestPayment() {
-  return { text: lang.requestPayment }
+  return null
 }
 
 function requestPaymentSlip() {
-  return { text: lang.requestPayment }
+  return { text: lang.requestPaymentSlip }
 }
 
-async function respondGreeting(intentText: string, customer?: Customer | null) {
+async function respondGreeting(customer?: Customer | null) {
   if (customer) {
     const name = customer.nickname || customer.name
-    const text = name
-      ? `${intentText} ${lang.namePrefix}${name}`
-      : `${intentText} ${lang.existingCustomer}`
+    const text = name ? `${lang.hello} ${lang.namePrefix}${name}` : lang.hello
     return { text }
   } else {
-    const text = `${intentText} ${lang.newCustomer}`
-    return { text }
+    return { text: lang.hello }
   }
 }
 
@@ -172,71 +92,29 @@ async function respondWelcome(pageId: string) {
     const text = `${shop.name} ${lang.welcome}`
     return { text }
   }
+  return null
 }
 
-async function respondCategories(pageId: string, customerId: string) {
+async function respondWebview(pageId: string, customerId: string) {
   const shop = await api.findShop(pageId)
   if (shop) {
-    const button = buildCategoryButton(pageId, customerId, shop)
-    return buildButtonTemplate(lang.category, [button])
+    const button = buildWebviewButton(pageId, customerId, shop)
+    return buildButtonTemplate(shop.name, [button])
   }
-  return respondFailure()
-}
-
-async function respondProducts(pageId: string, categoryId?: string) {
-  const products = await api.findProducts(pageId, categoryId)
-  const elements = buildProductElements(pageId, products)
-  return buildGenericTemplate(elements)
-}
-
-async function respondConfirm(pageId: string, productId: string) {
-  const product = await api.findProduct(pageId, productId)
-  if (product) return { text: `${lang.buyConfirm} ${product.name}` }
-}
-
-function respondCancel() {
-  return { text: lang.buyCancel }
-}
-
-function respondCreateOrderSucceeded(orderId: string) {
-  return { text: `${lang.yourOrderIdIs} ${orderId}` }
+  return null
 }
 
 function respondApproving() {
   return { text: lang.respondApproving }
 }
 
-function respondFailure(): ResponseMessage {
-  return { text: lang.failure }
-}
-
-function respondNotFound(): ResponseMessage {
-  return { text: lang.notFound }
-}
-
-function respondUnknown(): ResponseMessage {
-  return { text: lang.unknown }
-}
-
 export default {
-  requestDesire,
-  requestConfirm,
-  requestName,
-  requestPhone,
-  requestAddress,
   requestPayment,
   requestPaymentSlip,
 
   respondGreeting,
   respondWelcome,
-  respondCategories,
-  respondProducts,
-  respondConfirm,
-  respondCancel,
-  respondCreateOrderSucceeded,
+  respondWebview,
+  respondOrderSummary,
   respondApproving,
-
-  respondFailure,
-  respondNotFound,
-  respondUnknown,
 }

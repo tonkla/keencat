@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ShopOutlined } from '@ant-design/icons'
 
-import { useStoreState } from '../store'
+import { useStoreActions, useStoreState } from '../store'
 import api from '../services/api'
 import { Shop } from '../typings'
 
@@ -18,6 +18,8 @@ const ShopIndex = () => {
   const { sid } = useParams()
 
   const session = useStoreState(s => s.sessionState.session)
+  const customer = useStoreState(s => s.customerState.customer)
+  const setCustomer = useStoreActions(a => a.customerState._set)
 
   useEffect(() => {
     if (!(sid && session)) return
@@ -29,6 +31,14 @@ const ShopIndex = () => {
       if (shop) setShop(shop)
     })()
   }, [sid, session])
+
+  useEffect(() => {
+    if (!session || !session.customerId || customer) return
+    ;(async () => {
+      const c = await api.findCustomer(session, session.customerId)
+      if (c) setCustomer(c)
+    })()
+  }, [session, customer, setCustomer])
 
   return !shop ? (
     <div className="mt60">

@@ -6,35 +6,40 @@ async function call(headers: Session, path: string, params: any) {
   try {
     const url = process.env.REACT_APP_API_URL
     if (url) return await axios.create({ headers }).post(`${url}/${path}`, params)
-    return { data: null }
+    return null
   } catch (e) {
-    return { data: null }
+    return null
   }
 }
 
 async function findCategories(headers: Session, shopId: string): Promise<Category[]> {
-  const { data } = await call(headers, 'find-categories', { shopId })
-  return data ? data : []
+  const resp = await call(headers, 'find-categories', { shopId })
+  return resp && resp.data ? resp.data : []
 }
 
 async function findCustomer(headers: Session, id: string): Promise<Customer | null> {
-  const { data } = await call(headers, 'find-customer', { id })
-  return data ? data : null
+  const resp = await call(headers, 'find-customer', { id })
+  return resp && resp.data ? resp.data : null
 }
 
 async function findProduct(headers: Session, id: string): Promise<Product | null> {
-  const { data } = await call(headers, 'find-product', { id })
-  return data ? data : null
+  const resp = await call(headers, 'find-product', { id })
+  return resp && resp.data ? resp.data : null
 }
 
 async function findProducts(headers: Session, categoryId: string): Promise<Product[]> {
-  const { data } = await call(headers, 'find-products', { categoryId })
-  return data ? data : []
+  const resp = await call(headers, 'find-products', { categoryId })
+  return resp && resp.data ? resp.data : []
 }
 
 async function findShop(headers: Session, id: string): Promise<Shop | null> {
-  const { data } = await call(headers, 'find-shop', { id })
-  return data ? data : null
+  const resp = await call(headers, 'find-shop', { id })
+  return resp && resp.data ? resp.data : null
+}
+
+async function updateCustomer(headers: Session, customer: Customer): Promise<boolean> {
+  const resp = await call(headers, 'update-customer', { customer })
+  return resp !== null && resp.status === 200
 }
 
 export default {
@@ -43,4 +48,5 @@ export default {
   findProduct,
   findProducts,
   findShop,
+  updateCustomer,
 }
