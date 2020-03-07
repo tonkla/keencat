@@ -5,9 +5,9 @@ import api from '../api'
 import cache from '../api/cache'
 import dialogflow from '../dialogflow'
 import builder from './builder'
-import { MessageEvent, WebhookEvent, WebhookParams, PostbackPayload } from './typings/request'
+import { MessageEvent, WebhookEvent, WebhookParams } from './typings/request'
 import { Message } from './typings/response'
-import { Customer, Order } from '../../typings'
+import { CartItem, Customer, OrderCreate, OrderUpdate } from '../../typings'
 
 function verify({ mode, verifyToken, challenge }: WebhookParams): string {
   const token = process.env.MSG_VERIFY_TOKEN || ''
@@ -30,9 +30,6 @@ async function handleMessage(event: MessageEvent): Promise<void> {
   const shop = await api.findShop(event.recipient.id)
   if (!shop || !shop.isActive) return
 
-  await markSeen(event)
-  await typingOn(event)
-
   const pageId = event.recipient.id
   const customerId = event.sender.id
   const { text, attachments } = event.message
@@ -43,35 +40,27 @@ async function handleMessage(event: MessageEvent): Promise<void> {
     message: {},
   }
 
-  const customer = await api.findCustomer(customerId)
-  if (!customer) {
-    const customer: Customer = {
-      id: customerId,
-      source: 'messenger',
-    }
-    if (await api.createCustomer(customer)) {
-      cache.setCustomer(customerId, customer)
-    }
-  }
-
   const step = cache.getConversationStep(pageId, customerId)
 
   if (text) {
     const intent = await dialogflow.detectIntent(text)
     if (!intent) {
-      const message = builder.respondUnknown()
-      await send(pageId, { ...response, message })
+      // TODO: handle unknown intent
       return
     }
 
     if (intent.type === 'greeting') {
+      await markSeen(event)
+      await typingOn(event)
+
       if (step === 'respondGreeting') {
         const message = { text: '😊' }
         await send(pageId, { ...response, message })
         return
       }
 
-      const message = await builder.respondGreeting(intent.text, customer)
+      const customer = await api.findCustomer(customerId)
+      const message = await builder.respondGreeting(customer)
       await send(pageId, { ...response, message })
 
       await typingOn(event)
@@ -79,85 +68,40 @@ async function handleMessage(event: MessageEvent): Promise<void> {
         const message = await builder.respondWelcome(pageId)
         if (message) await send(pageId, { ...response, message })
         else {
-          const message = builder.respondFailure()
-          await send(pageId, { ...response, message })
+          await typingOff(event)
           return
         }
-
-        await typingOn(event)
-        setTimeout(async () => {
-          const message = builder.requestDesire()
-          await send(pageId, { ...response, message })
-
-          cache.setConversationStep(pageId, customerId, 'respondGreeting')
-        }, 1000)
+        cache.setConversationStep(pageId, customerId, 'respondGreeting')
       }, 1000)
-
       return
     }
-    // The customer asks for what categories we have
-    else if (intent.type === 'category') {
-      const message = await builder.respondCategories(pageId, customerId)
-      await send(pageId, { ...response, message })
-      return
-    }
-    // The customer asks for what products we have
+    // The customer asks for what we have
     else if (intent.type === 'product') {
-      const message = await builder.respondProducts(pageId)
-      await send(pageId, { ...response, message })
-      return
-    }
-    // The customer told their name
-    else if (step === 'requestName' || intent.type === 'name') {
-      if (customer) {
-        await api.updateCustomer({ ...customer, name: text })
-        if (customer.name) {
-          // const message = builder.respondExistingName(customer.name)
-          // await send(pageId, { ...response, message })
-          // cache.setConversationStep(pageId, customerId, 'requestPhone')
-          // return
-        }
-      }
-
-      const message = builder.requestPhone()
-      await send(pageId, { ...response, message })
-      cache.setConversationStep(pageId, customerId, 'requestPhone')
-      return
-    }
-    // The customer told their phone number
-    else if (step === 'requestPhone' || intent.type === 'phone') {
-      if (customer) await api.updateCustomer({ ...customer, phone: text })
-    }
-    // The customer told their address
-    else if (step === 'requestAddress' || intent.type === 'address') {
-      if (customer) await api.updateCustomer({ ...customer, address: text })
-
-      const message = builder.requestPayment()
-      await send(pageId, { ...response, message })
-
+      await markSeen(event)
       await typingOn(event)
-      setTimeout(async () => {
-        const message = builder.requestPayment()
+      const message = await builder.respondWebview(pageId, customerId)
+      if (message) {
         await send(pageId, { ...response, message })
-        cache.setConversationStep(pageId, customerId, 'requestPayment')
-      }, 1000)
-
-      return
+        return
+      }
     }
   }
   // Attachment: Image
   else if (attachments) {
     const attachment = attachments[0]
-    if (attachment && attachment.type === 'image' && step === 'requestPayment') {
-      // Reject stricker and GIF
+    if (attachment && attachment.type === 'image') {
+      // Ignore stricker and GIF
       if (attachment.payload.sticker_id || /\.gif/.test(attachment.payload.url)) return
 
       const shop = await api.findShop(pageId)
       if (shop) {
-        const order: Order = {
+        await markSeen(event)
+        await typingOn(event)
+
+        const order: OrderUpdate = {
+          shopId: shop.id,
           pageId,
           customerId,
-          shopId: shop.id,
           attachment: attachment.payload.url,
         }
         await api.updateOrder(order)
@@ -168,81 +112,94 @@ async function handleMessage(event: MessageEvent): Promise<void> {
       }
     }
   }
-
   // Fallback
-  const message = builder.respondUnknown()
-  await send(pageId, { ...response, message })
+  await typingOff(event)
 }
 
 async function handlePostback(event: MessageEvent): Promise<void> {
   const shop = await api.findShop(event.recipient.id)
   if (!shop || !shop.isActive) return
 
-  await markSeen(event)
-  await typingOn(event)
+  // await markSeen(event)
+  // await typingOn(event)
 
-  const pageId = event.recipient.id
-  const customerId = event.sender.id
+  // const pageId = event.recipient.id
+  // const customerId = event.sender.id
 
+  // const response: Message = {
+  //   recipient: { id: customerId },
+  //   messaging_type: 'response',
+  //   message: {},
+  // }
+
+  // if (event.postback.payload === 'menu') {
+  //   const message = { text: 'TODO: Show Menu' }
+  //   await send(pageId, { ...response, message })
+  //   return
+  // }
+
+  // const customer = await api.findCustomer(customerId)
+  // if (!customer) {
+  //   const customer: Customer = {
+  //     id: customerId,
+  //     source: 'messenger',
+  //   }
+  //   if (await api.createCustomer(customer)) {
+  //     cache.setCustomer(customerId, customer)
+  //   }
+  // }
+
+  // const payload: PostbackPayload = JSON.parse(event.postback.payload)
+}
+
+async function handlePostbackFromWebview(pageId: string, customer: Customer, items: CartItem[]) {
+  // Create order
+  if (!items || items.length < 1) return
+  // Recalculate the amount because I don't trust the data from webview
+  const newItems = items.map(item => ({
+    productId: item.product.id,
+    productName: item.product.name,
+    price: item.product.price,
+    quantity: item.quantity,
+    amount: item.product.price * item.quantity,
+  }))
+  const totalAmount = newItems.reduce((accum, item) => accum + item.amount, 0)
+  const order: OrderCreate = {
+    pageId,
+    shopId: items[0].product.shopId,
+    ownerId: items[0].product.ownerId,
+    customerId: customer.id,
+    items: newItems,
+    totalAmount,
+  }
+  await api.createOrder(order)
+
+  // Respond order summary and request payment
   const response: Message = {
-    recipient: { id: customerId },
+    recipient: { id: customer.id },
     messaging_type: 'response',
     message: {},
   }
 
-  if (event.postback.payload === 'menu') {
-    const message = { text: 'TODO: Show Menu' }
-    await send(pageId, { ...response, message })
-    return
-  }
+  await typingOnManual(pageId, customer.id)
+  const message = builder.respondOrderSummary(totalAmount)
+  await send(pageId, { ...response, message })
 
-  const customer = await api.findCustomer(customerId)
-  if (!customer) {
-    const customer: Customer = {
-      id: customerId,
-      source: 'messenger',
-    }
-    if (await api.createCustomer(customer)) {
-      cache.setCustomer(customerId, customer)
-    }
-  }
-
-  const payload: PostbackPayload = JSON.parse(event.postback.payload)
-
-  if (payload.action === 'listProducts') {
-    const message = await builder.respondProducts(pageId, payload.categoryId)
-    await send(pageId, { ...response, message })
-    return
-  } else if (payload.action === 'buy') {
-    if (payload.productId) {
-      const message = await builder.requestConfirm(pageId, customerId, payload.productId)
-      if (message) {
-        await send(pageId, { ...response, message })
-        return
-      }
-    }
-  } else if (payload.action === 'confirm') {
-    const orderId = await api.createOrder(payload)
-    if (orderId) {
-      const message = builder.respondCreateOrderSucceeded(orderId)
+  await typingOnManual(pageId, customer.id)
+  setTimeout(async () => {
+    const message = await builder.requestPayment(pageId)
+    if (message) {
       await send(pageId, { ...response, message })
 
-      await typingOn(event)
+      await typingOnManual(pageId, customer.id)
       setTimeout(async () => {
-        const message = builder.requestName()
+        const message = builder.requestPaymentSlip()
         await send(pageId, { ...response, message })
-        cache.setConversationStep(pageId, customerId, 'requestName')
       }, 1000)
-      return
+    } else {
+      await typingOffManual(pageId, customer.id)
     }
-  } else if (payload.action === 'cancel') {
-    const message = builder.respondCancel()
-    await send(pageId, { ...response, message })
-    return
-  }
-
-  const message = builder.respondUnknown()
-  await send(pageId, { ...response, message })
+  }, 1000)
 }
 
 async function markSeen(event: MessageEvent): Promise<void> {
@@ -263,6 +220,15 @@ async function typingOn(event: MessageEvent): Promise<void> {
   await send(event.recipient.id, { ...response, sender_action: 'typing_on' })
 }
 
+async function typingOnManual(pageId: string, customerId: string): Promise<void> {
+  const response: Message = {
+    recipient: { id: customerId },
+    messaging_type: 'response',
+    message: {},
+  }
+  await send(pageId, { ...response, sender_action: 'typing_on' })
+}
+
 async function typingOff(event: MessageEvent): Promise<void> {
   const response: Message = {
     recipient: { id: event.sender.id },
@@ -270,6 +236,15 @@ async function typingOff(event: MessageEvent): Promise<void> {
     message: {},
   }
   await send(event.recipient.id, { ...response, sender_action: 'typing_off' })
+}
+
+async function typingOffManual(pageId: string, customerId: string): Promise<void> {
+  const response: Message = {
+    recipient: { id: customerId },
+    messaging_type: 'response',
+    message: {},
+  }
+  await send(pageId, { ...response, sender_action: 'typing_off' })
 }
 
 async function send(pageId: string, message: Message): Promise<void> {
@@ -311,5 +286,5 @@ async function send(pageId: string, message: Message): Promise<void> {
 export default {
   reply,
   verify,
-  send,
+  handlePostbackFromWebview,
 }

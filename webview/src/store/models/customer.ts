@@ -1,15 +1,27 @@
-import { Action, action } from 'easy-peasy'
+import { Action, action, Thunk, thunk } from 'easy-peasy'
 
-import { Customer } from '../../typings'
+import api from '../../services/api'
+import { Customer, Session } from '../../typings'
+
+interface CustomerWithSession {
+  customer: Customer
+  session: Session
+}
 
 export interface CustomerStateModel {
   customer: Customer | null
-  set: Action<CustomerStateModel, Customer>
+  set: Thunk<CustomerStateModel, CustomerWithSession>
+  _set: Action<CustomerStateModel, Customer>
 }
 
 const customerState: CustomerStateModel = {
   customer: null,
-  set: action((state, customer) => {
+  set: thunk(async (actions, payload) => {
+    if (await api.updateCustomer(payload.session, payload.customer)) {
+      actions._set(payload.customer)
+    }
+  }),
+  _set: action((state, customer) => {
     state.customer = customer
   }),
 }

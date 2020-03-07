@@ -20,7 +20,7 @@ const cachedShop = new Map<string, CachedShop>()
 const cachedCustomer = new Map<string, CachedCustomer>()
 const conversation = new Map<string, ConversationStep>()
 
-const EXPMIN = 5
+const EXPMIN = 10
 
 function getPage(pageId: string): Page | null {
   const data = cachedPage.get(pageId)

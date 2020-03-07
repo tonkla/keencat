@@ -8,7 +8,6 @@ dotenv.config()
 
 import utils from './pkg/utils'
 import msg from './pkg/messenger'
-import { Message } from './pkg/messenger/typings/response'
 
 async function handleGetMessenger(ctx: Context) {
   ctx.body = msg.verify({
@@ -41,14 +40,9 @@ async function handlePostWebview(ctx: Context) {
     if (hmac !== utils.createHmac(pageId, customerId)) {
       return (ctx.status = 401)
     }
-    const { order } = ctx.request.body
-    if (order) {
-      const message: Message = {
-        recipient: { id: customerId },
-        messaging_type: 'response',
-        message: { text: `Total Amount: ${order.totalAmount} THB.` },
-      }
-      await msg.send(pageId, message)
+    const { customer, items } = ctx.request.body
+    if (customer && items) {
+      await msg.handlePostbackFromWebview(pageId, customer, items)
       return (ctx.status = 200)
     }
   }

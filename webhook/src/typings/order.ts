@@ -1,12 +1,21 @@
-export interface Order {
+export interface OrderCreate {
+  shopId: string
+  pageId: string
+  ownerId: string
+  customerId: string
+  items: {
+    productId: string
+    productName: string
+    price: number
+    quantity: number
+    amount: number
+  }[]
+  totalAmount: number
+}
+
+export interface OrderUpdate {
   shopId: string
   pageId: string
   customerId: string
-  amount?: number
-  productId?: string
-  productName?: string
-  categoryId?: string
-  ownerId?: string
-  attachment?: string
-  customerAddress?: string
+  attachment: string
 }

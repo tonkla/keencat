@@ -45,10 +45,18 @@ async function findShop(ctx: Context) {
   }
 }
 
+async function updateCustomer(ctx: Context) {
+  const { customer } = ctx.request.body
+  if (customer && customer.id) {
+    if (await customerRepository.update(customer)) ctx.status = 200
+  }
+}
+
 export default {
   findCategories,
   findCustomer,
   findProduct,
   findProducts,
   findShop,
+  updateCustomer,
 }

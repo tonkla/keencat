@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 
 import cache from './cache'
 import utils from '../utils'
-import { Category, Customer, Order, Page, Product, Shop } from '../../typings'
+import { Category, Customer, OrderCreate, OrderUpdate, Page, Product, Shop } from '../../typings'
 
 dotenv.config()
 const accessToken = process.env.API_ACCESS_TOKEN || ''
@@ -89,36 +89,18 @@ async function findProduct(pageId: string, productId: string): Promise<Product |
   }
 }
 
-async function createOrder(order: Order): Promise<string | null> {
+async function createOrder(order: OrderCreate): Promise<string | null> {
   try {
-    const { data: orderId } = await api.post(`${url}/create-order`, order)
+    const { data: orderId } = await api.post(`${url}/create-order`, { order })
     return orderId ? orderId : null
   } catch (e) {
     return null
   }
 }
 
-async function updateOrder(order: Order): Promise<boolean> {
+async function updateOrder(order: OrderUpdate): Promise<boolean> {
   try {
-    const resp = await api.post(`${url}/update-order`, order)
-    return resp.status === 200
-  } catch (e) {
-    return false
-  }
-}
-
-async function createCustomer(customer: Customer): Promise<boolean> {
-  try {
-    const resp = await api.post(`${url}/create-customer`, customer)
-    return resp.status === 200
-  } catch (e) {
-    return false
-  }
-}
-
-async function updateCustomer(customer: Customer): Promise<boolean> {
-  try {
-    const resp = await api.post(`${url}/update-customer`, customer)
+    const resp = await api.post(`${url}/update-order`, { order })
     return resp.status === 200
   } catch (e) {
     return false
@@ -133,7 +115,5 @@ export default {
   findProduct,
   findProducts,
   createOrder,
-  createCustomer,
   updateOrder,
-  updateCustomer,
 }

@@ -53,22 +53,8 @@ async function findShop(ctx: Context) {
   }
 }
 
-async function createCustomer(ctx: Context) {
-  const customer = ctx.request.body
-  if (customer && customer.id) {
-    if (await customerRepository.create(customer)) ctx.status = 200
-  }
-}
-
-async function updateCustomer(ctx: Context) {
-  const customer = ctx.request.body
-  if (customer && customer.id) {
-    if (await customerRepository.update(customer)) ctx.status = 200
-  }
-}
-
 async function createOrder(ctx: Context) {
-  const order = ctx.request.body
+  const { order } = ctx.request.body
   if (order && order.pageId && order.customerId) {
     const orderId = await orderRepository.create(order)
     if (orderId) ctx.body = orderId
@@ -76,9 +62,9 @@ async function createOrder(ctx: Context) {
 }
 
 async function updateOrder(ctx: Context) {
-  const order = ctx.request.body
+  const { order } = ctx.request.body
   if (order && order.pageId && order.customerId) {
-    if (await orderRepository.update(order)) ctx.status = 200
+    if (await orderRepository.updateAttachment(order)) ctx.status = 200
   }
 }
 
@@ -89,8 +75,6 @@ export default {
   findProduct,
   findProducts,
   findShop,
-  createCustomer,
   createOrder,
-  updateCustomer,
   updateOrder,
 }
