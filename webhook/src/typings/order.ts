@@ -1,15 +1,17 @@
+export interface OrderItem {
+  productId: string
+  productName: string
+  price: number
+  quantity: number
+  amount: number
+}
+
 export interface OrderCreate {
   shopId: string
   pageId: string
   ownerId: string
   customerId: string
-  items: {
-    productId: string
-    productName: string
-    price: number
-    quantity: number
-    amount: number
-  }[]
+  items: OrderItem[]
   totalAmount: number
 }
 

@@ -55,20 +55,20 @@ const OrderIndex = () => {
 
   const columns = [
     {
-      title: 'Order',
+      title: 'Order ID',
       dataIndex: 'id',
-    },
-    {
-      title: 'Product',
-      dataIndex: 'product',
     },
     {
       title: 'Date',
       dataIndex: 'createdAt',
     },
     {
-      title: 'Amount',
-      dataIndex: 'amount',
+      title: 'Items',
+      dataIndex: 'items',
+    },
+    {
+      title: 'Total Amount',
+      dataIndex: 'totalAmount',
     },
     {
       title: 'Status',
@@ -78,12 +78,13 @@ const OrderIndex = () => {
 
   const dataSource = orders.map(order => {
     const id = order.createdAt.replace(/[-T:Z.]/g, '')
+    const totalAmount = order.totalAmount ? order.totalAmount.toLocaleString() : 0
     return {
       key: order.id,
       id: <Link to={`${PATH_ORDER}/${order.id}`}>{id}</Link>,
-      product: order.productName,
-      createdAt: new Date(order.createdAt).toLocaleString('th', { timeZone: 'Asia/Bangkok' }),
-      amount: order.amount ? order.amount.toLocaleString() : 0,
+      createdAt: moment(order.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+      items: order.items.length,
+      totalAmount: `฿${totalAmount}`,
       status: renderStatusTag(order.status),
     }
   })

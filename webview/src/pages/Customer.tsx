@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Button, Input } from 'antd'
 
@@ -23,6 +23,14 @@ const CustomerProfile = () => {
 
   const session = useStoreState(s => s.sessionState.session)
 
+  useEffect(() => {
+    if (customer) {
+      setName(customer.name)
+      setPhoneNumber(customer.phoneNumber)
+      setAddress(customer.address)
+    }
+  }, [customer])
+
   function handleChangePhoneNumber(e: any) {
     const number = e.currentTarget.value
     const regexNumeric = /(^\d+$|^$)/
@@ -34,9 +42,9 @@ const CustomerProfile = () => {
     if (!session || !session.customerId) return
     const c: Customer = {
       id: session.customerId,
-      name: (name && name.trim()) || (customer ? customer.name : ''),
-      phoneNumber: phoneNumber || (customer ? customer.phoneNumber : ''),
-      address: (address && address.trim()) || (customer ? customer.address : ''),
+      name: (name && name.trim()) || '',
+      phoneNumber: phoneNumber || '',
+      address: (address && address.trim()) || '',
     }
     setCustomer({ customer: c, session })
     setEditing(false)
@@ -61,7 +69,7 @@ const CustomerProfile = () => {
               <Input
                 placeholder="Name"
                 disabled={!isEditing}
-                value={name || customer?.name}
+                value={name}
                 onChange={e => setName(e.currentTarget.value)}
               />
             </div>
@@ -69,7 +77,7 @@ const CustomerProfile = () => {
               <Input
                 placeholder="Phone Number"
                 disabled={!isEditing}
-                value={phoneNumber || customer?.phoneNumber}
+                value={phoneNumber}
                 onChange={handleChangePhoneNumber}
               />
             </div>
@@ -77,7 +85,7 @@ const CustomerProfile = () => {
               <Input.TextArea
                 placeholder="Shipping Address"
                 disabled={!isEditing}
-                value={address || customer?.address}
+                value={address}
                 onChange={e => setAddress(e.currentTarget.value)}
               />
             </div>

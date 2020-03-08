@@ -16,3 +16,40 @@
   display: flex;
   justify-content: center;
 }
+
+.order-items {
+  display: flex;
+}
+
+.order-item {
+  border: 1px solid #f0f0f0;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 10px;
+
+  .cover {
+    width: 120px;
+    height: 120px;
+    background-color: #f0f0f0;
+    background-position: center center;
+    background-size: cover;
+    margin-bottom: 5px;
+  }
+
+  label {
+    font-size: 12px;
+    margin-right: 5px;
+  }
+}
+
+.total-amount {
+  font-size: 20px;
+}
+
+.note {
+  width: 400px;
+
+  .ant-btn {
+    margin-top: 5px;
+  }
+}
