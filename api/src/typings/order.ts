@@ -1,18 +1,21 @@
 export type OrderStatus = 'unpaid' | 'approving' | 'paid' | 'rejected' | 'canceled'
 
+export interface OrderItem {
+  productId: string
+  productName: string
+  price: number
+  quantity: number
+  amount: number
+}
+
 export interface Order {
   id: string
   shopId: string
   pageId: string
   ownerId: string
   customerId: string
-  items: {
-    productId: string
-    productName: string
-    price: number
-    quantity: number
-    amount: number
-  }[]
+  items: OrderItem[]
+  totalAmount: number
   status: OrderStatus
   attachments?: string[]
   createdAt: string
@@ -25,13 +28,7 @@ export interface OrderCreate {
   pageId: string
   ownerId: string
   customerId: string
-  items: {
-    productId: string
-    productName: string
-    price: number
-    quantity: number
-    amount: number
-  }[]
+  items: OrderItem[]
   totalAmount: number
 }
 
@@ -42,4 +39,5 @@ export interface OrderUpdate {
   customerId: string
   attachment?: string
   status?: OrderStatus
+  note?: string
 }

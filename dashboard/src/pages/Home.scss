@@ -4,6 +4,10 @@
   display: flex;
   width: 100%;
 
+  main {
+    overflow-y: scroll;
+  }
+
   .ant-layout-content {
     padding: 20px;
   }

@@ -8,18 +8,25 @@ export enum OrderStatusEnum {
   Canceled = 'canceled',
 }
 
+export interface OrderItem {
+  productId: string
+  productName: string
+  price: number
+  quantity: number
+  amount: number
+}
+
 export interface Order {
   id: string
+  pageId: string
   shopId: string
   ownerId: string
   customerId: string
-  productId: string
-  productName: string
   status: OrderStatus
-  amount: number
-  pageId?: string
+  items: OrderItem[]
+  totalAmount: number
   attachments?: string[]
-  customerAddress?: string
+  note?: string
   createdAt: string
   createdDate: string
   updatedAt?: string

@@ -1,47 +1,53 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Card, Descriptions, message, Modal, Select, Tag } from 'antd'
+import { Button, Card, Descriptions, message, Modal, Select, Tag, Input } from 'antd'
 import moment from 'moment'
 
-import { useStoreState } from '../../store'
-import { customerRepository, orderRepository } from '../../services/repositories'
-import { PATH_CUSTOMER, PATH_PRODUCT } from '../../constants'
-import { Customer, Order, OrderStatus, OrderStatusEnum } from '../../typings'
+import { useStoreActions, useStoreState } from '../../store'
+import { customerRepository, orderRepository, productRepository } from '../../services/repositories'
+import { PATH_PRODUCT } from '../../constants'
+import { Customer, Order, OrderStatus, OrderStatusEnum, Product } from '../../typings'
 
 import Loading from '../../components/Loading'
 import Back from '../../components/Back'
 
 const OrderItem = () => {
   const [order, setOrder] = useState<Order>()
+  const [products, setProducts] = useState<Product[]>()
   const [customer, setCustomer] = useState<Customer>()
   const [imgSrc, setImgSrc] = useState('')
 
   const { id } = useParams()
 
   const orders = useStoreState(s => s.orderState.orders)
-  const activeOrder = orders.find(o => o.id === id)
+
+  const updateProduct = useStoreActions(a => a.productState.update)
 
   useEffect(() => {
     if (!id) return
     ;(async () => {
+      const activeOrder = orders.find(o => o.id === id)
       if (activeOrder) setOrder(activeOrder)
       else {
         const order = await orderRepository.find(id)
         if (order) setOrder(order)
       }
     })()
-  }, [id, activeOrder])
+  }, [id, orders])
 
   useEffect(() => {
     if (!order) return
     ;(async () => {
+      // Fetch customer
       const customer = await customerRepository.find(order.customerId)
       if (customer) setCustomer(customer)
+      // Fetch products
+      setProducts(await productRepository.findByIds(order.items.map(item => item.productId)))
     })()
   }, [order])
 
   async function handleChangeStatus(value: string) {
-    if (!order) return
+    if (!order || order.status === value) return
     const status: OrderStatus =
       value === OrderStatusEnum.Paid
         ? OrderStatusEnum.Paid
@@ -56,8 +62,30 @@ const OrderItem = () => {
     if (await orderRepository.update(newOrder)) {
       setOrder(newOrder)
       message.success('The order status has been updated.')
+
+      // Decrease a product's available quantity
+      if (status === 'paid') {
+        order.items.forEach(async item => {
+          const product = await productRepository.find(item.productId)
+          if (product) {
+            const qty = product.quantity - item.quantity
+            updateProduct({ ...product, quantity: qty >= 0 ? qty : 0 })
+          }
+        })
+      }
     } else {
       message.error('Cannot update the order status.')
+    }
+  }
+
+  function handleChangeNote(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    if (order) setOrder({ ...order, note: e.currentTarget.value.trim() })
+  }
+
+  async function handleSaveNote() {
+    if (order) {
+      await orderRepository.update(order)
+      message.success('The order note has been saved.')
     }
   }
 
@@ -103,6 +131,54 @@ const OrderItem = () => {
     )
   }
 
+  function renderOrderItems(order: Order) {
+    return !products || products.length < 1 ? (
+      <Loading size="small" position="left" />
+    ) : (
+      order.items.map(item => {
+        const product = products.find(p => p.id === item.productId)
+        return (
+          <div key={item.productId} className="order-item">
+            <div>
+              {!product ? (
+                <div>
+                  <span>{item.productName}</span>
+                </div>
+              ) : (
+                <Link to={`${PATH_PRODUCT}/${product.id}`}>
+                  <div
+                    className="cover"
+                    style={{
+                      backgroundImage:
+                        product.images && product.images.length > 0
+                          ? `url('${product.images[0]}')`
+                          : 'none',
+                    }}
+                  />
+                  <div>
+                    <span>{product.name}</span>
+                  </div>
+                </Link>
+              )}
+            </div>
+            <div>
+              <label>Price:</label>
+              <span>{item.price}</span>
+            </div>
+            <div>
+              <label>Quantity:</label>
+              <span>{item.quantity}</span>
+            </div>
+            <div>
+              <label>Amount:</label>
+              <span>{item.amount}</span>
+            </div>
+          </div>
+        )
+      })
+    )
+  }
+
   return (
     <div>
       <Back />
@@ -111,26 +187,28 @@ const OrderItem = () => {
           <Loading position="center" />
         ) : (
           <div>
-            <Descriptions title={`Order: ${order.id}`} column={1} size="middle" bordered>
+            <Descriptions title="Order Details" column={1} size="middle" bordered>
               <Descriptions.Item label="Date">
                 {moment(order.createdAt).format('YYYY-MM-DD HH:mm:ss')}
               </Descriptions.Item>
-              <Descriptions.Item label="Product">
-                <Link to={`${PATH_PRODUCT}/${order.productId}`}>{order.productName}</Link>
+              <Descriptions.Item label="Items">
+                <div className="order-items">{renderOrderItems(order)}</div>
               </Descriptions.Item>
-              <Descriptions.Item label="Amount">
-                {order.amount ? order.amount.toLocaleString() : 0}
+              <Descriptions.Item label="Total Amount">
+                <div className="price total-amount">
+                  <span>{order.totalAmount ? `฿${order.totalAmount.toLocaleString()}` : 0}</span>
+                </div>
               </Descriptions.Item>
               <Descriptions.Item label="Customer">
-                {customer ? (
-                  <div>
-                    <Link to={`${PATH_CUSTOMER}/${customer.id}`}>{customer.id}</Link>
-                    <div>{customer.name}</div>
-                    <div>{customer.address}</div>
-                    <div>{customer.phone}</div>
-                  </div>
+                {!customer ? (
+                  <Loading size="small" position="left" />
                 ) : (
-                  <span>{order.customerId}</span>
+                  <div>
+                    <div>
+                      {customer.name} ({customer.phoneNumber})
+                    </div>
+                    <div>{customer.address}</div>
+                  </div>
                 )}
               </Descriptions.Item>
               <Descriptions.Item label="Attatchments">
@@ -139,6 +217,14 @@ const OrderItem = () => {
               <Descriptions.Item label="Status">
                 {displayStatusTag(order.status)}
                 {displayStatusOptions()}
+              </Descriptions.Item>
+              <Descriptions.Item label="Note">
+                <div className="note">
+                  <Input.TextArea rows={2} defaultValue={order?.note} onChange={handleChangeNote} />
+                  <Button size="small" onClick={handleSaveNote}>
+                    Save
+                  </Button>
+                </div>
               </Descriptions.Item>
             </Descriptions>
           </div>

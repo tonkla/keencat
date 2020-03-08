@@ -1,5 +1,6 @@
 import admin from '../firebase'
 import storage from '../storage'
+import utils from '../utils'
 import { Order, OrderCreate, OrderUpdate } from '../../typings'
 
 const db = admin.firestore()
@@ -39,15 +40,14 @@ async function create(input: OrderCreate): Promise<string | null> {
     if (!input.shopId || !input.ownerId) return null
 
     const createdAt = new Date().toISOString()
-    const id = createdAt.replace(/[-T:Z.]/g, '')
-
     const order: Order = {
-      id,
+      id: utils.genId(),
       shopId: input.shopId,
       pageId: input.pageId,
       ownerId: input.ownerId,
       customerId: input.customerId,
       items: input.items,
+      totalAmount: input.totalAmount,
       status: 'unpaid',
       createdAt,
       createdDate: createdAt.split('T')[0],
@@ -56,9 +56,27 @@ async function create(input: OrderCreate): Promise<string | null> {
       .collection('orders')
       .doc(order.id)
       .set(order)
-    return id
+    return order.id
   } catch (e) {
     return null
+  }
+}
+
+async function update(input: OrderUpdate): Promise<boolean> {
+  if (!input.id || !input.status) return false
+  try {
+    const updated = {
+      note: input.note,
+      status: input.status,
+      updatedAt: new Date().toISOString(),
+    }
+    await db
+      .collection('orders')
+      .doc(input.id)
+      .set(updated, { merge: true })
+    return true
+  } catch (e) {
+    return false
   }
 }
 
@@ -98,23 +116,10 @@ async function updateAttachment(input: OrderUpdate): Promise<boolean> {
   }
 }
 
-async function updateStatus(input: OrderUpdate): Promise<boolean> {
-  if (!input.id || !input.status) return false
-  try {
-    await db
-      .collection('orders')
-      .doc(input.id)
-      .set({ status: input.status, updatedAt: new Date().toISOString() }, { merge: true })
-    return true
-  } catch (e) {
-    return false
-  }
-}
-
 export default {
   find,
   findByShop,
   create,
+  update,
   updateAttachment,
-  updateStatus,
 }

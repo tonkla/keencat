@@ -4,11 +4,11 @@ import { Card, Layout } from 'antd'
 
 import { useStoreState, useStoreActions } from '../store'
 import shopRepository from '../services/repositories/shop'
+import { Shop } from '../typings'
 // import utils from '../services/utils'
 
 import Loading from '../components/Loading'
 import SiderMenu from '../components/SiderMenu'
-
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import './Home.scss'
@@ -16,32 +16,37 @@ import './Home.scss'
 const Home: React.FC = ({ children }) => {
   const [isCollapsed, setCollapse] = useState(false)
   const [isLoading, setLoading] = useState(false)
-
-  const setActiveShop = useStoreActions(a => a.activeState.setShopId)
-  const setShops = useStoreActions(a => a.shopState.setShops)
+  const [activeShop, setActiveShop] = useState<Shop>()
 
   const user = useStoreState(s => s.userState.user)
   const shops = useStoreState(s => s.shopState.shops)
-  const shopId = useStoreState(s => s.activeState.shopId)
-  const activeShop = shops.find(s => s.id === shopId)
+  const activeShopId = useStoreState(s => s.activeState.shopId)
 
-  // Note: DO NOT combine these two useEffects, will cause infinite loop with shops/setShops
+  const setShops = useStoreActions(a => a.shopState.setShops)
+  const setActiveShopId = useStoreActions(a => a.activeState.setShopId)
+
   useEffect(() => {
     // Note: In development, do not fetch shops everytime the component is mounted
     // if (utils.isDev()) return
 
-    if (!user) return
+    if (!user || shops.length > 0) return
     ;(async () => {
       setLoading(true)
       setShops(await shopRepository.findByOwner(user.firebaseId))
       setLoading(false)
     })()
-  }, [user, setShops])
+  }, [user, shops.length, setShops])
 
   useEffect(() => {
-    if (shops.length > 0 && (!activeShop || !shops.map(s => s.id).includes(activeShop.id)))
-      setActiveShop(shops[0].id)
-  }, [activeShop, shops, setActiveShop])
+    if (shops.length > 0) {
+      if (activeShopId) {
+        const activeShop = shops.find(s => s.id === activeShopId)
+        if (activeShop) return setActiveShop(activeShop)
+      }
+      setActiveShop(shops[0])
+      setActiveShopId(shops[0].id)
+    }
+  }, [shops, activeShopId, setActiveShopId])
 
   const { Content } = Layout
 
