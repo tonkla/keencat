@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Redirect } from 'react-router-dom'
-import { Alert, Button, Icon, Input } from 'antd'
+import { Alert, Button, Input } from 'antd'
+import { MailOutlined } from '@ant-design/icons'
 
 import { useStoreState, useStoreActions } from '../store'
 import auth from '../services/firebase/auth'
@@ -94,7 +95,7 @@ const Login = () => {
             onChange={e => setEmail(e.target.value.trim())}
             value={email}
             placeholder="Email"
-            prefix={<Icon type="mail" style={{ color: 'rgba(0,0,0,.3)' }} />}
+            prefix={<MailOutlined style={{ color: 'rgba(0,0,0,.3)' }} />}
             size="large"
             className="input"
           />

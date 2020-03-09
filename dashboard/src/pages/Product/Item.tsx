@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Alert, Button, Card, Input, message, Modal, Switch } from 'antd'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 
 import { useStoreActions, useStoreState } from '../../store'
 import { productRepository } from '../../services/repositories'
@@ -99,13 +100,13 @@ const ProductItem = () => {
         <div className="actions">
           <Switch defaultChecked={product.isActive} onChange={handleToggle} />
           <Button
-            icon="edit"
+            icon={<EditOutlined />}
             shape="circle"
             title="Edit Product"
             onClick={() => enableForm(true)}
           />
           <Button
-            icon="delete"
+            icon={<DeleteOutlined />}
             shape="circle"
             title="Delete Product"
             onClick={() => showDeletingConfirm(true)}

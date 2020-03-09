@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Card } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
 
 import { useStoreActions, useStoreState } from '../../store'
 import categoryRepository from '../../services/repositories/category'
@@ -58,7 +59,7 @@ const CategoryList = ({ shop, user }: Props) => {
         <span>Categories</span>
         <div className="actions">
           <Button
-            icon="plus"
+            icon={<PlusOutlined />}
             shape="circle"
             title="Add Category"
             onClick={() => setFormEnabled(true)}

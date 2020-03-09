@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Icon, Modal, Upload } from 'antd'
+import { Modal, Upload } from 'antd'
 import { UploadFile } from 'antd/lib/upload/interface'
+import { PlusOutlined } from '@ant-design/icons'
 
 import storage from '../services/firebase/storage'
 import { Product } from '../typings'
@@ -106,7 +107,7 @@ const ImageUpload = ({ onError, onSuccess, onRemove, product }: UploadProps) => 
 
   const uploadButton = (
     <div>
-      <Icon type="plus" style={{ color: '#c0c0c0', fontSize: 30 }} />
+      <PlusOutlined style={{ color: '#c0c0c0', fontSize: 30 }} />
       <div>Upload</div>
     </div>
   )

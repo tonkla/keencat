@@ -38,3 +38,8 @@
     }
   }
 }
+
+.ant-menu-item .anticon + span,
+.ant-menu-item span + .anticon {
+  margin-left: 8px;
+}

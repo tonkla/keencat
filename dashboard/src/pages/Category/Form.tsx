@@ -4,70 +4,47 @@ import { Button, Card, Form, Input } from 'antd'
 import { Category } from '../../typings'
 
 interface FormProps {
-  form: any
   callback: any
   cancel: any
   category?: Category
 }
 
-const CategoryForm = ({ form, callback, cancel, category }: FormProps) => {
-  const { getFieldDecorator } = form
-  const formItemLayout = {
-    labelCol: {
-      sm: { span: 4 },
-    },
-    wrapperCol: {
-      sm: { span: 8 },
-    },
-  }
-  const tailFormItemLayout = {
-    wrapperCol: {
-      sm: {
-        span: 8,
-        offset: 4,
-      },
-    },
-  }
+const CategoryForm = ({ callback, cancel, category }: FormProps) => {
+  const formLayout = { labelCol: { span: 4 }, wrapperCol: { span: 8 } }
+  const tailLayout = { wrapperCol: { offset: 4, span: 8 } }
 
-  function handleSubmit(e: any) {
-    e.preventDefault()
-    form.validateFieldsAndScroll((err: any, values: any) => {
-      if (!err) {
-        category ? callback({ ...category, name: values.name }) : callback(values)
-      }
-    })
+  function onFinish(values: any) {
+    category ? callback({ ...category, name: values.name }) : callback(values)
   }
 
   const formTitle = category ? 'Edit Category' : 'Add Category'
 
   return (
     <Card title={formTitle} bordered={false}>
-      <Form {...formItemLayout} onSubmit={handleSubmit}>
-        <Form.Item label="Name">
-          {getFieldDecorator('name', {
-            initialValue: category ? category.name : '',
-            rules: [
-              {
-                required: true,
-                message: 'Please input a category name',
-              },
-            ],
-          })(<Input />)}
+      <Form
+        {...formLayout}
+        name="category"
+        initialValues={{ name: category ? category.name : '' }}
+        onFinish={onFinish}
+      >
+        <Form.Item
+          label="Name"
+          name="name"
+          rules={[{ required: true, message: 'Name is required' }]}
+        >
+          <Input />
         </Form.Item>
-        <Form.Item {...tailFormItemLayout}>
+        <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit">
             {category ? 'Edit' : 'Add'}
           </Button>
-          <div className="btn-cancel">
-            <span className="link" onClick={cancel}>
-              Cancel
-            </span>
-          </div>
+          <Button type="link" onClick={cancel}>
+            Cancel
+          </Button>
         </Form.Item>
       </Form>
     </Card>
   )
 }
 
-const _this: any = Form.create({ name: 'categoryForm' })(CategoryForm)
-export default _this
+export default CategoryForm

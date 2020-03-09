@@ -1,5 +1,6 @@
 import React from 'react'
-import { Avatar, Dropdown, Icon, Menu, Modal } from 'antd'
+import { Avatar, Dropdown, Menu, Modal } from 'antd'
+import { ExclamationCircleOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons'
 
 import { useStoreActions } from '../store'
 import { User } from '../typings'
@@ -14,6 +15,7 @@ const UserAvatar = ({ user }: UserProps) => {
   const showConfirmSignOut = () => {
     Modal.confirm({
       title: 'Are you sure you want to sign out?',
+      icon: <ExclamationCircleOutlined />,
       onOk() {
         signOut()
       },
@@ -23,7 +25,7 @@ const UserAvatar = ({ user }: UserProps) => {
   const menu = (
     <Menu>
       <Menu.Item key="3" onClick={showConfirmSignOut}>
-        <Icon type="logout" />
+        <LogoutOutlined />
         <span>Sign Out</span>
       </Menu.Item>
     </Menu>
@@ -31,7 +33,7 @@ const UserAvatar = ({ user }: UserProps) => {
 
   return (
     <Dropdown overlay={menu}>
-      {user.photoURL ? <Avatar src={user.photoURL} /> : <Avatar icon="user" />}
+      {user.photoURL ? <Avatar src={user.photoURL} /> : <Avatar icon={<UserOutlined />} />}
     </Dropdown>
   )
 }

@@ -1,6 +1,7 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
-import { Button, Icon, Layout, Select } from 'antd'
+import { Button, Layout, Select } from 'antd'
+import { MenuFoldOutlined, MenuUnfoldOutlined, PlusOutlined } from '@ant-design/icons'
 
 import { useStoreActions } from '../store'
 import { Shop, User } from '../typings'
@@ -40,11 +41,11 @@ const Header = (props: Props) => {
   return (
     <Layout.Header className="header">
       <div className="left">
-        <Icon
-          className="trigger"
-          type={isCollapsed ? 'menu-unfold' : 'menu-fold'}
-          onClick={() => setCollapse(!isCollapsed)}
-        />
+        {isCollapsed ? (
+          <MenuUnfoldOutlined className="trigger" onClick={() => setCollapse(false)} />
+        ) : (
+          <MenuFoldOutlined className="trigger" onClick={() => setCollapse(true)} />
+        )}
         {activeShop && shops.length > 0 && (
           <div>
             <Select defaultValue={activeShop.name} onChange={handleChangeShop}>
@@ -56,7 +57,7 @@ const Header = (props: Props) => {
             </Select>
             <Button
               className="btn-create-shop"
-              icon="plus"
+              icon={<PlusOutlined />}
               shape="circle"
               title="Create Shop"
               onClick={handleCreateShop}

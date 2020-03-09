@@ -1,24 +1,19 @@
 import React from 'react'
 import { Button, Form, Input, Select } from 'antd'
 
-import { Page, Shop } from '../../typings'
+import { Shop } from '../../typings'
+import { FBPage } from '../../typings/facebook'
 
 interface FormProps {
-  form: any
   callback: any
   cancel: any
-  pages: Page[]
+  pages: FBPage[]
   shop?: Shop
 }
 
-const ShopForm = ({ form, callback, cancel, pages, shop }: FormProps) => {
-  function handleSubmit(e: any) {
-    e.preventDefault()
-    form.validateFieldsAndScroll((err: any, values: any) => {
-      if (!err) {
-        shop ? callback({ ...shop, ...values }) : callback(values)
-      }
-    })
+const ShopForm = ({ callback, cancel, pages, shop }: FormProps) => {
+  function onFinish(values: any) {
+    shop ? callback({ ...shop, ...values }) : callback(values)
   }
 
   const banks = [
@@ -33,119 +28,105 @@ const ShopForm = ({ form, callback, cancel, pages, shop }: FormProps) => {
 
   const regexNumeric = /(^\d+$|^$)/
 
-  const { getFieldDecorator } = form
-  const { Option } = Select
-  const formItemLayout = {
-    labelCol: {
-      sm: { span: 4 },
-    },
-    wrapperCol: {
-      sm: { span: 8 },
-    },
-  }
-  const tailFormItemLayout = {
-    wrapperCol: {
-      sm: {
-        span: 8,
-        offset: 4,
-      },
-    },
+  const formLayout = { labelCol: { span: 4 }, wrapperCol: { span: 8 } }
+  const tailLayout = { wrapperCol: { offset: 4, span: 8 } }
+  const initialValues = {
+    name: shop ? shop.name : '',
+    phoneNumber: shop ? shop.phoneNumber : '',
+    promptPay: shop ? shop.promptPay : '',
+    bank: shop ? shop.bank : '',
+    bankAccountNumber: shop ? shop.bankAccountNumber : '',
+    bankAccountName: shop ? shop.bankAccountName : '',
   }
 
   return (
-    <Form {...formItemLayout} onSubmit={handleSubmit}>
+    <Form {...formLayout} initialValues={initialValues} onFinish={onFinish}>
       {!shop && (
-        <Form.Item label="Facebook Page">
-          {getFieldDecorator('pageId', {
-            rules: [
-              {
-                required: true,
-                message: 'Please choose a Facebook page',
-              },
-            ],
-          })(
-            <Select placeholder="Choose Page" optionFilterProp="children">
-              {pages.map((page: Page) => (
-                <Option key={page.id} value={page.id}>
-                  {page.name}
-                </Option>
-              ))}
-            </Select>
-          )}
-        </Form.Item>
-      )}
-      <Form.Item label="Name">
-        {getFieldDecorator('name', {
-          initialValue: shop ? shop.name : '',
-          rules: [
-            {
-              required: true,
-              message: 'Please input a shop name',
-            },
-          ],
-        })(<Input />)}
-      </Form.Item>
-      <Form.Item label="Phone Number">
-        {getFieldDecorator('phoneNumber', {
-          initialValue: shop ? shop.phoneNumber : '',
-          getValueFromEvent: (e: React.FormEvent<HTMLInputElement>) => {
-            return regexNumeric.test(e.currentTarget.value)
-              ? e.currentTarget.value
-              : form.getFieldValue('phoneNumber')
-          },
-        })(<Input placeholder="Input a number" />)}
-      </Form.Item>
-      <Form.Item label="PromptPay ID">
-        {getFieldDecorator('promptPay', {
-          initialValue: shop ? shop.promptPay : '',
-          getValueFromEvent: (e: React.FormEvent<HTMLInputElement>) => {
-            return regexNumeric.test(e.currentTarget.value)
-              ? e.currentTarget.value
-              : form.getFieldValue('promptPay')
-          },
-        })(<Input placeholder="Input a number" />)}
-      </Form.Item>
-      <Form.Item label="Bank">
-        {getFieldDecorator('bank', {
-          initialValue: shop ? shop.bank : '',
-        })(
-          <Select style={{ width: 200 }}>
-            {banks.map(bank => (
-              <Option key={bank.code} value={bank.name}>
-                {bank.name}
-              </Option>
+        <Form.Item
+          label="Facebook Page"
+          name="pageId"
+          rules={[{ required: true, message: 'Facebook page is required' }]}
+        >
+          <Select placeholder="Choose Page" optionFilterProp="children">
+            {pages.map((page: FBPage) => (
+              <Select.Option key={page.id} value={page.id}>
+                {page.name}
+              </Select.Option>
             ))}
           </Select>
-        )}
+        </Form.Item>
+      )}
+      <Form.Item label="Name" name="name" rules={[{ required: true, message: 'Name is required' }]}>
+        <Input />
       </Form.Item>
-      <Form.Item label="Bank Account Number">
-        {getFieldDecorator('bankAccountNumber', {
-          initialValue: shop ? shop.bankAccountNumber : '',
-          getValueFromEvent: (e: React.FormEvent<HTMLInputElement>) => {
-            return regexNumeric.test(e.currentTarget.value)
-              ? e.currentTarget.value
-              : form.getFieldValue('bankAccountNumber')
+      <Form.Item
+        label="Phone Number"
+        name="phoneNumber"
+        rules={[
+          { required: true, message: 'Phone number is required' },
+          {
+            validator: async (rule, value) => {
+              return regexNumeric.test(value)
+                ? Promise.resolve()
+                : Promise.reject('Only number is accepted')
+            },
           },
-        })(<Input placeholder="Input a number" />)}
+        ]}
+      >
+        <Input placeholder="Input a number" />
       </Form.Item>
-      <Form.Item label="Bank Account Name">
-        {getFieldDecorator('bankAccountName', {
-          initialValue: shop ? shop.bankAccountName : '',
-        })(<Input />)}
+      <Form.Item
+        label="PromptPay ID"
+        name="promptPay"
+        rules={[
+          {
+            validator: async (rule, value) => {
+              return regexNumeric.test(value)
+                ? Promise.resolve()
+                : Promise.reject('Only number is accepted')
+            },
+          },
+        ]}
+      >
+        <Input placeholder="Input a number" />
       </Form.Item>
-      <Form.Item {...tailFormItemLayout}>
+      <Form.Item label="Bank" name="bank">
+        <Select style={{ width: 200 }}>
+          {banks.map(bank => (
+            <Select.Option key={bank.code} value={bank.name}>
+              {bank.name}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
+      <Form.Item
+        label="Account Number"
+        name="bankAccountNumber"
+        rules={[
+          {
+            validator: async (rule, value) => {
+              return regexNumeric.test(value)
+                ? Promise.resolve()
+                : Promise.reject('Only number is accepted')
+            },
+          },
+        ]}
+      >
+        <Input placeholder="Input a number" />
+      </Form.Item>
+      <Form.Item label="Account Name" name="bankAccountName">
+        <Input />
+      </Form.Item>
+      <Form.Item {...tailLayout}>
         <Button type="primary" htmlType="submit">
           {shop ? 'Edit' : 'Create'}
         </Button>
-        <div className="btn-cancel">
-          <span className="link" onClick={cancel}>
-            Cancel
-          </span>
-        </div>
+        <Button type="link" onClick={cancel}>
+          Cancel
+        </Button>
       </Form.Item>
     </Form>
   )
 }
 
-const _this: any = Form.create({ name: 'shopForm' })(ShopForm)
-export default _this
+export default ShopForm

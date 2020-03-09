@@ -53,7 +53,7 @@ const Home: React.FC = ({ children }) => {
   return !user ? (
     <Redirect to="/login" />
   ) : (
-    <div className="home-container">
+    <div className="container">
       <Layout>
         <SiderMenu isCollapsed={isCollapsed} activeShop={activeShop} />
         <Layout>
@@ -67,7 +67,7 @@ const Home: React.FC = ({ children }) => {
           <Content>
             {isLoading ? (
               <Card>
-                <Loading position="center" size="large" />
+                <Loading position="center" />
               </Card>
             ) : (
               children

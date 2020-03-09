@@ -1,6 +1,6 @@
 @import '../styles/shared';
 
-.home-container {
+.container {
   display: flex;
   width: 100%;
 
@@ -18,7 +18,7 @@
     }
 
     .ant-card-head {
-      color: rgba(0, 0, 0, 0.85);
+      color: rgba(0, 0, 0, 0.8);
       display: flex;
     }
 
@@ -60,36 +60,12 @@
     width: 15%;
   }
 
-  .ant-form-item {
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    .ant-form-explain {
-      font-size: 12px;
-    }
+  .ant-form-item:last-child {
+    margin-bottom: 0;
   }
 
   .ant-modal-title {
     font-weight: 500;
-  }
-
-  .buttons {
-    padding-top: 10px;
-  }
-
-  .btn-cancel {
-    display: inline;
-    margin-left: 15px;
-  }
-
-  .link {
-    color: $linkColor;
-    cursor: pointer;
-    text-decoration: underline;
-    &:hover {
-      text-decoration: none;
-    }
   }
 }
 
@@ -104,4 +80,8 @@
   .ant-input {
     width: 250px;
   }
+}
+
+.ant-modal-root .ant-modal-confirm-body .ant-modal-confirm-title {
+  color: rgba(0, 0, 0, 0.8);
 }
