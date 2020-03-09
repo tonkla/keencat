@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Button, Card, Descriptions, Input, message, Modal, Switch } from 'antd'
+import { FacebookOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 
 import { useStoreState, useStoreActions } from '../../store'
 import { pageRepository } from '../../services/repositories'
@@ -8,15 +9,19 @@ import utils from '../../services/utils'
 import { Page, Shop } from '../../typings'
 import { FBPage } from '../../typings/facebook'
 
+import Loading from '../../components/Loading'
 import CategoryList from '../Category'
 import Form from './Form'
 import './Shop.scss'
 
 const ShopIndex = () => {
-  const [step, setStep] = useState(0)
   const [pages, setPages] = useState<FBPage[]>([])
-  const [isFormEnabled, enableForm] = useState(false)
-  const [deletingConfirm, showDeletingConfirm] = useState(false)
+  const [activeShop, setActiveShop] = useState<Shop>()
+  const [step, setStep] = useState(0)
+  const [isSaving, setSaving] = useState(false)
+  const [isEditing, setEditing] = useState(false)
+  const [isDeleting, setDeleting] = useState(false)
+  const [isConfirmDelete, setConfirmDelete] = useState(false)
   const [confirmCode, setConfirmCode] = useState('')
 
   const createShop = useStoreActions(a => a.shopState.create)
@@ -29,7 +34,6 @@ const ShopIndex = () => {
   const user = useStoreState(s => s.userState.user)
   const shops = useStoreState(s => s.shopState.shops)
   const shopId = useStoreState(s => s.activeState.shopId)
-  const activeShop = shops.find(s => s.id === shopId)
 
   const getAvailablePages = useCallback((): FBPage[] => {
     const availablePages: FBPage[] = []
@@ -45,6 +49,15 @@ const ShopIndex = () => {
     }
     return availablePages
   }, [pages, shops])
+
+  useEffect(() => {
+    const shop = shops.find(s => s.id === shopId)
+    if (shop) {
+      setActiveShop(shop)
+      setSaving(false)
+      setDeleting(false)
+    }
+  }, [shops, shopId])
 
   useEffect(() => {
     // Note: Work when the component is unmounted
@@ -63,6 +76,10 @@ const ShopIndex = () => {
 
   async function handleCreateShop(values: any) {
     if (!user || pages.length < 1) return
+
+    setSaving(true)
+    setCreateShop(false)
+    setStep(0)
 
     // First, create page
     const { authResponse } = await facebook.getLoginStatus()
@@ -93,17 +110,17 @@ const ShopIndex = () => {
       bankAccountName: values.bankAccountName,
     }
     createShop(shop)
-
-    setCreateShop(false)
   }
 
   async function handleUpdateShop(shop: Shop) {
-    enableForm(false)
+    setEditing(false)
+    setSaving(true)
     updateShop(shop)
   }
 
   async function handleDeleteShop(shop: Shop) {
-    showDeletingConfirm(false)
+    setConfirmDelete(false)
+    setDeleting(true)
     if (shop.name === confirmCode) {
       deleteShop(shop)
       if (shops.length < 1) {
@@ -126,19 +143,24 @@ const ShopIndex = () => {
         <span>{shop.name}</span>
         <div className="actions">
           <Switch defaultChecked={shop.isActive} onChange={handleToggle} />
-          <Button icon="edit" shape="circle" title="Edit Shop" onClick={() => enableForm(true)} />
           <Button
-            icon="delete"
+            icon={<EditOutlined />}
+            shape="circle"
+            title="Edit Shop"
+            onClick={() => setEditing(true)}
+          />
+          <Button
+            icon={<DeleteOutlined />}
             shape="circle"
             title="Delete Shop"
-            onClick={() => showDeletingConfirm(true)}
+            onClick={() => setConfirmDelete(true)}
           />
         </div>
         <Modal
           title="Are you sure you want to delete?"
-          visible={deletingConfirm}
+          visible={isConfirmDelete}
           onOk={() => handleDeleteShop(shop)}
-          onCancel={() => showDeletingConfirm(false)}
+          onCancel={() => setConfirmDelete(false)}
           className="dialog-confirm-deleting"
         >
           <span>The shop and all related data will be permanently deleted.</span>
@@ -155,18 +177,20 @@ const ShopIndex = () => {
 
   return (
     <div>
-      {isCreateShop || shops.length < 1 ? (
+      {isSaving || isDeleting ? (
+        <Card>
+          <Loading position="center" text={isSaving ? 'Saving...' : 'Deleting...'} />
+        </Card>
+      ) : isCreateShop || shops.length < 1 ? (
         <Card title="Create Shop" bordered={false}>
           {step === 0 && (
             <div>
-              <Button icon="facebook" onClick={handleGrantAccessFacebookPages}>
+              <Button icon={<FacebookOutlined />} onClick={handleGrantAccessFacebookPages}>
                 Facebook Page
               </Button>
-              <div className="btn-cancel">
-                <span className="link" onClick={() => setCreateShop(false)}>
-                  Cancel
-                </span>
-              </div>
+              <Button type="link" onClick={() => setCreateShop(false)}>
+                Cancel
+              </Button>
             </div>
           )}
           {step === 1 && (
@@ -185,13 +209,13 @@ const ShopIndex = () => {
             </div>
           )}
         </Card>
-      ) : isFormEnabled ? (
+      ) : isEditing ? (
         <Card title="Edit Shop" bordered={false}>
           <Form
             shop={activeShop}
             pages={[]}
             callback={handleUpdateShop}
-            cancel={() => enableForm(false)}
+            cancel={() => setEditing(false)}
           />
         </Card>
       ) : (

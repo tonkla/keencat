@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { Button, Card, Input, Modal } from 'antd'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 
 import { useStoreActions, useStoreState } from '../../store'
 import { categoryRepository } from '../../services/repositories'
@@ -67,13 +68,13 @@ const CategoryItem = () => {
         <span>{category.name}</span>
         <div className="actions">
           <Button
-            icon="edit"
+            icon={<EditOutlined />}
             shape="circle"
             title="Edit Category"
             onClick={() => enableForm(true)}
           />
           <Button
-            icon="delete"
+            icon={<DeleteOutlined />}
             shape="circle"
             title="Delete Category"
             onClick={() => showDeletingConfirm(true)}

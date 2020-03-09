@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Icon, Layout, Menu } from 'antd'
 import { Link, useLocation } from 'react-router-dom'
+import { Layout, Menu } from 'antd'
+import { DashboardOutlined, ShopOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 
 import { Shop } from '../typings'
 import { PATH_ORDER, PATH_SHOP } from '../constants'
@@ -39,20 +40,20 @@ const SiderMenu = ({ isCollapsed, activeShop }: Props) => {
         >
           <Menu.Item key="/">
             <Link to="/">
-              <Icon type="dashboard" />
+              <DashboardOutlined />
               <span>Dashboard</span>
             </Link>
           </Menu.Item>
           <Menu.Item key={PATH_SHOP}>
             <Link to={PATH_SHOP}>
-              <Icon type="shop" />
+              <ShopOutlined />
               <span>Manage Shop</span>
             </Link>
           </Menu.Item>
           {activeShop && (
             <Menu.Item key={PATH_ORDER}>
               <Link to={PATH_ORDER}>
-                <Icon type="shopping-cart" />
+                <ShoppingCartOutlined />
                 <span>Orders</span>
               </Link>
             </Menu.Item>

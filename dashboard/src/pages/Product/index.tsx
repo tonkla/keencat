@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Card } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
 
 import { useStoreActions, useStoreState } from '../../store'
 import { productRepository } from '../../services/repositories'
@@ -63,7 +64,12 @@ const ProductList = ({ category }: Props) => {
       <div className="title">
         <span>Products</span>
         <div className="actions">
-          <Button icon="plus" shape="circle" title="Add Product" onClick={() => enableForm(true)} />
+          <Button
+            icon={<PlusOutlined />}
+            shape="circle"
+            title="Add Product"
+            onClick={() => enableForm(true)}
+          />
         </div>
       </div>
     )
