@@ -1,5 +1,6 @@
 import { Action, action, Thunk, thunk } from 'easy-peasy'
 
+import pageRepository from '../../services/repositories/page'
 import shopRepository from '../../services/repositories/shop'
 import { Injections, StoreModel } from './index'
 import { Shop } from '../../typings'
@@ -28,6 +29,9 @@ const shopState: ShopStateModel = {
   }),
   remove: thunk(async (actions, shop, { getStoreActions, getStoreState, getState }) => {
     if (await shopRepository.remove(shop)) {
+      // Remove page
+      await pageRepository.remove(shop.pageId)
+
       const { productState: productActions, categoryState: categoryActions } = getStoreActions()
       // Delete all child products
       getStoreState().categoryState.categories.forEach(category =>

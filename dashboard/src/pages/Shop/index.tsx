@@ -64,6 +64,21 @@ const ShopIndex = () => {
   async function handleCreateShop(values: any) {
     if (!user || pages.length < 1) return
 
+    // First, create page
+    const { authResponse } = await facebook.getLoginStatus()
+    const fbPage = pages.find(page => page.id === values.pageId)
+    if (fbPage && authResponse) {
+      const page: Page = {
+        id: fbPage.id,
+        name: fbPage.name,
+        psid: authResponse.userID,
+        userAccessToken: authResponse.accessToken,
+        ownerId: user.firebaseId,
+      }
+      await pageRepository.create(page)
+    }
+
+    // Then, create shop
     const shop: Shop = {
       id: utils.genId(),
       ownerId: user.firebaseId,
@@ -78,21 +93,6 @@ const ShopIndex = () => {
       bankAccountName: values.bankAccountName,
     }
     createShop(shop)
-
-    const { authResponse } = await facebook.getLoginStatus()
-    if (!authResponse || !authResponse.accessToken) return
-
-    const fbPage = pages.find(page => page.id === values.pageId)
-    if (fbPage) {
-      const page: Page = {
-        id: fbPage.id,
-        name: fbPage.name,
-        psid: authResponse.userID,
-        userAccessToken: authResponse.accessToken,
-        ownerId: user.firebaseId,
-      }
-      await pageRepository.create(page)
-    }
 
     setCreateShop(false)
   }

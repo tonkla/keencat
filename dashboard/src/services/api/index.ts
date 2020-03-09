@@ -26,7 +26,8 @@ async function call(path: string, params: APICallParams) {
     if (!user) return null
     const authorization = await user.getIdToken()
     const url = process.env.REACT_APP_API_URL
-    if (url) return await axios.create({ headers: { authorization } }).post(`${url}${path}`, params)
+    if (url)
+      return await axios.create({ headers: { authorization } }).post(`${url}/${path}`, params)
     return null
   } catch (e) {
     return null
