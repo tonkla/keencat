@@ -1,12 +1,16 @@
-.ant-layout-footer {
+.home-container .ant-layout-footer {
+  font-size: 12px;
   text-align: center;
+
   .love {
     color: black;
-    font-size: 1.4rem;
+    font-size: 20px;
   }
+
   a {
     color: #d68717;
     text-decoration: underline;
+
     &:hover {
       color: #d68717;
       text-decoration: none;

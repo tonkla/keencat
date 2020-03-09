@@ -1,6 +1,6 @@
 import admin from '../firebase/index'
 import facebook from '../../pkg/facebook'
-import { Page, PageInput, User } from '../../typings'
+import { Page, PageInput } from '../../typings'
 
 const db = admin.firestore()
 
@@ -17,8 +17,6 @@ async function find(pageId: string): Promise<Page | null> {
     return null
   }
 }
-
-async function findByOwner(owner: User) {}
 
 async function create(input: PageInput): Promise<boolean> {
   try {
@@ -51,14 +49,20 @@ async function create(input: PageInput): Promise<boolean> {
   }
 }
 
-async function update(page: Page) {}
-
-async function remove(page: Page) {}
+async function remove(pageId: string): Promise<boolean> {
+  try {
+    await db
+      .collection('pages')
+      .doc(pageId)
+      .delete()
+    return true
+  } catch (e) {
+    return false
+  }
+}
 
 export default {
   find,
-  findByOwner,
   create,
-  update,
   remove,
 }

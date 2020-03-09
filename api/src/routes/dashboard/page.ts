@@ -7,6 +7,12 @@ async function create(ctx: Context) {
   if (page && (await pageRepository.create(page))) ctx.status = 200
 }
 
+async function remove(ctx: Context) {
+  const { pageId } = ctx.request.body
+  if (pageId && (await pageRepository.remove(pageId))) ctx.status = 200
+}
+
 export default {
   create,
+  remove,
 }

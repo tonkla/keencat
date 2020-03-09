@@ -1,6 +1,8 @@
 import { Context } from 'koa'
 
 import shopRepository from '../../pkg/db/shop'
+import pageRepository from '../../pkg/db/page'
+import facebook from '../../pkg/facebook'
 
 async function findByOwner(ctx: Context) {
   const { ownerId } = ctx.request.body
@@ -23,19 +25,29 @@ function isValid(ctx: Context): boolean {
 async function create(ctx: Context) {
   if (!isValid(ctx)) return
   const { shop } = ctx.request.body
-  if (await shopRepository.create(shop)) ctx.status = 200
+  if (await shopRepository.create(shop)) {
+    ctx.status = 200
+    const page = await pageRepository.find(shop.pageId)
+    if (page) await facebook.setMessengerProfile(page.accessToken)
+  }
 }
 
 async function update(ctx: Context) {
   if (!isValid(ctx)) return
   const { shop } = ctx.request.body
-  if (await shopRepository.update(shop)) ctx.status = 200
+  if (await shopRepository.update(shop)) {
+    ctx.status = 200
+  }
 }
 
 async function remove(ctx: Context) {
   if (!isValid(ctx)) return
   const { shop } = ctx.request.body
-  if (await shopRepository.remove(shop)) ctx.status = 200
+  if (await shopRepository.remove(shop)) {
+    ctx.status = 200
+    const page = await pageRepository.find(shop.pageId)
+    if (page) await facebook.resetMessengerProfile(page.accessToken)
+  }
 }
 
 export default {
