@@ -120,36 +120,21 @@ async function handlePostback(event: MessageEvent): Promise<void> {
   const shop = await api.findShop(event.recipient.id)
   if (!shop || !shop.isActive) return
 
-  // await markSeen(event)
-  // await typingOn(event)
+  const pageId = event.recipient.id
+  const customerId = event.sender.id
 
-  // const pageId = event.recipient.id
-  // const customerId = event.sender.id
+  const response: Message = {
+    recipient: { id: customerId },
+    messaging_type: 'response',
+    message: {},
+  }
 
-  // const response: Message = {
-  //   recipient: { id: customerId },
-  //   messaging_type: 'response',
-  //   message: {},
-  // }
-
-  // if (event.postback.payload === 'menu') {
-  //   const message = { text: 'TODO: Show Menu' }
-  //   await send(pageId, { ...response, message })
-  //   return
-  // }
-
-  // const customer = await api.findCustomer(customerId)
-  // if (!customer) {
-  //   const customer: Customer = {
-  //     id: customerId,
-  //     source: 'messenger',
-  //   }
-  //   if (await api.createCustomer(customer)) {
-  //     cache.setCustomer(customerId, customer)
-  //   }
-  // }
-
-  // const payload: PostbackPayload = JSON.parse(event.postback.payload)
+  if (event.postback.payload === 'shopNow') {
+    await markSeen(event)
+    await typingOn(event)
+    const message = await builder.respondWebview(pageId, customerId)
+    if (message) return await send(pageId, { ...response, message })
+  }
 }
 
 async function handlePostbackFromWebview(pageId: string, customer: Customer, items: CartItem[]) {
@@ -251,13 +236,13 @@ async function send(pageId: string, message: Message): Promise<void> {
   try {
     const page = await api.findPage(pageId)
     if (page && page.accessToken) {
-      const resp = await axios.post(
+      await axios.post(
         'https://graph.facebook.com/v6.0/me/messages',
         qs.stringify({ access_token: page.accessToken, ...message })
       )
-      if (resp && resp.data) {
-        // TODO: log success, resp.data={ recipient_id?: string, message_id: string }
-      }
+      // if (resp && resp.data) {
+      // TODO: log success, resp.data={ recipient_id?: string, message_id: string }
+      // }
     }
   } catch (e) {
     try {

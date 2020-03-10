@@ -13,7 +13,7 @@ import './Shop.scss'
 
 const ShopIndex = () => {
   const [shop, setShop] = useState<Shop>()
-  const [height, setHeight] = useState()
+  const [height, setHeight] = useState(0)
 
   const { sid } = useParams()
 
@@ -24,7 +24,7 @@ const ShopIndex = () => {
   useEffect(() => {
     if (!(sid && session)) return
     const elMain = document.getElementById('container')
-    const height = elMain ? elMain.offsetHeight - 35 : '95%'
+    const height = elMain ? elMain.offsetHeight - 35 : 0
     setHeight(height)
     ;(async () => {
       const shop = await api.findShop(session, sid)
@@ -47,7 +47,7 @@ const ShopIndex = () => {
   ) : (
     <>
       <main>
-        <div className="content shop" style={{ height }}>
+        <div className="content shop" style={{ height: height > 0 ? height : '95%' }}>
           <div className="information">
             <div className="name">
               <ShopOutlined />

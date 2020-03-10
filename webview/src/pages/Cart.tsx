@@ -10,7 +10,7 @@ import InputNumber from '../components/InputNumber'
 import './Cart.scss'
 
 const Cart = () => {
-  const [height, setHeight] = useState()
+  const [height, setHeight] = useState(0)
 
   const history = useHistory()
   const location = useLocation()
@@ -22,7 +22,7 @@ const Cart = () => {
 
   useEffect(() => {
     const elMain = document.getElementById('container')
-    const height = elMain ? elMain.offsetHeight - 75 : '85%'
+    const height = elMain ? elMain.offsetHeight - 75 : 0
     setHeight(height)
   }, [])
 
@@ -115,7 +115,7 @@ const Cart = () => {
   return (
     <>
       <main>
-        <div className="content cart" style={{ height }}>
+        <div className="content cart" style={{ height: height > 0 ? height : '85%' }}>
           <h1>Cart</h1>
           {items.length > 0 ? (
             <ul>

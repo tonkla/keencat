@@ -35,9 +35,9 @@ export interface OrderCreate {
 export interface OrderUpdate {
   id?: string
   shopId: string
-  pageId: string
   customerId: string
   attachment?: string
   status?: OrderStatus
   note?: string
+  updatedAt?: string
 }

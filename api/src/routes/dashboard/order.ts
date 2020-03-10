@@ -44,7 +44,8 @@ function isValid(ctx: Context): boolean {
 async function update(ctx: Context) {
   if (!isValid(ctx)) return
   const { order } = ctx.request.body
-  if (await orderRepository.update(order)) ctx.status = 200
+  if (await orderRepository.update(order)) return (ctx.status = 200)
+  return 500
 }
 
 export default {
