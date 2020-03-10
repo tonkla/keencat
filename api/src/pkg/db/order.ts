@@ -65,11 +65,13 @@ async function create(input: OrderCreate): Promise<string | null> {
 async function update(input: OrderUpdate): Promise<boolean> {
   if (!input.id || !input.status) return false
   try {
-    const updated = {
-      note: input.note,
+    const updated: OrderUpdate = {
+      shopId: input.shopId,
+      customerId: input.customerId,
       status: input.status,
       updatedAt: new Date().toISOString(),
     }
+    if (input.note) updated.note = input.note
     await db
       .collection('orders')
       .doc(input.id)

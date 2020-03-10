@@ -106,14 +106,3 @@ export interface WebhookParams {
   verifyToken: string
   challenge: string
 }
-
-export interface PostbackPayload {
-  action: 'listProducts' | 'buy' | 'confirm' | 'cancel'
-  shopId: string
-  pageId: string
-  customerId: string
-  productId?: string
-  productName?: string
-  categoryId?: string
-  ownerId?: string
-}

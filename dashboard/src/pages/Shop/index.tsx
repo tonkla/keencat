@@ -133,7 +133,7 @@ const ShopIndex = () => {
   async function handleToggle(isActive: boolean) {
     if (!activeShop) return
     updateShop({ ...activeShop, isActive })
-    const text = isActive ? 'Chatbot is ON.' : 'Chatbot is OFF.'
+    const text = isActive ? 'Chatbot will be available soon.' : 'Chatbot will be unavailable soon.'
     message.success(text)
   }
 
