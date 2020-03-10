@@ -8,6 +8,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import auth from './pkg/auth'
+import logging from './pkg/logging'
 import { category, customer, order, page, product, shop } from './routes/dashboard'
 import webhook from './routes/webhook'
 import webview from './routes/webview'
@@ -16,7 +17,7 @@ async function handleError(ctx: Context, next: Function) {
   try {
     await next()
   } catch (e) {
-    // TODO: log
+    await logging.error(e)
     ctx.status = 500
   }
 }
@@ -114,4 +115,4 @@ new Koa()
   .use(r2.mount('/webhook'))
   .use(r3.mount('/webview'))
   .use(r4.mount('/dashboard'))
-  .listen({ port: 8080 }, () => console.log('🚀 API Launched'))
+  .listen({ port: 8080 }, async () => await logging.notice('🚀 API Launched'))
