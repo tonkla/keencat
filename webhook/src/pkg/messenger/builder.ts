@@ -79,7 +79,7 @@ function requestPaymentSlip() {
 async function respondGreeting(customer?: Customer | null) {
   if (customer) {
     const name = customer.nickname || customer.name
-    const text = name ? `${lang.hello} ${lang.namePrefix}${name}` : lang.hello
+    const text = name ? `${lang.hello} ${lang.namePrefix} ${name}` : lang.hello
     return { text }
   } else {
     return { text: lang.hello }

@@ -4,6 +4,7 @@ import qs from 'qs'
 import api from '../api'
 import cache from '../api/cache'
 import dialogflow from '../dialogflow'
+import logging from '../logging'
 import builder from './builder'
 import { MessageEvent, WebhookEvent, WebhookParams } from './typings/request'
 import { Message } from './typings/response'
@@ -46,6 +47,7 @@ async function handleMessage(event: MessageEvent): Promise<void> {
     const intent = await dialogflow.detectIntent(text)
     if (!intent) {
       // TODO: handle unknown intent
+      cache.setConversationStep(pageId, customerId, '')
       return
     }
 
@@ -62,6 +64,7 @@ async function handleMessage(event: MessageEvent): Promise<void> {
       const customer = await api.findCustomer(customerId)
       const message = await builder.respondGreeting(customer)
       await send(pageId, { ...response, message })
+      cache.setConversationStep(pageId, customerId, 'respondGreeting')
 
       await typingOn(event)
       setTimeout(async () => {
@@ -71,7 +74,6 @@ async function handleMessage(event: MessageEvent): Promise<void> {
           await typingOff(event)
           return
         }
-        cache.setConversationStep(pageId, customerId, 'respondGreeting')
       }, 1000)
       return
     }
@@ -82,6 +84,7 @@ async function handleMessage(event: MessageEvent): Promise<void> {
       const message = await builder.respondWebview(pageId, customerId)
       if (message) {
         await send(pageId, { ...response, message })
+        cache.setConversationStep(pageId, customerId, '')
         return
       }
     }
@@ -108,12 +111,14 @@ async function handleMessage(event: MessageEvent): Promise<void> {
 
         const message = builder.respondApproving()
         await send(pageId, { ...response, message })
+        cache.setConversationStep(pageId, customerId, '')
         return
       }
     }
   }
   // Fallback
   await typingOff(event)
+  cache.setConversationStep(pageId, customerId, '')
 }
 
 async function handlePostback(event: MessageEvent): Promise<void> {
@@ -133,11 +138,16 @@ async function handlePostback(event: MessageEvent): Promise<void> {
     await markSeen(event)
     await typingOn(event)
     const message = await builder.respondWebview(pageId, customerId)
-    if (message) return await send(pageId, { ...response, message })
+    if (message) {
+      await send(pageId, { ...response, message })
+      cache.setConversationStep(pageId, customerId, '')
+      return
+    }
   }
 }
 
 async function handlePostbackFromWebview(pageId: string, customer: Customer, items: CartItem[]) {
+  await logging.info('Enter handlePostbackFromWebview')
   // Create order
   if (!items || items.length < 1) return
   // Recalculate the amount because I don't trust the data from webview
@@ -157,7 +167,8 @@ async function handlePostbackFromWebview(pageId: string, customer: Customer, ite
     items: newItems,
     totalAmount,
   }
-  await api.createOrder(order)
+  const id = await api.createOrder(order)
+  await logging.debug(`ID=${id}`)
 
   // Respond order summary and request payment
   const response: Message = {
@@ -240,9 +251,7 @@ async function send(pageId: string, message: Message): Promise<void> {
         'https://graph.facebook.com/v6.0/me/messages',
         qs.stringify({ access_token: page.accessToken, ...message })
       )
-      // if (resp && resp.data) {
-      // TODO: log success, resp.data={ recipient_id?: string, message_id: string }
-      // }
+      // resp.data: { recipient_id?: string, message_id: string }
     }
   } catch (e) {
     try {
@@ -254,17 +263,14 @@ async function send(pageId: string, message: Message): Promise<void> {
           qs.stringify({ access_token: page.accessToken, ..._message })
         )
       }
-    } catch (e) {}
+    } catch (e) {
+      await logging.error(e.response.data.error)
+      return
+    }
 
-    // TODO: log
-    console.log('Error=', e.response.data.error)
-    // https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes
-    // e.response.data = { error:
-    // { message: string, type: string, code: number, error_subcode?: number, fbtrace_id: string }}
-    //
-    // if (e.response && e.response.status === 400) {
-    //   await api.resetPageAccessToken(pageId)
-    // }
+    await logging.error(e.response.data.error)
+    // error: { message: string, type: string, code: number, error_subcode?: number, fbtrace_id: string }}
+    // See more, https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes
   }
 }
 

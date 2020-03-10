@@ -20,15 +20,13 @@ const cachedShop = new Map<string, CachedShop>()
 const cachedCustomer = new Map<string, CachedCustomer>()
 const conversation = new Map<string, ConversationStep>()
 
-const EXPMIN = 5
-
 function getPage(pageId: string): Page | null {
   const data = cachedPage.get(pageId)
   return data && data.expiredAt > new Date() ? data.page : null
 }
 
 function setPage(pageId: string, page: Page) {
-  const expiredAt = new Date(new Date().setMinutes(new Date().getMinutes() + EXPMIN))
+  const expiredAt = new Date(new Date().setMinutes(new Date().getMinutes() + 30))
   return cachedPage.set(pageId, { page, expiredAt })
 }
 
@@ -38,7 +36,7 @@ function getShop(pageId: string): Shop | null {
 }
 
 function setShop(pageId: string, shop: Shop) {
-  const expiredAt = new Date(new Date().setMinutes(new Date().getMinutes() + EXPMIN))
+  const expiredAt = new Date(new Date().setMinutes(new Date().getMinutes() + 5))
   return cachedShop.set(pageId, { shop, expiredAt })
 }
 
@@ -48,7 +46,7 @@ function getCustomer(customerId: string): Customer | null {
 }
 
 function setCustomer(customerId: string, customer: Customer) {
-  const expiredAt = new Date(new Date().setMinutes(new Date().getMinutes() + EXPMIN))
+  const expiredAt = new Date(new Date().setMinutes(new Date().getMinutes() + 5))
   return cachedCustomer.set(customerId, { customer, expiredAt })
 }
 
