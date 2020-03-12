@@ -1,6 +1,7 @@
 import React from 'react'
 import { StoreProvider } from 'easy-peasy'
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
+import * as Sentry from '@sentry/browser'
 
 import store from './store'
 
@@ -14,6 +15,8 @@ import Customer from './pages/Customer'
 
 import 'antd/dist/antd.css'
 import './App.scss'
+
+Sentry.init({ dsn: 'https://438ac07af54149868c4af1c97529a640@sentry.io/4430748' })
 
 const App = () => (
   <StoreProvider store={store}>

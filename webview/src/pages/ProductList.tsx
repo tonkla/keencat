@@ -23,7 +23,7 @@ const ProductList = () => {
   useEffect(() => {
     if (!(cid && session)) return
     const elMain = document.getElementById('container')
-    const height = elMain ? elMain.offsetHeight - 35 : 0
+    const height = elMain ? elMain.offsetHeight - 40 : 0
     const width = elMain ? elMain.offsetWidth : 0
     setHeight(height)
     setWidth(width)

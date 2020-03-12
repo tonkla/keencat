@@ -1,4 +1,17 @@
 .shop {
+  display: flex;
+  flex-direction: column;
+
+  label {
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 14px;
+    margin-right: 5px;
+  }
+
+  .category-list {
+    flex-grow: 1;
+  }
+
   .information {
     margin: 0;
     padding: 10px;
@@ -20,9 +33,15 @@
     }
   }
 
-  label {
-    color: rgba(0, 0, 0, 0.7);
-    font-size: 14px;
-    margin-right: 5px;
+  .version {
+    min-height: 20px;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    color: rgba(0, 0, 0, 0.2);
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
   }
 }

@@ -8,6 +8,7 @@ import { Customer } from '../typings'
 import './Customer.scss'
 
 const CustomerProfile = () => {
+  const [height, setHeight] = useState(0)
   const history = useHistory()
   const location = useLocation()
   const params = new URLSearchParams(location.search)
@@ -30,6 +31,12 @@ const CustomerProfile = () => {
       setAddress(customer.address)
     }
   }, [customer])
+
+  useEffect(() => {
+    const elMain = document.getElementById('container')
+    const height = elMain ? elMain.offsetHeight - 40 : 0
+    setHeight(height)
+  }, [])
 
   function handleChangePhoneNumber(e: any) {
     const number = e.currentTarget.value
@@ -61,7 +68,7 @@ const CustomerProfile = () => {
 
   return (
     <main>
-      <div className="content user">
+      <div className="content user" style={{ height: height > 0 ? height : '95%' }}>
         <h1>Profile</h1>
         <div>
           <div className="form">
