@@ -24,7 +24,7 @@ const ShopIndex = () => {
   useEffect(() => {
     if (!(sid && session)) return
     const elMain = document.getElementById('container')
-    const height = elMain ? elMain.offsetHeight - 35 : 0
+    const height = elMain ? elMain.offsetHeight - 40 : 0
     setHeight(height)
     ;(async () => {
       const shop = await api.findShop(session, sid)
@@ -85,6 +85,7 @@ const ShopIndex = () => {
             )}
           </div>
           <CategoryList />
+          <div className="version">v2020031203</div>
         </div>
       </main>
     </>

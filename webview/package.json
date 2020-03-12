@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@sentry/browser": "^5.14.0",
     "antd": "^4.0.2",
     "axios": "^0.19.2",
+    "dayjs": "^1.8.22",
     "easy-peasy": "^3.3.0",
     "nanoid": "^2.1.11",
     "node-sass": "^4.13.1",
@@ -28,7 +30,7 @@
   },
   "scripts": {
     "start": "PORT=3001 react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "build": "rm -rf build && GENERATE_SOURCEMAP=false react-scripts build",
     "deploy": "npm run build && firebase deploy"
   },
   "eslintConfig": {

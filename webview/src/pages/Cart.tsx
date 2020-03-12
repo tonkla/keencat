@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import { Button, Empty, Modal } from 'antd'
 import axios from 'axios'
+import * as Sentry from '@sentry/browser'
 
 import { useStoreActions, useStoreState } from '../store'
 import { CartItem } from '../typings'
@@ -22,7 +23,7 @@ const Cart = () => {
 
   useEffect(() => {
     const elMain = document.getElementById('container')
-    const height = elMain ? elMain.offsetHeight - 75 : 0
+    const height = elMain ? elMain.offsetHeight - 80 : 0
     setHeight(height)
   }, [])
 
@@ -81,18 +82,23 @@ const Cart = () => {
           </div>
         ),
         okText: 'Confirm',
-        onOk() {
+        async onOk() {
+          try {
+            const url = process.env.REACT_APP_WEBHOOK_URL
+            if (url && session) {
+              await axios.create({ headers: session }).post(url, { items, customer })
+            } else {
+              Sentry.captureException('No URL/Session')
+            }
+          } catch (e) {
+            Sentry.captureException(e)
+          }
           if (!(window as any).MessengerExtensions) return
           ;(window as any).MessengerExtensions.requestCloseBrowser(
-            async function success() {
-              try {
-                const url = process.env.REACT_APP_WEBHOOK_URL
-                if (url && session) {
-                  await axios.create({ headers: session }).post(url, { items, customer })
-                }
-              } catch (e) {}
-            },
-            function error(err: any) {}
+            function success() {},
+            function error(e: any) {
+              Sentry.captureException(e)
+            }
           )
         },
         cancelText: 'Edit',
