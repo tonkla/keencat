@@ -13,7 +13,7 @@ const webviewDomain =
 
 function buildWebviewButton(pageId: string, customerId: string, shop: Shop): ButtonTemplateButton {
   const hmac = utils.createHmac(pageId, customerId)
-  const params = qs.stringify({ hmac, pageId, customerId })
+  const params = qs.stringify({ hmac, pageId, customerId, version: new Date().getTime() })
   return {
     type: 'web_url',
     title: lang.viewProductsAndServices,
