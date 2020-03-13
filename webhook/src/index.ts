@@ -36,15 +36,12 @@ async function handleGetWebview(ctx: Context) {
 }
 
 async function handlePostWebview(ctx: Context) {
-  await logging.info('Enter handlePostWebview')
   const { hmac, pageid: pageId, customerid: customerId } = ctx.headers
-  await logging.debug({ hmac, pageId, customerId })
   if (hmac && pageId && customerId) {
     if (hmac !== utils.createHmac(pageId, customerId)) {
       return (ctx.status = 401)
     }
     const { customer, items } = ctx.request.body
-    await logging.debug({ customer, items })
     if (customer && items) {
       await msg.handlePostbackFromWebview(pageId, customer, items)
       return (ctx.status = 200)

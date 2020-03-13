@@ -147,7 +147,6 @@ async function handlePostback(event: MessageEvent): Promise<void> {
 }
 
 async function handlePostbackFromWebview(pageId: string, customer: Customer, items: CartItem[]) {
-  await logging.info('Enter handlePostbackFromWebview')
   // Create order
   if (!items || items.length < 1) return
   // Recalculate the amount because I don't trust the data from webview
@@ -168,7 +167,6 @@ async function handlePostbackFromWebview(pageId: string, customer: Customer, ite
     totalAmount,
   }
   const id = await api.createOrder(order)
-  await logging.debug(`ID=${id}`)
 
   // Respond order summary and request payment
   const response: Message = {
