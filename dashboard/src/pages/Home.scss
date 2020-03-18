@@ -64,6 +64,13 @@
     margin-bottom: 0;
   }
 
+  .ant-upload-list-picture-card-container,
+  .ant-upload-list-picture-card .ant-upload-list-item,
+  .ant-upload.ant-upload-select-picture-card {
+    height: 120px;
+    width: 120px;
+  }
+
   .ant-modal-title {
     font-weight: 500;
   }

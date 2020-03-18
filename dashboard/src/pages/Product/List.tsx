@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { List, Tag } from 'antd'
+import { Tag } from 'antd'
 
 import { Product } from '../../typings/product'
 import { PATH_PRODUCT } from '../../constants'
@@ -11,44 +11,39 @@ interface Props {
 
 const ProductList = ({ products }: Props) => {
   return (
-    <List
-      itemLayout="horizontal"
-      size="small"
-      dataSource={products}
-      renderItem={item => (
-        <List.Item>
-          <List.Item.Meta
-            avatar={
-              item.images && item.images.length > 0 ? (
-                <Link to={`${PATH_PRODUCT}/${item.id}`}>
-                  <div className="cover" style={{ backgroundImage: `url(${item.images[0]})` }} />
-                </Link>
-              ) : (
-                <Link to={`${PATH_PRODUCT}/${item.id}`}>
-                  <div className="cover" />
-                </Link>
-              )
-            }
-            title={
-              <Link to={`${PATH_PRODUCT}/${item.id}`}>
-                {item.name}
-                {item.isActive ? (
-                  <Tag color="green">Available</Tag>
-                ) : (
-                  <Tag color="red">Unavailable</Tag>
-                )}
-              </Link>
-            }
-            description={
-              <div className="details">
-                <span className="price">฿{item.price.toLocaleString()}</span>
-                <span className="quantity">( {item.quantity || 0} left )</span>
+    <ul>
+      {products.map(product => (
+        <li key={product.id}>
+          {product.images && product.images.length > 0 ? (
+            <Link to={`${PATH_PRODUCT}/${product.id}`}>
+              <div className="cover">
+                <img src={product.images[0]} alt={product.name} />
               </div>
-            }
-          />
-        </List.Item>
-      )}
-    />
+            </Link>
+          ) : (
+            <Link to={`${PATH_PRODUCT}/${product.id}`}>
+              <div className="cover">
+                <span>No Image</span>
+              </div>
+            </Link>
+          )}
+          <div className="info">
+            <Link to={`${PATH_PRODUCT}/${product.id}`}>
+              {product.name}
+              {product.isActive ? (
+                <Tag color="green">Available</Tag>
+              ) : (
+                <Tag color="red">Unavailable</Tag>
+              )}
+            </Link>
+            <div className="details">
+              <span className="price">฿{product.price.toLocaleString()}</span>
+              <span className="quantity">( {product.quantity || 0} left )</span>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
   )
 }
 

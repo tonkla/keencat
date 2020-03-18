@@ -150,8 +150,8 @@ const ProductItem = () => {
               <span className="price">฿{product.price.toLocaleString()}</span>
               <span className="quantity">( {product.quantity} left )</span>
             </div>
-            <div>
-              <div className="description">{product.description}</div>
+            <div className="description">
+              <span>{product.description}</span>
             </div>
           </div>
           <Upload
