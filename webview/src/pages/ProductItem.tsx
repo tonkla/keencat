@@ -88,9 +88,10 @@ const ProductItem = () => {
                     style={{
                       height: 300,
                       width: width > 0 ? width - 20 : 300,
-                      backgroundImage: `url('${img}')`,
                     }}
-                  />
+                  >
+                    <img src={img} alt={`${product.name}-${idx}`} />
+                  </div>
                 </div>
               ))
             ) : (
@@ -101,7 +102,9 @@ const ProductItem = () => {
                     height: 300,
                     width: width > 0 ? width - 20 : 300,
                   }}
-                />
+                >
+                  <span>No Image</span>
+                </div>
               </div>
             )}
           </Carousel>
