@@ -54,12 +54,14 @@ const ProductList = () => {
                     style={{
                       height: 130,
                       width: width > 0 ? (width - 22) / 2 - 10 : 130,
-                      backgroundImage:
-                        product.images && product.images.length > 0
-                          ? `url('${product.images[0]}')`
-                          : 'none',
                     }}
-                  />
+                  >
+                    {product.images && product.images.length > 0 ? (
+                      <img src={product.images[0]} alt={product.name} />
+                    ) : (
+                      <span>No Image</span>
+                    )}
+                  </div>
                 </div>
                 <div className="details">
                   <div className="name">
