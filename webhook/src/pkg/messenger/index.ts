@@ -166,7 +166,7 @@ async function handlePostbackFromWebview(pageId: string, customer: Customer, ite
     items: newItems,
     totalAmount,
   }
-  const id = await api.createOrder(order)
+  await api.createOrder(order)
 
   // Respond order summary and request payment
   const response: Message = {
