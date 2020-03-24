@@ -17,6 +17,11 @@ async function findCategories(headers: Session, shopId: string): Promise<Categor
   return resp && resp.data ? resp.data : []
 }
 
+async function findCategory(headers: Session, id: string): Promise<Category | null> {
+  const resp = await call(headers, 'find-category', { id })
+  return resp && resp.data ? resp.data : null
+}
+
 async function findCustomer(headers: Session, id: string): Promise<Customer | null> {
   const resp = await call(headers, 'find-customer', { id })
   return resp && resp.data ? resp.data : null
@@ -44,6 +49,7 @@ async function updateCustomer(headers: Session, customer: Customer): Promise<boo
 
 export default {
   findCategories,
+  findCategory,
   findCustomer,
   findProduct,
   findProducts,

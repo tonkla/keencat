@@ -5,8 +5,9 @@ import { Button, Carousel } from 'antd'
 import { useStoreActions, useStoreState } from '../store'
 import api from '../services/api'
 import utils from '../services/utils'
-import { CartItem, Product } from '../typings'
+import { CartItem, Product, ProductTypeEnum, ProductChargeTypeEnum } from '../typings'
 
+import Booking from '../components/Booking'
 import InputNumber from '../components/InputNumber'
 import Loading from '../components/Loading'
 
@@ -15,6 +16,7 @@ import './ProductItem.scss'
 const ProductItem = () => {
   const [product, setProduct] = useState<Product>()
   const [quantity, setQuantity] = useState(1)
+  const [showBookingModal, setShowBookingModal] = useState(false)
   const [height, setHeight] = useState(0)
   const [width, setWidth] = useState(0)
 
@@ -67,9 +69,32 @@ const ProductItem = () => {
     history.push(`/cart${location.search}`)
   }
 
-  function handleClickBookNow() {}
+  function handleClickBookNow() {
+    setShowBookingModal(true)
+  }
 
-  const itemUnit = product && product.quantity > 1 ? 'items' : 'item'
+  function handleBookingOk() {
+    setShowBookingModal(false)
+  }
+
+  function handleBookingCancel() {
+    setShowBookingModal(false)
+  }
+
+  function displayChargeType(chargeType: string) {
+    switch (chargeType) {
+      case ProductChargeTypeEnum.Hourly:
+        return '/ Hour'
+      case ProductChargeTypeEnum.Daily:
+        return '/ Day'
+      case ProductChargeTypeEnum.Monthly:
+        return '/ Month'
+      default:
+        return ''
+    }
+  }
+
+  const itemUnit = product && product.quantity && product.quantity > 1 ? 'items' : 'item'
 
   return !product ? (
     <div className="mt60">
@@ -111,7 +136,12 @@ const ProductItem = () => {
           <div className="details">
             <div className="wrapper">
               <span className="price">฿{product.price.toLocaleString()}</span>
-              <span className="quantity">{`(only ${product.quantity} ${itemUnit} left)`}</span>
+              {product.type === ProductTypeEnum.Goods && product.quantity !== undefined && (
+                <span className="quantity">{`(only ${product.quantity} ${itemUnit} left)`}</span>
+              )}
+              {product.type === ProductTypeEnum.Service && product.charge !== undefined && (
+                <span className="quantity">{displayChargeType(product.charge)}</span>
+              )}
             </div>
             <div className="name">
               <span>{product.name}</span>
@@ -123,21 +153,23 @@ const ProductItem = () => {
         </div>
       </main>
       <footer>
-        {product.type === 'goods' ? (
-          <>
-            <InputNumber
-              defaultValue={1}
-              min={1}
-              max={product.quantity}
-              callback={handleChangeQuantity}
-            />
-            <Button type="primary" onClick={handleClickAddToCart}>
-              Add to Cart
-            </Button>
-            <Button type="primary" onClick={handleClickBuyNow}>
-              Buy Now
-            </Button>
-          </>
+        {product.type === ProductTypeEnum.Goods ? (
+          product.quantity !== undefined && (
+            <>
+              <InputNumber
+                defaultValue={1}
+                min={1}
+                max={product.quantity}
+                callback={handleChangeQuantity}
+              />
+              <Button type="primary" onClick={handleClickAddToCart}>
+                Add to Cart
+              </Button>
+              <Button type="primary" onClick={handleClickBuyNow}>
+                Buy Now
+              </Button>
+            </>
+          )
         ) : (
           <>
             <Button type="primary" onClick={handleClickBookNow}>
@@ -146,6 +178,9 @@ const ProductItem = () => {
           </>
         )}
       </footer>
+      {showBookingModal && (
+        <Booking visible={true} handleOk={handleBookingOk} handleCancel={handleBookingCancel} />
+      )}
     </>
   )
 }

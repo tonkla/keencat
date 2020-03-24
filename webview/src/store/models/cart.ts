@@ -13,7 +13,7 @@ const cartState: CartStateModel = {
   add: action((state, item) => {
     const rest = state.items.filter(i => i.product.id !== item.product.id)
     const old = state.items.find(i => i.product.id === item.product.id)
-    if (old) {
+    if (old && item.product.quantity) {
       if (old.quantity + item.quantity <= item.product.quantity) {
         state.items = [
           ...rest,
