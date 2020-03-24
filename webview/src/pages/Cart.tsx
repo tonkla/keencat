@@ -147,14 +147,16 @@ const Cart = () => {
                         <span className="price">฿{item.product.price.toLocaleString()}</span>
                         <span className="x">x</span>
                         <span className="quantity">{item.quantity}</span>
-                        <div className="input">
-                          <InputNumber
-                            defaultValue={item.quantity}
-                            min={0}
-                            max={item.product.quantity}
-                            callback={(qty: number) => handleChangeQuantity(item, qty)}
-                          />
-                        </div>
+                        {item.product.quantity !== undefined && (
+                          <div className="input">
+                            <InputNumber
+                              defaultValue={item.quantity}
+                              min={0}
+                              max={item.product.quantity}
+                              callback={(qty: number) => handleChangeQuantity(item, qty)}
+                            />
+                          </div>
+                        )}
                       </div>
                       <div className="amount price">
                         <span>฿{item.amount.toLocaleString()}</span>

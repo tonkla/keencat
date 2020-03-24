@@ -36,9 +36,7 @@ const CategoryList = () => {
         <li key={category.id}>
           <Link to={`/c/${category.id}/p${location.search}`}>
             <TagsOutlined />
-            <span>
-              {category.name} ({category.productIds.length})
-            </span>
+            <span>{category.name}</span>
           </Link>
         </li>
       ))}

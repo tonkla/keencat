@@ -1,9 +1,11 @@
+@import '../styles/shared';
+
 .shop {
   display: flex;
   flex-direction: column;
 
   label {
-    color: rgba(0, 0, 0, 0.7);
+    color: $textColor2;
     font-size: 14px;
     margin-right: 5px;
   }
@@ -27,7 +29,7 @@
     margin-bottom: 8px;
 
     .anticon {
-      color: rgba(0, 0, 0, 0.7);
+      color: $textColor2;
       margin-right: 7px;
       font-size: 20px;
     }
@@ -39,7 +41,7 @@
     position: fixed;
     bottom: 0;
     left: 0;
-    color: rgba(0, 0, 0, 0.2);
+    color: $textColor4;
     font-size: 12px;
     display: flex;
     justify-content: center;

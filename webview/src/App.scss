@@ -1,9 +1,11 @@
+@import './styles/shared';
+
 html {
   box-sizing: border-box;
 }
 
 body {
-  color: rgba(0, 0, 0, 0.8);
+  color: $textColor;
   font-family: Montserrat, Prompt, sans-serif;
   font-size: 16px;
   font-weight: 500;

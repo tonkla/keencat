@@ -1,3 +1,5 @@
+@import '../styles/shared';
+
 .product {
   .ant-carousel .slick-slide {
     text-align: center;
@@ -37,7 +39,7 @@
   }
 
   .quantity {
-    color: rgba(0, 0, 0, 0.6);
+    color: $textColor2;
     font-size: 14px;
     margin-left: 10px;
   }
