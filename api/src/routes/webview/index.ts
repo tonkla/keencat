@@ -13,6 +13,13 @@ async function findCategories(ctx: Context) {
   }
 }
 
+async function findCategory(ctx: Context) {
+  const { id } = ctx.request.body
+  if (id) {
+    ctx.body = await categoryRepository.find(id)
+  }
+}
+
 async function findCustomer(ctx: Context) {
   const { id } = ctx.request.body
   if (id) {
@@ -25,7 +32,7 @@ async function findProduct(ctx: Context) {
   const { id } = ctx.request.body
   if (id) {
     const product = await productRepository.find(id)
-    ctx.body = product && product.isActive && product.quantity > 0 ? product : null
+    ctx.body = product && product.isActive ? product : null
   }
 }
 
@@ -33,7 +40,7 @@ async function findProducts(ctx: Context) {
   const { categoryId } = ctx.request.body
   if (categoryId) {
     const products = await productRepository.findByCategory(categoryId)
-    ctx.body = products.filter(p => p.isActive && p.quantity > 0)
+    ctx.body = products.filter(p => p.isActive)
   }
 }
 
@@ -54,6 +61,7 @@ async function updateCustomer(ctx: Context) {
 
 export default {
   findCategories,
+  findCategory,
   findCustomer,
   findProduct,
   findProducts,

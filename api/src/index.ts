@@ -76,6 +76,7 @@ r2.post('/update-order', webhook.updateOrder)
 
 const r3 = new Router()
 r3.post('/find-categories', webview.findCategories)
+r3.post('/find-category', webview.findCategory)
 r3.post('/find-customer', webview.findCustomer)
 r3.post('/find-product', webview.findProduct)
 r3.post('/find-products', webview.findProducts)
