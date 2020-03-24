@@ -1,4 +1,15 @@
 export type ProductType = 'goods' | 'service'
+export type ProductChargeType = 'hourly' | 'daily' | 'monthly'
+
+export enum ProductTypeEnum {
+  Goods = 'goods',
+  Service = 'service',
+}
+export enum ProductChargeTypeEnum {
+  Hourly = 'hourly',
+  Daily = 'daily',
+  Monthly = 'monthly',
+}
 
 export interface Product {
   id: string
@@ -11,6 +22,9 @@ export interface Product {
   ownerId: string
   isActive: boolean
   price: number
-  quantity: number
+  quantity?: number
+  charge?: ProductChargeType
+  openAt?: string
+  closeAt?: string
   images?: string[]
 }
