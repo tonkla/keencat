@@ -5,7 +5,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import { useStoreActions, useStoreState } from '../../store'
 import { productRepository } from '../../services/repositories'
 import utils from '../../services/utils'
-import { Category, Product } from '../../typings'
+import { Category, Product, ProductTypeEnum, ProductChargeTypeEnum } from '../../typings'
 
 import Loading from '../../components/Loading'
 import Form from './Form'
@@ -52,7 +52,15 @@ const ProductList = ({ category }: Props) => {
       name: values.name,
       description: values.description,
       price: values.price,
-      quantity: values.quantity,
+    }
+    if (values.type === ProductTypeEnum.Goods) {
+      product.quantity = values.quantity
+    } else if (values.type === ProductTypeEnum.Service) {
+      product.charge = values.charge
+      if (values.charge === ProductChargeTypeEnum.Hourly) {
+        product.openAt = values.openAt
+        product.closeAt = values.closeAt
+      }
     }
     createProduct(product)
     enableForm(false)

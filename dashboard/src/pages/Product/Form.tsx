@@ -1,7 +1,8 @@
-import React from 'react'
-import { Button, Card, Form, Input, Radio } from 'antd'
+import React, { useState } from 'react'
+import { Button, Card, Form, Input, Radio, TimePicker } from 'antd'
+import moment from 'moment'
 
-import { Product } from '../../typings'
+import { Product, ProductTypeEnum, ProductChargeTypeEnum } from '../../typings'
 
 interface FormProps {
   callback: any
@@ -10,13 +11,39 @@ interface FormProps {
 }
 
 const ProductForm = ({ callback, cancel, product }: FormProps) => {
+  const [productType, setProductType] = useState(product ? product.type : ProductTypeEnum.Goods)
+  const [chargeType, setChargeType] = useState(
+    product ? product.charge : ProductChargeTypeEnum.Daily
+  )
+
+  const timeFormat = 'HH:mm'
+
   function onFinish(values: any) {
+    const _product = product ? { ...product } : null
+
     const _val = {
       ...values,
       price: parseFloat(values.price) || 0,
-      quantity: parseInt(values.quantity) || 0,
     }
-    product ? callback({ ...product, ..._val }) : callback(_val)
+
+    if (values.type === ProductTypeEnum.Goods) {
+      _val.quantity = parseInt(values.quantity) || 0
+    } else if (_product?.quantity) {
+      delete _product.quantity
+    }
+
+    if (values.charge === ProductChargeTypeEnum.Hourly) {
+      _val.openAt = moment(values.openAt).format(timeFormat)
+      _val.closeAt = moment(values.closeAt).format(timeFormat)
+    }
+
+    if (_product) {
+      if (_product.openAt) delete _product.openAt
+      if (_product.closeAt) delete _product.closeAt
+      callback({ ..._product, ..._val })
+    } else {
+      callback(_val)
+    }
   }
 
   const regexPrice = /(^\d+\.?\d{0,2}$|^$)/
@@ -30,11 +57,14 @@ const ProductForm = ({ callback, cancel, product }: FormProps) => {
       <Form
         {...formLayout}
         initialValues={{
-          type: product ? product.type : 'goods',
+          type: product ? product.type : ProductTypeEnum.Goods,
           name: product ? product.name : '',
           description: product ? product.description : '',
           price: product ? product.price : '',
           quantity: product ? product.quantity : '',
+          charge: product ? product.charge : '',
+          openAt: product ? (product.openAt ? moment(product.openAt, timeFormat) : '') : '',
+          closeAt: product ? (product.closeAt ? moment(product.closeAt, timeFormat) : '') : '',
         }}
         onFinish={onFinish}
       >
@@ -43,7 +73,7 @@ const ProductForm = ({ callback, cancel, product }: FormProps) => {
           name="type"
           rules={[{ required: true, message: 'Type is required' }]}
         >
-          <Radio.Group buttonStyle="solid">
+          <Radio.Group buttonStyle="solid" onChange={e => setProductType(e.target.value)}>
             <Radio.Button value="goods">Goods</Radio.Button>
             <Radio.Button value="service">Service</Radio.Button>
           </Radio.Group>
@@ -78,22 +108,56 @@ const ProductForm = ({ callback, cancel, product }: FormProps) => {
         >
           <Input placeholder="Input a number" />
         </Form.Item>
-        <Form.Item
-          label="Quantity"
-          name="quantity"
-          rules={[
-            { required: true, message: 'Quantity is required' },
-            {
-              validator: async (rule, value) => {
-                return regexNumeric.test(value)
-                  ? Promise.resolve()
-                  : Promise.reject('Only number is accepted')
+        {productType === ProductTypeEnum.Goods ? (
+          <Form.Item
+            label="Quantity"
+            name="quantity"
+            rules={[
+              { required: true, message: 'Quantity is required' },
+              {
+                validator: async (rule, value) => {
+                  return regexNumeric.test(value)
+                    ? Promise.resolve()
+                    : Promise.reject('Only number is accepted')
+                },
               },
-            },
-          ]}
-        >
-          <Input placeholder="Input a number" />
-        </Form.Item>
+            ]}
+          >
+            <Input placeholder="Input a number" />
+          </Form.Item>
+        ) : (
+          <>
+            <Form.Item
+              label="Charge"
+              name="charge"
+              rules={[{ required: true, message: 'Charge type is required' }]}
+            >
+              <Radio.Group buttonStyle="outline" onChange={e => setChargeType(e.target.value)}>
+                <Radio.Button value="hourly">Hourly</Radio.Button>
+                <Radio.Button value="daily">Daily</Radio.Button>
+                <Radio.Button value="monthly">Monthly</Radio.Button>
+              </Radio.Group>
+            </Form.Item>
+            {chargeType === ProductChargeTypeEnum.Hourly && (
+              <>
+                <Form.Item
+                  label="Open at"
+                  name="openAt"
+                  rules={[{ required: true, message: 'Opening hour is required' }]}
+                >
+                  <TimePicker format={timeFormat} />
+                </Form.Item>
+                <Form.Item
+                  label="Close at"
+                  name="closeAt"
+                  rules={[{ required: true, message: 'Closed hour is required' }]}
+                >
+                  <TimePicker format={timeFormat} />
+                </Form.Item>
+              </>
+            )}
+          </>
+        )}
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit">
             {product ? 'Edit' : 'Add'}

@@ -67,7 +67,7 @@ const OrderItem = () => {
       if (status === 'paid') {
         order.items.forEach(async item => {
           const product = await productRepository.find(item.productId)
-          if (product) {
+          if (product && product.quantity) {
             const qty = product.quantity - item.quantity
             updateProduct({ ...product, quantity: qty >= 0 ? qty : 0 })
           }
