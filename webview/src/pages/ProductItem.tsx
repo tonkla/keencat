@@ -5,7 +5,15 @@ import { Button, Carousel } from 'antd'
 import { useStoreActions, useStoreState } from '../store'
 import api from '../services/api'
 import utils from '../services/utils'
-import { CartItem, Product, ProductTypeEnum, ProductChargeTypeEnum } from '../typings'
+import {
+  BookingCallbackParams,
+  CartItemGoods,
+  CartItemTypeEnum,
+  CartItemServiceDay,
+  Product,
+  ProductTypeEnum,
+  ProductChargeTypeEnum,
+} from '../typings'
 
 import Booking from '../components/Booking'
 import InputNumber from '../components/InputNumber'
@@ -17,6 +25,7 @@ const ProductItem = () => {
   const [product, setProduct] = useState<Product>()
   const [quantity, setQuantity] = useState(1)
   const [showBookingModal, setShowBookingModal] = useState(false)
+  const [buyNow, setBuyNow] = useState(false)
   const [height, setHeight] = useState(0)
   const [width, setWidth] = useState(0)
 
@@ -44,37 +53,43 @@ const ProductItem = () => {
     setQuantity(qty)
   }
 
-  function handleClickAddToCart() {
+  function handleClickAddToCart(buyNow: boolean) {
     if (!product) return
-    const item: CartItem = {
+    const item: CartItemGoods = {
+      kind: CartItemTypeEnum.Goods,
       id: utils.genId(),
       product,
       quantity,
       amount: product.price * quantity,
-      updatedAt: new Date().toISOString(),
     }
     addToCart(item)
+    if (buyNow) history.push(`/cart${location.search}`)
   }
 
-  function handleClickBuyNow() {
-    if (!product) return
-    const item: CartItem = {
-      id: utils.genId(),
-      product,
-      quantity,
-      amount: product.price * quantity,
-      updatedAt: new Date().toISOString(),
-    }
-    addToCart(item)
-    history.push(`/cart${location.search}`)
-  }
-
-  function handleClickBookNow() {
+  function handleClickAddServiceToCart() {
+    setBuyNow(false)
     setShowBookingModal(true)
   }
 
-  function handleBookingOk() {
+  function handleClickBuyServiceNow() {
+    setBuyNow(true)
+    setShowBookingModal(true)
+  }
+
+  function handleBookingOk({ from, to, days }: BookingCallbackParams) {
+    if (!product) return
+    const item: CartItemServiceDay = {
+      kind: CartItemTypeEnum.Daily,
+      id: utils.genId(),
+      product,
+      from,
+      to,
+      days,
+      amount: product.price * days,
+    }
+    addToCart(item)
     setShowBookingModal(false)
+    if (buyNow) history.push(`/cart${location.search}`)
   }
 
   function handleBookingCancel() {
@@ -154,33 +169,37 @@ const ProductItem = () => {
       </main>
       <footer>
         {product.type === ProductTypeEnum.Goods ? (
-          product.quantity !== undefined && (
-            <>
-              <InputNumber
-                defaultValue={1}
-                min={1}
-                max={product.quantity}
-                callback={handleChangeQuantity}
-              />
-              <Button type="primary" onClick={handleClickAddToCart}>
-                Add to Cart
-              </Button>
-              <Button type="primary" onClick={handleClickBuyNow}>
-                Buy Now
-              </Button>
-            </>
-          )
+          <>
+            <InputNumber
+              defaultValue={1}
+              min={1}
+              max={product.quantity || 1}
+              callback={handleChangeQuantity}
+            />
+            <Button type="primary" onClick={() => handleClickAddToCart(false)}>
+              Add to Cart
+            </Button>
+            <Button type="primary" onClick={() => handleClickAddToCart(true)}>
+              Buy Now
+            </Button>
+          </>
         ) : (
           <>
-            <Button type="primary" onClick={handleClickBookNow}>
-              Book Now
+            <Button type="primary" onClick={handleClickAddServiceToCart}>
+              Add to Cart
+            </Button>
+            <Button type="primary" onClick={handleClickBuyServiceNow}>
+              Buy Now
             </Button>
           </>
         )}
       </footer>
-      {showBookingModal && (
-        <Booking visible={true} handleOk={handleBookingOk} handleCancel={handleBookingCancel} />
-      )}
+      <Booking
+        product={product}
+        visible={showBookingModal}
+        handleOk={handleBookingOk}
+        handleCancel={handleBookingCancel}
+      />
     </>
   )
 }

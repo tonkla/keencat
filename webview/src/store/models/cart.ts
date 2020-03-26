@@ -1,6 +1,6 @@
 import { Action, action } from 'easy-peasy'
 
-import { CartItem } from '../../typings'
+import { CartItem, CartItemTypeEnum } from '../../typings'
 
 export interface CartStateModel {
   items: CartItem[]
@@ -13,7 +13,12 @@ const cartState: CartStateModel = {
   add: action((state, item) => {
     const rest = state.items.filter(i => i.product.id !== item.product.id)
     const old = state.items.find(i => i.product.id === item.product.id)
-    if (old && item.product.quantity) {
+    if (
+      old &&
+      old.kind === CartItemTypeEnum.Goods &&
+      item.kind === CartItemTypeEnum.Goods &&
+      item.product.quantity
+    ) {
       if (old.quantity + item.quantity <= item.product.quantity) {
         state.items = [
           ...rest,

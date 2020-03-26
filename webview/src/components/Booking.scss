@@ -1,3 +1,21 @@
-.flatpickr-calendar {
-  font-size: 12px;
+.booking {
+  .flatpickr-calendar {
+    font-size: 12px;
+  }
+
+  .ant-row {
+    margin-bottom: 5px;
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    padding-right: 5px;
+  }
+}
+
+.ant-picker-dropdown-placement-bottomCenter {
+  left: 20px !important;
 }
