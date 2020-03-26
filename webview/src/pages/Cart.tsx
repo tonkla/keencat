@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Link, useHistory, useLocation } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { Button, Empty, Modal } from 'antd'
+import { MinusCircleOutlined } from '@ant-design/icons'
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
 
 import { useStoreActions, useStoreState } from '../store'
-import { CartItem } from '../typings'
+import { CartItemGoods, CartItemTypeEnum } from '../typings'
 
 import InputNumber from '../components/InputNumber'
 import './Cart.scss'
@@ -109,13 +110,17 @@ const Cart = () => {
     }
   }
 
-  function handleChangeQuantity(item: CartItem, quantity: number) {
+  function handleChangeQuantity(item: CartItemGoods, quantity: number) {
     const rest = items.filter(i => i.id !== item.id)
     if (quantity > 0) {
       updateCart([...rest, { ...item, quantity, amount: quantity * item.product.price }])
     } else {
       updateCart(rest)
     }
+  }
+
+  function handleClickRemove(id: string) {
+    updateCart(items.filter(item => item.id !== id))
   }
 
   return (
@@ -127,40 +132,63 @@ const Cart = () => {
             <ul>
               {items.map(item => (
                 <li key={item.id}>
-                  <Link to={`/p/${item.product.id}${location.search}`}>
-                    <div
-                      className="cover"
-                      style={{
-                        backgroundImage:
-                          item.product.images && item.product.images.length > 0
-                            ? `url('${item.product.images[0]}')`
-                            : 'none',
-                      }}
-                    />
-                  </Link>
+                  <div
+                    className="cover"
+                    onClick={() => history.push(`/p/${item.product.id}${location.search}`)}
+                  >
+                    <div className="img">
+                      {item.product.images && item.product.images.length > 0 ? (
+                        <img src={item.product.images[0]} alt={item.product.name} />
+                      ) : (
+                        <span>No Image</span>
+                      )}
+                    </div>
+                  </div>
                   <div className="details">
-                    <div className="name">
+                    <div
+                      className="name"
+                      onClick={() => history.push(`/p/${item.product.id}${location.search}`)}
+                    >
                       <span>{item.product.name}</span>
                     </div>
                     <div className="mt10">
                       <div className="wrapper">
                         <span className="price">฿{item.product.price.toLocaleString()}</span>
                         <span className="x">x</span>
-                        <span className="quantity">{item.quantity}</span>
-                        {item.product.quantity !== undefined && (
-                          <div className="input">
-                            <InputNumber
-                              defaultValue={item.quantity}
-                              min={0}
-                              max={item.product.quantity}
-                              callback={(qty: number) => handleChangeQuantity(item, qty)}
-                            />
-                          </div>
+                        {item.kind === CartItemTypeEnum.Goods && (
+                          <>
+                            <span className="quantity">{item.quantity}</span>
+                            {item.product.quantity !== undefined && (
+                              <div className="input">
+                                <InputNumber
+                                  defaultValue={item.quantity}
+                                  min={0}
+                                  max={item.product.quantity}
+                                  callback={(qty: number) => handleChangeQuantity(item, qty)}
+                                />
+                              </div>
+                            )}
+                          </>
+                        )}
+                        {item.kind === CartItemTypeEnum.Daily && (
+                          <span className="quantity">
+                            {item.days} {item.days < 2 ? 'day' : 'days'}
+                          </span>
                         )}
                       </div>
                       <div className="amount price">
                         <span>฿{item.amount.toLocaleString()}</span>
                       </div>
+                    </div>
+                    <div>
+                      <Button
+                        type="link"
+                        icon={<MinusCircleOutlined />}
+                        style={{ paddingLeft: 0 }}
+                        onClick={() => handleClickRemove(item.id)}
+                      >
+                        Remove
+                      </Button>
                     </div>
                   </div>
                 </li>

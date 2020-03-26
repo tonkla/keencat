@@ -5,5 +5,4 @@ export interface CartItem {
   product: Product
   quantity: number
   amount: number
-  updatedAt: string
 }
