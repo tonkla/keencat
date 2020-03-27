@@ -18,25 +18,25 @@ export interface CartItemGoods {
 interface CartItemService {
   id: string
   product: Product
-  from: string
-  to: string
   amount: number
 }
 
 export interface CartItemServiceHour extends CartItemService {
   kind: CartItemTypeEnum.Hourly
   date: string
-  hours: number
+  hour: string
 }
 
 export interface CartItemServiceDay extends CartItemService {
   kind: CartItemTypeEnum.Daily
+  from: string
+  to: string
   days: number
 }
 
 export interface CartItemServiceMonth extends CartItemService {
   kind: CartItemTypeEnum.Monthly
-  months: number
+  month: string
 }
 
 export type CartItem =

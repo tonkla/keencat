@@ -56,7 +56,7 @@ const ProductList = ({ category }: Props) => {
     if (values.type === ProductTypeEnum.Goods) {
       product.quantity = values.quantity
     } else if (values.type === ProductTypeEnum.Service) {
-      product.charge = values.charge
+      product.chargeType = values.chargeType
       if (values.charge === ProductChargeTypeEnum.Hourly) {
         product.openAt = values.openAt
         product.closeAt = values.closeAt

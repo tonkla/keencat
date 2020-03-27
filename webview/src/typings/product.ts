@@ -23,7 +23,7 @@ export interface Product {
   isActive: boolean
   price: number
   quantity?: number
-  charge?: ProductChargeType
+  chargeType?: ProductChargeType
   openAt?: string
   closeAt?: string
   images?: string[]

@@ -8,11 +8,13 @@ import utils from '../services/utils'
 import {
   BookingCallbackParams,
   CartItemGoods,
-  CartItemTypeEnum,
   CartItemServiceDay,
+  CartItemServiceHour,
+  CartItemServiceMonth,
+  CartItemTypeEnum,
   Product,
-  ProductTypeEnum,
   ProductChargeTypeEnum,
+  ProductTypeEnum,
 } from '../typings'
 
 import Booking from '../components/Booking'
@@ -76,18 +78,43 @@ const ProductItem = () => {
     setShowBookingModal(true)
   }
 
-  function handleBookingOk({ from, to, days }: BookingCallbackParams) {
+  function handleBookingOk({ from, to, days, month, hour }: BookingCallbackParams) {
     if (!product) return
-    const item: CartItemServiceDay = {
-      kind: CartItemTypeEnum.Daily,
-      id: utils.genId(),
-      product,
-      from,
-      to,
-      days,
-      amount: product.price * days,
+    if (product.chargeType === ProductChargeTypeEnum.Hourly) {
+      const item: CartItemServiceHour = {
+        kind: CartItemTypeEnum.Hourly,
+        id: utils.genId(),
+        product,
+        date: from,
+        hour,
+        amount: product.price,
+      }
+      addToCart(item)
     }
-    addToCart(item)
+    //
+    else if (product.chargeType === ProductChargeTypeEnum.Daily) {
+      const item: CartItemServiceDay = {
+        kind: CartItemTypeEnum.Daily,
+        id: utils.genId(),
+        product,
+        from,
+        to,
+        days,
+        amount: product.price * days,
+      }
+      addToCart(item)
+    }
+    //
+    else if (product.chargeType === ProductChargeTypeEnum.Monthly) {
+      const item: CartItemServiceMonth = {
+        kind: CartItemTypeEnum.Monthly,
+        id: utils.genId(),
+        product,
+        month,
+        amount: product.price,
+      }
+      addToCart(item)
+    }
     setShowBookingModal(false)
     if (buyNow) history.push(`/cart${location.search}`)
   }
@@ -154,8 +181,8 @@ const ProductItem = () => {
               {product.type === ProductTypeEnum.Goods && product.quantity !== undefined && (
                 <span className="quantity">{`(only ${product.quantity} ${itemUnit} left)`}</span>
               )}
-              {product.type === ProductTypeEnum.Service && product.charge !== undefined && (
-                <span className="quantity">{displayChargeType(product.charge)}</span>
+              {product.type === ProductTypeEnum.Service && product.chargeType !== undefined && (
+                <span className="quantity">{displayChargeType(product.chargeType)}</span>
               )}
             </div>
             <div className="name">
