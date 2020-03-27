@@ -102,7 +102,7 @@ const ProductList = () => {
                     <div className="price">
                       <span>฿{product.price.toLocaleString()}</span>
                       {product.type === ProductTypeEnum.Service && (
-                        <span className="charge-type">{displayChargeType(product.charge)}</span>
+                        <span className="charge-type">{displayChargeType(product.chargeType)}</span>
                       )}
                     </div>
                     {product.type === ProductTypeEnum.Goods &&

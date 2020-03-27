@@ -11,12 +11,15 @@ interface FormProps {
 }
 
 const ProductForm = ({ callback, cancel, product }: FormProps) => {
+  const timeFormat = 'HH:mm'
+
   const [productType, setProductType] = useState(product ? product.type : ProductTypeEnum.Goods)
   const [chargeType, setChargeType] = useState(
-    product ? product.charge : ProductChargeTypeEnum.Daily
+    product ? product.chargeType : ProductChargeTypeEnum.Daily
   )
-
-  const timeFormat = 'HH:mm'
+  const [openAt, setOpenAt] = useState<moment.Moment | undefined>(
+    product?.openAt ? moment(product.openAt, timeFormat) : undefined
+  )
 
   function onFinish(values: any) {
     const _product = product ? { ...product } : null
@@ -32,7 +35,7 @@ const ProductForm = ({ callback, cancel, product }: FormProps) => {
       delete _product.quantity
     }
 
-    if (values.charge === ProductChargeTypeEnum.Hourly) {
+    if (values.chargeType === ProductChargeTypeEnum.Hourly) {
       _val.openAt = moment(values.openAt).format(timeFormat)
       _val.closeAt = moment(values.closeAt).format(timeFormat)
     }
@@ -44,6 +47,10 @@ const ProductForm = ({ callback, cancel, product }: FormProps) => {
     } else {
       callback(_val)
     }
+  }
+
+  function disableHours(openAt: moment.Moment) {
+    return [...Array(24).keys()].filter(h => h <= moment(openAt).hour())
   }
 
   const regexPrice = /(^\d+\.?\d{0,2}$|^$)/
@@ -62,7 +69,7 @@ const ProductForm = ({ callback, cancel, product }: FormProps) => {
           description: product ? product.description : '',
           price: product ? product.price : '',
           quantity: product ? product.quantity : '',
-          charge: product ? product.charge : '',
+          chargeType: product ? product.chargeType : '',
           openAt: product ? (product.openAt ? moment(product.openAt, timeFormat) : '') : '',
           closeAt: product ? (product.closeAt ? moment(product.closeAt, timeFormat) : '') : '',
         }}
@@ -129,7 +136,7 @@ const ProductForm = ({ callback, cancel, product }: FormProps) => {
           <>
             <Form.Item
               label="Charge"
-              name="charge"
+              name="chargeType"
               rules={[{ required: true, message: 'Charge type is required' }]}
             >
               <Radio.Group buttonStyle="outline" onChange={e => setChargeType(e.target.value)}>
@@ -145,15 +152,21 @@ const ProductForm = ({ callback, cancel, product }: FormProps) => {
                   name="openAt"
                   rules={[{ required: true, message: 'Opening hour is required' }]}
                 >
-                  <TimePicker format={timeFormat} />
+                  <TimePicker format={timeFormat} showMinute={false} onSelect={v => setOpenAt(v)} />
                 </Form.Item>
-                <Form.Item
-                  label="Close at"
-                  name="closeAt"
-                  rules={[{ required: true, message: 'Closed hour is required' }]}
-                >
-                  <TimePicker format={timeFormat} />
-                </Form.Item>
+                {openAt && (
+                  <Form.Item
+                    label="Close at"
+                    name="closeAt"
+                    rules={[{ required: true, message: 'Closed hour is required' }]}
+                  >
+                    <TimePicker
+                      format={timeFormat}
+                      showMinute={false}
+                      disabledHours={() => disableHours(openAt)}
+                    />
+                  </Form.Item>
+                )}
               </>
             )}
           </>

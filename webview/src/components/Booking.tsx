@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Modal, DatePicker, TimePicker, Row, Col } from 'antd'
+import { Modal, DatePicker, Radio, Row, Col } from 'antd'
 import moment from 'moment'
 
 import { Product, ProductChargeTypeEnum } from '../typings'
@@ -14,12 +14,13 @@ interface Props {
 }
 
 const Booking = ({ product, visible, handleOk, handleCancel }: Props) => {
-  const [fromDate, setFromDate] = useState<moment.Moment>(moment('2020-03-28'))
-  const [toDate, setToDate] = useState<moment.Moment>(moment('2020-03-31'))
-  const [time, setTime] = useState<moment.Moment>()
+  const [fromDate, setFromDate] = useState<moment.Moment>()
+  const [toDate, setToDate] = useState<moment.Moment>()
+  const [month, setMonth] = useState<moment.Moment>()
+  const [hour, setHour] = useState('')
 
   function disableDate(current: moment.Moment) {
-    return product.charge === ProductChargeTypeEnum.Hourly && current
+    return product.chargeType === ProductChargeTypeEnum.Hourly && current
       ? current <=
           moment()
             .local()
@@ -27,103 +28,125 @@ const Booking = ({ product, visible, handleOk, handleCancel }: Props) => {
       : current <= moment().local()
   }
 
-  function disableHours() {
-    const open = parseInt(moment(product.openAt || 0, 'HH:mm').format('H'))
-    const close = parseInt(moment(product.closeAt || 0, 'HH:mm').format('H'))
-    const disabledHours = [...Array(24).keys()].filter(h => h < open || h >= close)
-    if (
-      fromDate?.date() ===
-      moment()
-        .local()
-        .date()
-    ) {
-      const now = moment()
-        .local()
-        .hour()
-      const pastHours = [...Array(24).keys()].filter(h => h >= open && h <= now)
-      return [...disabledHours, ...pastHours]
-    }
-    return disabledHours
+  function renderHours(product: Product, date: moment.Moment) {
+    const openAt = product.openAt ? parseInt(product.openAt) || 0 : 0
+    const closeAt = product.closeAt ? parseInt(product.closeAt) || 0 : 0
+    const hours = [...Array(24).keys()].filter(h => h >= openAt && h < closeAt)
+    const availableHours =
+      moment(date).date() !== moment().date() ? hours : hours.filter(h => h > moment().hour())
+    return availableHours.length === 0 ? (
+      <span style={{ color: '#999' }}>no available hour</span>
+    ) : (
+      <Radio.Group size="small" onChange={e => setHour(e.target.value)}>
+        {availableHours.map(h => (
+          <Radio.Button key={h} value={h < 10 ? `0${h}:00` : `${h}:00`}>
+            {h < 10 ? `0${h}:00` : `${h}:00`}
+          </Radio.Button>
+        ))}
+      </Radio.Group>
+    )
   }
 
   return (
-    <>
-      <Modal
-        title=""
-        visible={visible}
-        onOk={() =>
-          handleOk({
-            from: fromDate?.format('YYYY-MM-DD') || '',
-            to: toDate?.format('YYYY-MM-DD') || '',
-            days: fromDate && toDate ? toDate.diff(fromDate, 'days') : 0,
-            fromTime: time?.format('H') || '',
-          })
-        }
-        onCancel={handleCancel}
-      >
-        {product.charge === ProductChargeTypeEnum.Hourly && (
-          <>
-            <div>
-              Open: {product.openAt} - {product.closeAt}
-            </div>
-            <div>
-              <label>Date:</label>
-              <DatePicker disabledDate={disableDate} onSelect={value => setFromDate(value)} />
-            </div>
-            {fromDate && (
-              <div>
-                <label>Time:</label>
-                <TimePicker
-                  format="HH:00"
-                  disabledHours={disableHours}
-                  onSelect={value => setTime(value)}
-                />
+    <Modal
+      title=""
+      visible={visible}
+      onOk={() =>
+        handleOk({
+          from: fromDate?.format('YYYY-MM-DD') || '',
+          to: toDate?.format('YYYY-MM-DD') || '',
+          days: fromDate && toDate ? toDate.diff(fromDate, 'days') : 0,
+          month: month?.format('YYYY-MM-01') || '',
+          hour,
+        })
+      }
+      onCancel={handleCancel}
+    >
+      {product.chargeType === ProductChargeTypeEnum.Hourly && (
+        <div className="booking">
+          <Row>
+            <Col span={5}>
+              <div className="label">
+                <label>Date:</label>
               </div>
-            )}
-          </>
-        )}
-        {product.charge === ProductChargeTypeEnum.Daily && (
-          <div className="booking">
+            </Col>
+            <Col>
+              <DatePicker
+                disabledDate={disableDate}
+                dropdownClassName="ant-picker-dropdown-placement-bottomCenter"
+                onSelect={value => setFromDate(value)}
+              />
+            </Col>
+          </Row>
+          {fromDate && (
+            <Row>
+              <Col span={5}>
+                <div className="label">
+                  <label>Time:</label>
+                </div>
+              </Col>
+              <Col span={19}>{renderHours(product, fromDate)}</Col>
+            </Row>
+          )}
+        </div>
+      )}
+      {product.chargeType === ProductChargeTypeEnum.Daily && (
+        <div className="booking">
+          <Row>
+            <Col span={7}>
+              <div className="label">
+                <label>Check-in:</label>
+              </div>
+            </Col>
+            <Col>
+              <DatePicker
+                showToday={false}
+                dropdownClassName="ant-picker-dropdown-placement-bottomCenter"
+                disabledDate={current => current <= moment().local()}
+                onSelect={value => setFromDate(value)}
+              />
+            </Col>
+          </Row>
+          {fromDate && (
             <Row>
               <Col span={7}>
                 <div className="label">
-                  <label>Check-in:</label>
+                  <label>Check-out:</label>
                 </div>
               </Col>
               <Col>
                 <DatePicker
                   showToday={false}
-                  defaultValue={moment('2020-03-28')}
                   dropdownClassName="ant-picker-dropdown-placement-bottomCenter"
-                  disabledDate={current => current <= moment().local()}
-                  onSelect={value => setFromDate(value)}
+                  defaultPickerValue={moment(fromDate).subtract(1, 'days')}
+                  disabledDate={current => current < moment(fromDate).add(1, 'days')}
+                  onSelect={value => setToDate(value)}
                 />
               </Col>
             </Row>
-            {fromDate && (
-              <Row>
-                <Col span={7}>
-                  <div className="label">
-                    <label>Check-out:</label>
-                  </div>
-                </Col>
-                <Col>
-                  <DatePicker
-                    showToday={false}
-                    defaultValue={moment('2020-03-31')}
-                    dropdownClassName="ant-picker-dropdown-placement-bottomCenter"
-                    defaultPickerValue={moment(fromDate).subtract(1, 'days')}
-                    disabledDate={current => current < moment(fromDate).add(1, 'days')}
-                    onSelect={value => setToDate(value)}
-                  />
-                </Col>
-              </Row>
-            )}
-          </div>
-        )}
-        {product.charge === ProductChargeTypeEnum.Monthly && <div />}
-      </Modal>
-    </>
+          )}
+        </div>
+      )}
+      {product.chargeType === ProductChargeTypeEnum.Monthly && (
+        <div className="booking">
+          <Row>
+            <Col span={7}>
+              <div className="label">
+                <label>Month:</label>
+              </div>
+            </Col>
+            <Col>
+              <DatePicker
+                picker="month"
+                disabledDate={current => current && current < moment().endOf('day')}
+                dropdownClassName="ant-picker-dropdown-placement-bottomCenter"
+                onSelect={value => setMonth(value)}
+              />
+            </Col>
+          </Row>
+        </div>
+      )}
+    </Modal>
   )
 }
 

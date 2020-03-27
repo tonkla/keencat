@@ -4,7 +4,11 @@
   }
 
   .ant-row {
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   .label {
@@ -13,6 +17,24 @@
     justify-content: flex-end;
     height: 100%;
     padding-right: 5px;
+  }
+
+  .ant-radio-group-small .ant-radio-button-wrapper {
+    padding: 0 3px;
+  }
+
+  .ant-radio-button-wrapper {
+    width: 50px;
+    margin-right: 3px;
+    margin-bottom: 3px;
+    text-align: center;
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+
+    &:first-child,
+    &:last-child {
+      border-radius: 2px;
+    }
   }
 }
 
