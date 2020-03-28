@@ -1,9 +1,14 @@
 export interface OrderItem {
   productId: string
-  productName: string
   price: number
-  quantity: number
   amount: number
+  quantity?: number
+  date?: string
+  from?: string
+  to?: string
+  days?: number
+  hour?: string
+  month?: string
 }
 
 export interface OrderCreate {

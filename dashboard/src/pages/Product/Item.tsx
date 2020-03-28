@@ -148,7 +148,7 @@ const ProductItem = () => {
           <div>
             <div className="pq">
               <span className="price">฿{product.price.toLocaleString()}</span>
-              <span className="quantity">( {product.quantity} left )</span>
+              {product.quantity && <span className="quantity">( {product.quantity} left )</span>}
             </div>
             <div className="description">
               <span>{product.description}</span>

@@ -6,7 +6,15 @@ import moment from 'moment'
 import { useStoreActions, useStoreState } from '../../store'
 import { customerRepository, orderRepository, productRepository } from '../../services/repositories'
 import { PATH_PRODUCT } from '../../constants'
-import { Customer, Order, OrderStatus, OrderStatusEnum, Product } from '../../typings'
+import {
+  Customer,
+  Order,
+  OrderStatus,
+  OrderStatusEnum,
+  Product,
+  ProductTypeEnum,
+  ProductChargeTypeEnum,
+} from '../../typings'
 
 import Loading from '../../components/Loading'
 import Back from '../../components/Back'
@@ -67,7 +75,7 @@ const OrderItem = () => {
       if (status === 'paid') {
         order.items.forEach(async item => {
           const product = await productRepository.find(item.productId)
-          if (product && product.quantity) {
+          if (product && product.quantity && item.quantity) {
             const qty = product.quantity - item.quantity
             updateProduct({ ...product, quantity: qty >= 0 ? qty : 0 })
           }
@@ -137,41 +145,84 @@ const OrderItem = () => {
     ) : (
       order.items.map(item => {
         const product = products.find(p => p.id === item.productId)
-        return (
+        return !product ? (
+          <div />
+        ) : (
           <div key={item.productId} className="order-item">
             <div>
-              {!product ? (
-                <div>
-                  <span>{item.productName}</span>
+              <Link to={`${PATH_PRODUCT}/${product.id}`}>
+                <div className="cover">
+                  {product.images && product.images.length > 0 ? (
+                    <img src={product.images[0]} alt={product.name} />
+                  ) : (
+                    <span>No Image</span>
+                  )}
                 </div>
-              ) : (
-                <Link to={`${PATH_PRODUCT}/${product.id}`}>
-                  <div
-                    className="cover"
-                    style={{
-                      backgroundImage:
-                        product.images && product.images.length > 0
-                          ? `url('${product.images[0]}')`
-                          : 'none',
-                    }}
-                  />
+                <span>{product.name}</span>
+              </Link>
+            </div>
+            {product.type === ProductTypeEnum.Goods && (
+              <>
+                {item.quantity && (
                   <div>
-                    <span>{product.name}</span>
+                    <label>Quantity:</label>
+                    <span>{item.quantity}</span>
                   </div>
-                </Link>
-              )}
-            </div>
-            <div>
-              <label>Price:</label>
-              <span>{item.price}</span>
-            </div>
-            <div>
-              <label>Quantity:</label>
-              <span>{item.quantity}</span>
-            </div>
+                )}
+              </>
+            )}
+            {product.chargeType && product.chargeType === ProductChargeTypeEnum.Daily && (
+              <>
+                {item.from && (
+                  <div>
+                    <label>From:</label>
+                    <span>{item.from}</span>
+                  </div>
+                )}
+                {item.to && (
+                  <div>
+                    <label>To:</label>
+                    <span>{item.to}</span>
+                  </div>
+                )}
+                {item.days && (
+                  <div>
+                    <label>Total:</label>
+                    <span>{item.days}</span>
+                    <span>{item.days < 2 ? ' day' : ' days'}</span>
+                  </div>
+                )}
+              </>
+            )}
+            {product.chargeType && product.chargeType === ProductChargeTypeEnum.Hourly && (
+              <>
+                {item.date && (
+                  <div>
+                    <label>Date:</label>
+                    <span>{item.date}</span>
+                  </div>
+                )}
+                {item.hour && (
+                  <div>
+                    <label>Time:</label>
+                    <span>{item.hour}</span>
+                  </div>
+                )}
+              </>
+            )}
+            {product.chargeType && product.chargeType === ProductChargeTypeEnum.Monthly && (
+              <>
+                {item.month && (
+                  <div>
+                    <label>Month:</label>
+                    <span>{item.month}</span>
+                  </div>
+                )}
+              </>
+            )}
             <div>
               <label>Amount:</label>
-              <span>{item.amount}</span>
+              <span>฿{item.amount.toLocaleString()}</span>
             </div>
           </div>
         )
@@ -220,7 +271,7 @@ const OrderItem = () => {
               </Descriptions.Item>
               <Descriptions.Item label="Note">
                 <div className="note">
-                  <Input.TextArea rows={2} defaultValue={order?.note} onChange={handleChangeNote} />
+                  <Input.TextArea rows={1} defaultValue={order?.note} onChange={handleChangeNote} />
                   <Button size="small" onClick={handleSaveNote}>
                     Save
                   </Button>

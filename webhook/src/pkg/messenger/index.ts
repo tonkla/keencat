@@ -8,7 +8,14 @@ import logging from '../logging'
 import builder from './builder'
 import { MessageEvent, WebhookEvent, WebhookParams } from './typings/request'
 import { Message } from './typings/response'
-import { CartItem, Customer, OrderCreate, OrderUpdate } from '../../typings'
+import {
+  CartItem,
+  CartItemTypeEnum,
+  Customer,
+  OrderItem,
+  OrderCreate,
+  OrderUpdate,
+} from '../../typings'
 
 function verify({ mode, verifyToken, challenge }: WebhookParams): string {
   const token = process.env.MSG_VERIFY_TOKEN || ''
@@ -149,21 +156,37 @@ async function handlePostback(event: MessageEvent): Promise<void> {
 async function handlePostbackFromWebview(pageId: string, customer: Customer, items: CartItem[]) {
   // Create order
   if (!items || items.length < 1) return
+
   // Recalculate the amount because I don't trust the data from webview
-  const newItems = items.map(item => ({
-    productId: item.product.id,
-    productName: item.product.name,
-    price: item.product.price,
-    quantity: item.quantity,
-    amount: item.product.price * item.quantity,
-  }))
-  const totalAmount = newItems.reduce((accum, item) => accum + item.amount, 0)
+  const orderItems: OrderItem[] = items.map(i => {
+    const item: OrderItem = {
+      productId: i.product.id,
+      price: i.product.price,
+      amount: i.product.price,
+    }
+    if (i.kind === CartItemTypeEnum.Goods) {
+      item.quantity = i.quantity
+      item.amount = i.quantity * i.product.price
+    } else if (i.kind === CartItemTypeEnum.Daily) {
+      item.from = i.from
+      item.to = i.to
+      item.days = i.days
+      item.amount = i.days * i.product.price
+    } else if (i.kind === CartItemTypeEnum.Hourly) {
+      item.date = i.date
+      item.hour = i.hour
+    } else if (i.kind === CartItemTypeEnum.Monthly) {
+      item.month = i.month
+    }
+    return item
+  })
+  const totalAmount = orderItems.reduce((accum, item) => accum + item.amount, 0)
   const order: OrderCreate = {
     pageId,
     shopId: items[0].product.shopId,
     ownerId: items[0].product.ownerId,
     customerId: customer.id,
-    items: newItems,
+    items: orderItems,
     totalAmount,
   }
   await api.createOrder(order)

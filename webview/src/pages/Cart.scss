@@ -54,8 +54,12 @@
     margin-bottom: 5px;
   }
 
-  .qty .price {
-    color: $textColor;
+  .qty {
+    display: flex;
+    align-items: center;
+    .price {
+      color: $textColor;
+    }
   }
 
   .x {
