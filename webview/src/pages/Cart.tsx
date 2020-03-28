@@ -199,12 +199,11 @@ const Cart = () => {
                     <div className="amount price">
                       <span>฿{item.amount.toLocaleString()}</span>
                     </div>
-                    <div>
+                    <div className="remove">
                       <Button
                         type="link"
                         icon={<MinusCircleOutlined />}
                         size="small"
-                        style={{ padding: 0 }}
                         onClick={() => handleClickRemove(item.id)}
                       >
                         Remove

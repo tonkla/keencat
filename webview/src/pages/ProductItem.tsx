@@ -78,9 +78,10 @@ const ProductItem = () => {
     setShowBookingModal(true)
   }
 
-  function handleBookingOk({ from, to, days, month, hour }: BookingCallbackParams) {
+  function handleBookingOk({ from, to, days, hour, month }: BookingCallbackParams) {
     if (!product) return
     if (product.chargeType === ProductChargeTypeEnum.Hourly) {
+      if (from === '' || hour === '') return
       const item: CartItemServiceHour = {
         kind: CartItemTypeEnum.Hourly,
         id: utils.genId(),
@@ -93,6 +94,7 @@ const ProductItem = () => {
     }
     //
     else if (product.chargeType === ProductChargeTypeEnum.Daily) {
+      if (from === '' || to === '' || days === 0) return
       const item: CartItemServiceDay = {
         kind: CartItemTypeEnum.Daily,
         id: utils.genId(),
@@ -106,6 +108,7 @@ const ProductItem = () => {
     }
     //
     else if (product.chargeType === ProductChargeTypeEnum.Monthly) {
+      if (month === '') return
       const item: CartItemServiceMonth = {
         kind: CartItemTypeEnum.Monthly,
         id: utils.genId(),
