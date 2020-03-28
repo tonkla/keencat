@@ -6,7 +6,7 @@ import axios from 'axios'
 import * as Sentry from '@sentry/browser'
 
 import { useStoreActions, useStoreState } from '../store'
-import { CartItemGoods, CartItemTypeEnum } from '../typings'
+import { CartItemGoods, CartItemTypeEnum, ProductTypeEnum } from '../typings'
 
 import InputNumber from '../components/InputNumber'
 import './Cart.scss'
@@ -151,40 +151,60 @@ const Cart = () => {
                     >
                       <span>{item.product.name}</span>
                     </div>
-                    <div className="mt10">
-                      <div className="wrapper">
-                        <span className="price">฿{item.product.price.toLocaleString()}</span>
-                        <span className="x">x</span>
-                        {item.kind === CartItemTypeEnum.Goods && (
-                          <>
-                            <span className="quantity">{item.quantity}</span>
-                            {item.product.quantity !== undefined && (
-                              <div className="input">
-                                <InputNumber
-                                  defaultValue={item.quantity}
-                                  min={0}
-                                  max={item.product.quantity}
-                                  callback={(qty: number) => handleChangeQuantity(item, qty)}
-                                />
-                              </div>
-                            )}
-                          </>
-                        )}
-                        {item.kind === CartItemTypeEnum.Daily && (
-                          <span className="quantity">
-                            {item.days} {item.days < 2 ? 'day' : 'days'}
+                    {item.product.type === ProductTypeEnum.Service && (
+                      <div>
+                        {item.kind === CartItemTypeEnum.Hourly && (
+                          <span>
+                            {item.date} {item.hour}
                           </span>
                         )}
+                        {item.kind === CartItemTypeEnum.Daily && (
+                          <span>
+                            {item.from} - {item.to}
+                          </span>
+                        )}
+                        {item.kind === CartItemTypeEnum.Monthly && <span>{item.month}</span>}
                       </div>
-                      <div className="amount price">
-                        <span>฿{item.amount.toLocaleString()}</span>
-                      </div>
+                    )}
+                    <div className="qty">
+                      <span className="price">฿{item.product.price.toLocaleString()}</span>
+                      <span className="x">x</span>
+                      {item.kind === CartItemTypeEnum.Goods && (
+                        <>
+                          <span className="quantity">{item.quantity}</span>
+                          {item.product.quantity !== undefined && (
+                            <div className="input">
+                              <InputNumber
+                                defaultValue={item.quantity}
+                                min={0}
+                                max={item.product.quantity}
+                                callback={(qty: number) => handleChangeQuantity(item, qty)}
+                              />
+                            </div>
+                          )}
+                        </>
+                      )}
+                      {item.kind === CartItemTypeEnum.Hourly && (
+                        <span className="quantity">1 hour</span>
+                      )}
+                      {item.kind === CartItemTypeEnum.Daily && (
+                        <span className="quantity">
+                          {item.days} {item.days < 2 ? 'day' : 'days'}
+                        </span>
+                      )}
+                      {item.kind === CartItemTypeEnum.Monthly && (
+                        <span className="quantity">1 month</span>
+                      )}
+                    </div>
+                    <div className="amount price">
+                      <span>฿{item.amount.toLocaleString()}</span>
                     </div>
                     <div>
                       <Button
                         type="link"
                         icon={<MinusCircleOutlined />}
-                        style={{ paddingLeft: 0 }}
+                        size="small"
+                        style={{ padding: 0 }}
                         onClick={() => handleClickRemove(item.id)}
                       >
                         Remove
