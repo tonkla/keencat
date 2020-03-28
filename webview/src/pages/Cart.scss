@@ -73,6 +73,14 @@
   .amount {
     font-size: 18px;
   }
+
+  .remove {
+    margin-top: 5px;
+
+    .ant-btn {
+      padding: 0;
+    }
+  }
 }
 
 footer .total-amount {
