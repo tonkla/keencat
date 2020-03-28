@@ -14,19 +14,15 @@ const ProductList = ({ products }: Props) => {
     <ul>
       {products.map(product => (
         <li key={product.id}>
-          {product.images && product.images.length > 0 ? (
-            <Link to={`${PATH_PRODUCT}/${product.id}`}>
-              <div className="cover">
+          <Link to={`${PATH_PRODUCT}/${product.id}`}>
+            <div className="cover">
+              {product.images && product.images.length > 0 ? (
                 <img src={product.images[0]} alt={product.name} />
-              </div>
-            </Link>
-          ) : (
-            <Link to={`${PATH_PRODUCT}/${product.id}`}>
-              <div className="cover">
+              ) : (
                 <span>No Image</span>
-              </div>
-            </Link>
-          )}
+              )}
+            </div>
+          </Link>
           <div className="info">
             <Link to={`${PATH_PRODUCT}/${product.id}`}>
               {product.name}

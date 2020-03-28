@@ -85,7 +85,7 @@ const ShopIndex = () => {
             )}
           </div>
           <CategoryList />
-          <div className="version">v2020031901</div>
+          <div className="version">v2020032801</div>
         </div>
       </main>
     </>

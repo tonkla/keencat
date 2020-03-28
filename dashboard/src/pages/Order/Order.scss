@@ -28,12 +28,23 @@
   padding: 10px;
 
   .cover {
-    width: 120px;
     height: 120px;
+    width: 120px;
     background-color: #f0f0f0;
-    background-position: center center;
-    background-size: cover;
+    color: #999;
+    font-size: 12px;
     margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      position: static;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
 
   label {
