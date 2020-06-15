@@ -13,7 +13,7 @@ A prototype of chatbot ecommerce (very MVP of Facebook Shop / LINE MyShop).
 The project consists of four modules,
 
 1. Back-end: REST-like APIs, integrates with Firebase services.
-2. Dashboard: for sellers to manage shops and products (goods & services).
+2. Dashboard: a web client for sellers to manage shops, products, and orders.
 3. Webhook: a proxy between the system and Messenger.
 4. Webview: a mini shopping catalog that works inside Messenger.
 
