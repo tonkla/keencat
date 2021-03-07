@@ -8,10 +8,10 @@
     "start": "ts-node-dev --respawn --transpileOnly --no-notify src/index.ts"
   },
   "dependencies": {
-    "@google-cloud/logging": "^7.3.0",
+    "@google-cloud/logging": "^9.1.0",
     "@koa/cors": "^3.0.0",
     "axios": "^0.21.1",
-    "dialogflow": "^1.2.0",
+    "dialogflow": "^4.0.3",
     "dotenv": "^8.2.0",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.3.0",
@@ -22,8 +22,8 @@
   "devDependencies": {
     "@types/dialogflow": "^0.11.0",
     "@types/koa": "^2.11.2",
-    "@types/koa-bodyparser": "^4.3.0",
     "@types/koa__cors": "^3.0.1",
+    "@types/koa-bodyparser": "^4.3.0",
     "@types/nanoid": "^2.1.0",
     "@types/node": "^12.12.31",
     "@types/qs": "^6.9.1",
