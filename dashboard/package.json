@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "antd": "^4.2.3",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "dayjs": "^1.8.27",
     "easy-peasy": "^3.3.0",
     "firebase": "^7.14.4",
